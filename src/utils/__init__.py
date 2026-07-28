@@ -1,0 +1,1 @@
+"""Utilitaires génériques de PaperNest."""
