@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import Callable, Iterable, Optional, Union
 
 import flet as ft
-from flet_color_pickers import MaterialPicker
 from papernestextension.controls.material.papernest_dropdown import (
     PaperNestDropdown,
     PaperNestDropdownOption,
@@ -17,18 +16,11 @@ from app.theme.buttons import IconAction, PrimaryButton, SecondaryButton
 LabelValue = Union[str, ft.Control, None]
 FilePickerErrorHandler = Callable[[RuntimeError], None]
 
-def _label_control(value: LabelValue):
-    if value is None or value == "": return None
-    return value if isinstance(value, ft.Control) else ft.Text(str(value))
 
-def normalize_hex_color(value: str | None, default: str = "#1E88E5") -> str:
-    color = str(value or default).strip().upper()
-    if not color.startswith("#"): color = f"#{color}"
-    if len(color) == 9: color = f"#{color[-6:]}"
-    if len(color) != 7: return default.upper()
-    try: int(color[1:], 16)
-    except ValueError: return default.upper()
-    return color
+def _label_control(value: LabelValue):
+    if value is None or value == "":
+        return None
+    return value if isinstance(value, ft.Control) else ft.Text(str(value))
 
 
 class _InputMixin:
@@ -52,7 +44,8 @@ class BaseTextField(_InputMixin, PaperNestTextField):
     def __init__(self, label: LabelValue = None, icon=None, compact: bool = False, expand: Optional[bool] = False, **kwargs):
         super().__init__(**kwargs)
         self.label = _label_control(label)
-        if icon is not None: self.prefix_icon = icon
+        if icon is not None:
+            self.prefix_icon = icon
         self.expand = expand
         self._apply_common_input_style(compact=compact)
         self.height = None
@@ -96,16 +89,20 @@ class BaseNumberField(BaseTextField):
 
 
 class BaseDropDown(_InputMixin, PaperNestDropdown):
-    def __init__( self, label: LabelValue = None, icon=None, leading_icon=None, compact: bool = False, expand: Optional[bool | int] = None, **kwargs):
+    def __init__(self, label: LabelValue = None, icon=None, leading_icon=None, compact: bool = False, expand: Optional[bool | int] = None, **kwargs):
         on_select = kwargs.pop("on_select", None)
-        if on_select is not None and "on_change" not in kwargs: kwargs["on_change"] = on_select
+        if on_select is not None and "on_change" not in kwargs:
+            kwargs["on_change"] = on_select
         dense = kwargs.pop("dense", None)
-        if dense is not None: compact = bool(dense)
+        if dense is not None:
+            compact = bool(dense)
         super().__init__(**kwargs)
         self.label = _label_control(label)
         field_icon = icon if icon is not None else leading_icon
-        if field_icon is not None: self.prefix_icon = field_icon
-        if expand is not None: self.expand = expand
+        if field_icon is not None:
+            self.prefix_icon = field_icon
+        if expand is not None:
+            self.expand = expand
         self._apply_common_input_style(compact=compact)
         self.menu_background_color = AppColors.SURFACE
         self.menu_border_color = AppColors.BORDER
@@ -296,201 +293,6 @@ class BaseDatePickerField(ft.Row):
     @staticmethod
     def _format_value(value: datetime | None) -> str:
         return value.date().isoformat() if value else ""
-
-
-class BaseMaterialPicker(MaterialPicker):
-    """MaterialPicker configuré pour retourner une couleur hexadécimale RGB."""
-
-    def __init__(self, color: str = "#1E88E5", on_color_change=None, **kwargs):
-        kwargs.setdefault("enable_label", False)
-        kwargs.setdefault("portrait_only", False)
-        super().__init__(
-            color=normalize_hex_color(color),
-            on_color_change=on_color_change,
-            **kwargs,
-        )
-
-
-class BaseColorField(ft.Column):
-    """Champ compact ouvrant un MaterialPicker dans un AppDialog.
-
-    La valeur publique est toujours une chaîne hexadécimale ``#RRGGBB``.
-    La sélection reste temporaire jusqu'au clic sur « Appliquer ».
-    """
-
-    def __init__(
-        self,
-        page: ft.Page,
-        label: str = "Couleur",
-        value: str = "#1E88E5",
-        on_change: Callable[[str], None] | None = None,
-        disabled: bool = False,
-        expand: bool = False,
-        **kwargs,
-    ):
-        self.app_page = page
-        self.external_on_change = on_change
-        self._value = normalize_hex_color(value)
-        self._temporary_value = self._value
-        self._disabled = disabled
-        self.dialog = None
-
-        self.swatch = ft.Container(
-            width=28,
-            height=28,
-            border_radius=AppRadius.SM,
-            bgcolor=self._value,
-            border=ft.Border.all(1, AppColors.BORDER),
-        )
-        self.value_text = ft.Text(
-            self._value,
-            size=AppText.BODY,
-            weight=ft.FontWeight.W_600,
-            color=AppColors.TEXT,
-        )
-        self.field = ft.Container(
-            height=AppSizes.FIELD_HEIGHT,
-            padding=ft.Padding.symmetric(horizontal=AppSpacing.MD),
-            border=ft.Border.all(1, AppColors.BORDER),
-            border_radius=AppRadius.MD,
-            bgcolor=AppColors.SURFACE,
-            on_click=self.open_picker,
-            content=ft.Row(
-                spacing=AppSpacing.MD,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER,
-                controls=[
-                    self.swatch,
-                    self.value_text,
-                    ft.Container(expand=True),
-                    ft.Icon(
-                        ft.Icons.CHEVRON_RIGHT_ROUNDED,
-                        size=AppSizes.ICON_SM,
-                        color=AppColors.TEXT_MUTED,
-                    ),
-                ],
-            ),
-        )
-
-        super().__init__(
-            spacing=AppSpacing.XS,
-            tight=True,
-            expand=expand,
-            controls=[FormLabel(label), self.field],
-            **kwargs,
-        )
-        self.disabled = disabled
-
-    @property
-    def value(self) -> str:
-        return self._value
-
-    @value.setter
-    def value(self, value: str) -> None:
-        self._value = normalize_hex_color(value)
-        self._temporary_value = self._value
-        self._refresh_field()
-
-    @property
-    def disabled(self) -> bool:
-        return self._disabled
-
-    @disabled.setter
-    def disabled(self, value: bool) -> None:
-        self._disabled = bool(value)
-        self.field.disabled = self._disabled
-        self.field.opacity = 0.55 if self._disabled else 1.0
-
-    def open_picker(self, _event=None) -> None:
-        if self.disabled:
-            return
-
-        from app.theme.dialogs import AppDialog
-
-        self._temporary_value = self._value
-        picker = BaseMaterialPicker(
-            color=self._value,
-            on_color_change=self._handle_picker_change,
-        )
-        self.dialog_swatch = ft.Container(
-            width=34,
-            height=34,
-            border_radius=AppRadius.SM,
-            bgcolor=self._temporary_value,
-            border=ft.Border.all(1, AppColors.BORDER),
-        )
-        self.dialog_value_text = ft.Text(
-            self._temporary_value,
-            weight=ft.FontWeight.W_600,
-            color=AppColors.TEXT,
-        )
-
-        self.dialog = AppDialog(
-            title="Choisir une couleur",
-            icon=ft.Icons.PALETTE_ROUNDED,
-            width=560,
-            content=ft.Column(
-                tight=True,
-                spacing=AppSpacing.MD,
-                controls=[
-                    ft.Row(
-                        spacing=AppSpacing.SM,
-                        controls=[self.dialog_swatch, self.dialog_value_text],
-                    ),
-                    ft.Container(
-                        padding=AppSpacing.SM,
-                        border=ft.Border.all(1, AppColors.BORDER),
-                        border_radius=AppRadius.MD,
-                        bgcolor=AppColors.SURFACE,
-                        content=picker,
-                    ),
-                ],
-            ),
-            actions=[
-                SecondaryButton("Annuler", on_click=self._close_dialog),
-                PrimaryButton(
-                    "Appliquer",
-                    icon=ft.Icons.CHECK_ROUNDED,
-                    on_click=self._apply_color,
-                ),
-            ],
-        )
-        self.app_page.overlay.append(self.dialog)
-        self.dialog.open = True
-        self.app_page.update()
-
-    def _handle_picker_change(self, event) -> None:
-        self._temporary_value = normalize_hex_color(event.data, self._value)
-        self.dialog_swatch.bgcolor = self._temporary_value
-        self.dialog_value_text.value = self._temporary_value
-        try:
-            self.dialog.update()
-        except RuntimeError:
-            pass
-
-    def _apply_color(self, _event=None) -> None:
-        self._value = self._temporary_value
-        self._refresh_field()
-        self._close_dialog()
-        if self.external_on_change:
-            self.external_on_change(self._value)
-
-    def _close_dialog(self, _event=None) -> None:
-        if self.dialog is None:
-            return
-        self.dialog.open = False
-        try:
-            self.app_page.update()
-        except RuntimeError:
-            pass
-
-    def _refresh_field(self) -> None:
-        self.swatch.bgcolor = self._value
-        self.value_text.value = self._value
-        try:
-            if self.page is not None:
-                self.update()
-        except RuntimeError:
-            pass
 
 
 class BaseIconField(ft.Column):
