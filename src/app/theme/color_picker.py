@@ -76,6 +76,11 @@ class BaseColorPicker(PaperNestColorPicker):
             **kwargs,
         )
 
+    @classmethod
+    def normalize_value(cls, value: str | None, default: str = "#1E88E5") -> str:
+        """Normalise une couleur via l'implémentation de PaperNestExtension."""
+        return cls._normalize_hex(value) or default
+
     def _handle_change(self, event) -> None:
         if self._external_on_change is not None:
             self._external_on_change(self.value)
