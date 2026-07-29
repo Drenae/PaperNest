@@ -22,6 +22,12 @@ Stabiliser l’interface de PaperNest et migrer progressivement les champs vers 
 ## En cours
 
 - [ ] Migration de `PaperNestDatePicker`.
+  - [x] Lecture de l’API Python réelle.
+  - [x] Lecture de l’implémentation Flutter réelle.
+  - [x] Création de l’adaptateur thématique conservant la valeur ISO historique.
+  - [ ] Remplacement progressif des usages de `BaseDatePickerField`.
+  - [ ] Validation visuelle et fonctionnelle sous Windows.
+  - [ ] Suppression de l’ancien champ après validation.
 
 ## À faire
 
