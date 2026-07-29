@@ -10,8 +10,9 @@ from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppColors, AppRadius, AppSpacing
 from services.categories.service import category_service
 from app.theme.buttons import GhostButton, PrimaryButton
+from app.theme.color_picker import BaseColorPicker
 from app.theme.dialogs import AppDialog
-from app.theme.forms import BaseColorField, BaseIconField, BaseTextField, normalize_hex_color
+from app.theme.forms import BaseIconField, BaseTextField, normalize_hex_color
 
 
 logger = logging.getLogger(__name__)
@@ -76,7 +77,11 @@ class CategoryEditorDialog:
             value=current_icon,
             on_change=self.update_preview,
         )
-        self.color_field = BaseColorField(page=self.page, label="Couleur", value=current_color, on_change=self.update_preview)
+        self.color_field = BaseColorPicker(
+            label="Couleur",
+            value=current_color,
+            on_change=self.update_preview,
+        )
         self.preview_icon = ft.Icon(getattr(ft.Icons, current_icon, ft.Icons.FOLDER_ROUNDED), color=current_color, size=30)
         default_title = "Nouvelle sous-catégorie" if self.parent else "Nouveau classeur"
         self.preview_title = ft.Text(self.name_field.value or default_title, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN)
