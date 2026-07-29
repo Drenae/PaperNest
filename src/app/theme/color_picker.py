@@ -87,8 +87,4 @@ class BaseColorPicker(PaperNestColorPicker):
             self._external_on_change(self.value)
 
 
-# Compatibilité temporaire pendant la migration des formulaires existants.
-BaseColorField = BaseColorPicker
-
-
-__all__ = ["BaseColorPicker", "BaseColorField"]
+__all__ = ["BaseColorPicker"]
