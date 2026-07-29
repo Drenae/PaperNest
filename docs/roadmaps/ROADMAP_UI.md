@@ -14,15 +14,15 @@ Stabiliser l’interface de PaperNest et migrer progressivement les champs vers 
 - [x] Résolution des problèmes causés par d’anciens dossiers de build.
 - [x] Étude du champ couleur actuel dans PaperNest.
 - [x] Création de `BaseColorPicker` à partir de l’API réelle de `PaperNestColorPicker`.
+- [x] Intégration de `PaperNestColorPicker` dans le formulaire d’édition des classeurs.
+- [x] Remplacement de l’utilisation de l’ancien `BaseColorField`.
 
 ## En cours
 
-- [ ] Intégration de `PaperNestColorPicker` dans les formulaires.
+- [ ] Suppression de l’ancien code couleur devenu inutile après validation.
 
 ## À faire
 
-- [ ] Remplacer les utilisations de l’ancien `BaseColorField`.
-- [ ] Supprimer l’ancien code couleur devenu inutile après validation.
 - [ ] Vérifier l’ensemble de `forms.py` après la migration.
 - [ ] Nettoyer les imports et wrappers obsolètes.
 - [ ] Effectuer une validation visuelle et fonctionnelle complète sous Windows.
