@@ -12,7 +12,7 @@ from services.categories.service import category_service
 from app.theme.buttons import GhostButton, PrimaryButton
 from app.theme.color_picker import BaseColorPicker
 from app.theme.dialogs import AppDialog
-from app.theme.forms import BaseIconField, BaseTextField, normalize_hex_color
+from app.theme.forms import BaseIconField, BaseTextField
 
 
 logger = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ DEFAULT_COLOR = "#1E88E5"
 
 
 def light_background(color: str, ratio: float = 0.88) -> str:
-    color = normalize_hex_color(color)
+    color = BaseColorPicker.normalize_value(color, DEFAULT_COLOR)
     red, green, blue = (int(color[i:i + 2], 16) for i in (1, 3, 5))
     blend = lambda channel: round(channel + (255 - channel) * ratio)
     return f"#{blend(red):02X}{blend(green):02X}{blend(blue):02X}"
@@ -61,7 +61,10 @@ class CategoryEditorDialog:
     def show(self) -> None:
         editing = self.category is not None
         current_icon = str((self.category or {}).get("icon") or "FOLDER_ROUNDED")
-        current_color = normalize_hex_color((self.category or {}).get("color") or DEFAULT_COLOR)
+        current_color = BaseColorPicker.normalize_value(
+            (self.category or {}).get("color"),
+            DEFAULT_COLOR,
+        )
 
         self.name_field = BaseTextField(
             label="Nom du classeur",
@@ -110,7 +113,7 @@ class CategoryEditorDialog:
         if (self.name_field.value or "").strip():
             self.name_field.state = PaperNestTextFieldState.NORMAL
             self.name_field.state_message = None
-        color = normalize_hex_color(self.color_field.value)
+        color = BaseColorPicker.normalize_value(self.color_field.value, DEFAULT_COLOR)
         icon_name = self.icon_field.value or "FOLDER_ROUNDED"
         self.preview_icon.icon = getattr(
             ft.Icons,
@@ -140,7 +143,7 @@ class CategoryEditorDialog:
         self.page.update()
         try:
             icon = self.icon_field.value or "FOLDER_ROUNDED"
-            color = normalize_hex_color(self.color_field.value)
+            color = BaseColorPicker.normalize_value(self.color_field.value, DEFAULT_COLOR)
             background = light_background(color)
             if self.category is None:
                 if self.parent is not None:
