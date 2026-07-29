@@ -1,14 +1,14 @@
 [project]
 name = "papernest"
 version = "1.0.0"
-description = "A premium, enterprise-grade document classification and smart archiving ecosystem built with Flet."
+description = "Écosystème haut de gamme de classement documentaire et d’archivage intelligent développé avec Flet."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
-    { name = "PaperNest Developer", email = "developer@papernest.io" }
+    { name = "Développeur PaperNest", email = "developer@papernest.io" }
 ]
-keywords = ["flet", "archiving", "pdf-search", "document-management", "mvc"]
+keywords = ["flet", "archivage", "recherche-pdf", "gestion-documentaire", "mvc"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: End Users/Desktop",
@@ -21,7 +21,6 @@ dependencies = [
     "pymupdf>=1.24,<2",
     "pillow>=10,<12",
     "flet-dropzone==0.3.1",
-    "flet-color-pickers==0.85.3",
     "papernestextension @ file:///C:/PaperNestExtension",
 ]
 
@@ -36,7 +35,7 @@ dev = [
 org = "io.papernest"
 product = "PaperNest Pro"
 company = "PaperNest Labs"
-copyright = "Copyright (C) 2023-2026 by PaperNest Labs"
+copyright = "Copyright (C) 2023-2026 par PaperNest Labs"
 
 [tool.flet.app]
 path = "src"
