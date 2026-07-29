@@ -12,15 +12,16 @@ Stabiliser l’interface de PaperNest et migrer progressivement les champs vers 
 - [x] Bouton d’effacement réservé aux filtres concernés.
 - [x] Correction de l’affichage des libellés des options de dropdown.
 - [x] Résolution des problèmes causés par d’anciens dossiers de build.
+- [x] Étude du champ couleur actuel dans PaperNest.
+- [x] Création de `BaseColorPicker` à partir de l’API réelle de `PaperNestColorPicker`.
 
 ## En cours
 
-- [ ] Préparation de l’intégration de `PaperNestColorPicker`.
+- [ ] Intégration de `PaperNestColorPicker` dans les formulaires.
 
 ## À faire
 
-- [ ] Étudier le champ couleur actuel dans PaperNest.
-- [ ] Intégrer `PaperNestColorPicker` après finalisation dans PaperNestExtension.
+- [ ] Remplacer les utilisations de l’ancien `BaseColorField`.
 - [ ] Supprimer l’ancien code couleur devenu inutile après validation.
 - [ ] Vérifier l’ensemble de `forms.py` après la migration.
 - [ ] Nettoyer les imports et wrappers obsolètes.
