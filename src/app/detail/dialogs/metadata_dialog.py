@@ -218,10 +218,10 @@ class MetadataDialog:
                 is_favorite=bool(self.favorite_field.value),
                 tags=self.tag_editor.get_tags(),
                 document_date=self.clean_value(
-                    self.document_date_field.value
+                    self.document_date_field.iso_value
                 ),
                 due_date=self.clean_value(
-                    self.due_date_field.value
+                    self.due_date_field.iso_value
                 ),
                 amount=self.clean_value(
                     self.amount_field.value
