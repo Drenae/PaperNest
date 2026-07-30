@@ -4,7 +4,6 @@ import flet as ft
 
 from app.theme.tokens import AppColors, AppSpacing
 from app.theme.cards import PageHeader
-from app.theme.forms import BaseFilePicker
 from app.dashboard.components.cabinet_panel import CabinetPanel
 from app.dashboard.components.upload_panel import UploadPanel
 from app.detail.detail_view import DetailView
@@ -13,14 +12,26 @@ from app.detail.detail_view import DetailView
 class DashboardView(ft.Column):
     """Accueil volontairement simple : import à gauche, classeurs à droite."""
 
-    def __init__(self, page: ft.Page, file_picker: BaseFilePicker):
+    def __init__(self, page: ft.Page):
         super().__init__(expand=True, spacing=AppSpacing.LG, scroll=ft.ScrollMode.AUTO)
         self.app_page = page
         self.detail_view: DetailView | None = None
 
-        self.processing_bar = ft.ProgressBar(value=0, visible=False, color=AppColors.PRIMARY_DARK, bgcolor=AppColors.PANEL, border_radius=4)
-        self.cabinet_panel = CabinetPanel(on_category_click=self.show_cabinet_details)
-        self.upload_panel = UploadPanel(page=page, file_picker=file_picker, processing_bar=self.processing_bar, on_storage_done=self.handle_storage_done)
+        self.processing_bar = ft.ProgressBar(
+            value=0,
+            visible=False,
+            color=AppColors.PRIMARY_DARK,
+            bgcolor=AppColors.PANEL,
+            border_radius=4,
+        )
+        self.cabinet_panel = CabinetPanel(
+            on_category_click=self.show_cabinet_details
+        )
+        self.upload_panel = UploadPanel(
+            page=page,
+            processing_bar=self.processing_bar,
+            on_storage_done=self.handle_storage_done,
+        )
         self.main_dashboard_controls = self._build_main_dashboard_controls()
         self.controls = list(self.main_dashboard_controls)
 
@@ -36,8 +47,14 @@ class DashboardView(ft.Column):
                 run_spacing=AppSpacing.LG,
                 vertical_alignment=ft.CrossAxisAlignment.START,
                 controls=[
-                    ft.Container(col={"xs": 12, "md": 5, "lg": 5}, content=self.upload_panel),
-                    ft.Container(col={"xs": 12, "md": 7, "lg": 7}, content=self.cabinet_panel),
+                    ft.Container(
+                        col={"xs": 12, "md": 5, "lg": 5},
+                        content=self.upload_panel,
+                    ),
+                    ft.Container(
+                        col={"xs": 12, "md": 7, "lg": 7},
+                        content=self.cabinet_panel,
+                    ),
                 ],
             ),
         ]
