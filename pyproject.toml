@@ -16,7 +16,7 @@ classifiers = [
     "Topic :: Office/Business"
 ]
 dependencies = [
-    "flet>=0.85.3",
+    "flet==0.85.3",
     "pypdf>=6.14.2",
     "pymupdf>=1.24,<2",
     "pillow>=10,<12",
@@ -27,9 +27,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "flet-cli>=0.85.3",
-    "flet-desktop>=0.85.3",
-    "flet-web>=0.85.3",
+    "flet-cli==0.85.3",
+    "flet-desktop==0.85.3",
+    "flet-web==0.85.3",
 ]
 
 [tool.flet]
