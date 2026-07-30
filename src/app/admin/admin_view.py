@@ -14,7 +14,7 @@ from app.admin.dialogs.delete_category_dialog import DeleteCategoryDialog
 from app.admin.dialogs.restore_backup_dialog import RestoreBackupDialog
 from app.admin.state import AdminState
 from app.notifications import notifications
-from app.theme.forms import BaseFilePicker
+from app.theme.file_picker import BaseFilePicker
 from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppSpacing
 
@@ -27,7 +27,6 @@ class AdminView(ft.Column):
     def __init__(
         self,
         page: ft.Page,
-        file_picker: BaseFilePicker,
         on_categories_changed=None,
         on_restore_done=None,
     ):
@@ -35,15 +34,29 @@ class AdminView(ft.Column):
         self.on_categories_changed = on_categories_changed
         self.on_restore_done = on_restore_done
         self.state = AdminState()
+
+        self.backup_file_picker = BaseFilePicker(
+            drag_and_drop=False,
+            click_to_pick=False,
+            allow_multiple=False,
+            allowed_extensions=["zip"],
+            show_file_list=False,
+            show_file_size=False,
+            show_constraints=False,
+            content=ft.Container(width=0, height=0),
+            width=0,
+            height=0,
+        )
         self.controller = AdminController(
             page=page,
-            file_picker=file_picker,
+            file_picker=self.backup_file_picker,
             state=self.state,
             on_state_changed=self.render,
         )
 
         self.backup_panel = BackupPanel(
             state=self.state,
+            file_picker=self.backup_file_picker,
             on_create=self.create_backup,
             on_select=self.select_backup,
             on_refresh=lambda _event: self.app_page.run_task(self.controller.load_backups),
@@ -83,6 +96,7 @@ class AdminView(ft.Column):
     async def select_backup(self, _event=None) -> None:
         backup_path = await self.controller.select_backup(self.handle_picker_error)
         if backup_path:
+            await self.backup_file_picker.clear_files()
             self.show_restore_dialog(backup_path)
 
     def handle_picker_error(self, error: RuntimeError) -> None:
