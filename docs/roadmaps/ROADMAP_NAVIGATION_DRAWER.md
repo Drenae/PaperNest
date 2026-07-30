@@ -1,0 +1,71 @@
+# Roadmap — NavigationDrawer PaperNest
+
+## État
+
+Prototype natif démarré. Aucun fork de `NavigationDrawer` ou `NavigationDrawerDestination` n’est prévu tant qu’une limite réelle et bloquante n’a pas été démontrée.
+
+## Objectif
+
+Remplacer la sidebar construite manuellement avec `Container`, `Row` et `Column` par un `NavigationDrawer` natif Flet, tout en conservant autant que possible le rendu visuel actuel et en ajoutant l’effet drawer.
+
+## Contraintes validées
+
+- [x] Conserver les destinations actuelles et leur ordre.
+- [x] Conserver les couleurs, arrondis, icônes et libellés de PaperNest.
+- [x] Ajouter un en-tête de marque en haut du drawer.
+- [x] Conserver l’administration comme destination secondaire visuellement séparée.
+- [x] Utiliser d’abord les contrôles natifs Flet sans fork.
+- [x] Ne forker qu’après comparaison visuelle et identification précise d’une limite du contrôle natif.
+- [x] Ne pas complexifier la navigation au-delà du besoin réel de PaperNest.
+
+## Étude de l’existant
+
+- [x] Lire `SidebarNavigation`, `NavigationButton` et `MainWindow`.
+- [x] Inventorier les largeurs, espacements, couleurs et états sélectionnés actuels.
+- [x] Identifier le comportement responsive actuel sous le seuil de 900 px.
+- [x] Lire l’API Python de `NavigationDrawer` et `NavigationDrawerDestination`.
+- [x] Lire l’implémentation Dart Flet correspondante.
+- [x] Identifier les limites potentielles : hauteur des destinations, padding interne, bordure sélectionnée, mode compact et ancrage inférieur.
+
+## Prototype natif
+
+- [ ] Créer un module de prototype séparé sans remplacer immédiatement la sidebar actuelle.
+- [ ] Construire le drawer avec `NavigationDrawer` et `NavigationDrawerDestination`.
+- [ ] Reproduire la largeur et la couleur de fond actuelles.
+- [ ] Reproduire l’indicateur sélectionné avec `indicator_color` et `indicator_shape`.
+- [ ] Ajouter le bloc de marque en haut.
+- [ ] Ajouter les séparateurs et les destinations secondaires.
+- [ ] Brancher `selected_index` et `on_change` sur la navigation actuelle.
+- [ ] Ajouter le bouton d’ouverture du drawer.
+- [ ] Vérifier la fermeture après sélection d’une destination.
+
+## Comparaison visuelle
+
+- [ ] Comparer le rendu natif à la sidebar actuelle sous Windows.
+- [ ] Vérifier les dimensions des destinations.
+- [ ] Vérifier l’espacement entre icône et libellé.
+- [ ] Vérifier les couleurs et l’état sélectionné.
+- [ ] Vérifier l’en-tête avec le futur logo.
+- [ ] Vérifier le comportement d’ouverture, de fermeture et de redimensionnement.
+- [ ] Lister précisément les différences impossibles à corriger par le thème natif.
+
+## Décision de fork
+
+- [ ] Confirmer que le rendu natif est suffisamment proche et poursuivre sans fork.
+- [ ] Ou documenter une limite réellement bloquante avant de créer un fork PaperNestExtension.
+- [ ] Si un fork devient nécessaire, limiter les modifications aux propriétés manquantes dont PaperNest a réellement besoin.
+
+## Migration finale
+
+- [ ] Intégrer le drawer validé dans `MainWindow`.
+- [ ] Retirer la sidebar historique uniquement après validation.
+- [ ] Supprimer `NavigationButton` et le code manuel devenu inutile.
+- [ ] Préserver la création, la destruction et le rafraîchissement des vues actuelles.
+- [ ] Valider toutes les destinations.
+- [ ] Valider le comportement sous Windows.
+- [ ] Valider le build Windows.
+- [ ] Mettre à jour le changelog et la roadmap UI.
+
+## Critère de finalisation
+
+La migration sera terminée uniquement lorsque le drawer natif ou son éventuel fork reproduira suffisamment le rendu PaperNest, que toutes les destinations fonctionneront, que l’ancien code sera supprimé et que le comportement Windows sera validé par l’utilisateur.
