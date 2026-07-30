@@ -6,6 +6,7 @@ from app.admin.builder import AdminBuilder
 from app.admin.state import AdminState
 from app.theme.buttons import IconAction, OutlineButton, PrimaryButton
 from app.theme.cards import Section
+from app.theme.file_picker import BaseFilePicker
 from app.theme.status_bar import StatusBar
 from app.theme.tokens import AppColors, AppSpacing
 
@@ -14,6 +15,7 @@ class BackupPanel(Section):
     def __init__(
         self,
         state: AdminState,
+        file_picker: BaseFilePicker,
         on_create,
         on_select,
         on_refresh,
@@ -22,6 +24,7 @@ class BackupPanel(Section):
         on_restore,
     ):
         self.state = state
+        self.file_picker = file_picker
         self.on_open_folder = on_open_folder
         self.on_verify = on_verify
         self.on_restore = on_restore
@@ -54,6 +57,7 @@ class BackupPanel(Section):
                 tight=True,
                 spacing=AppSpacing.MD,
                 controls=[
+                    self.file_picker,
                     ft.Row(
                         spacing=AppSpacing.SM,
                         controls=[self.create_button, self.restore_button],
@@ -86,6 +90,7 @@ class BackupPanel(Section):
         self.create_button.disabled = self.state.backups_loading
         self.restore_button.disabled = self.state.backups_loading
         self.refresh_button.disabled = self.state.backups_loading
+        self.file_picker.disabled = self.state.backups_loading
         self.status_bar.set_loading(
             self.state.backups_loading,
             "Traitement en cours...",
