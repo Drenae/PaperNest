@@ -35,10 +35,15 @@ Stabiliser l’interface de PaperNest et migrer progressivement les champs vers 
   - [x] Identification du sélecteur partagé créé dans `MainWindow`.
   - [x] Identification de la sélection multiple et du glisser-déposer dans `UploadPanel`.
   - [x] Identification de la sélection simple de sauvegarde dans `AdminController`.
-  - [ ] Comparaison détaillée des événements et de la source de vérité.
-  - [ ] Création d’un adaptateur thématique uniquement si nécessaire.
-  - [ ] Migration progressive des parcours réels.
-  - [ ] Validation visuelle et fonctionnelle sous Windows.
+  - [x] Comparaison détaillée des événements et de la source de vérité.
+  - [x] Décision de ne pas créer d’adaptateur thématique pour le parcours d’import.
+  - [x] Migration de la sélection multiple de `UploadPanel`.
+  - [x] Migration du glisser-déposer de `UploadPanel`.
+  - [x] Suppression de la dépendance de `DashboardView` au `BaseFilePicker` partagé.
+  - [x] Utilisation des identifiants du contrôle comme lien avec les métadonnées de classement.
+  - [ ] Validation visuelle et fonctionnelle de l’import sous Windows.
+  - [ ] Migration de la sélection simple de sauvegarde dans l’administration.
+  - [ ] Validation visuelle et fonctionnelle du parcours de restauration sous Windows.
 
 ## Après migration de tous les contrôles
 
