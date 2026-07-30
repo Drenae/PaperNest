@@ -3,19 +3,13 @@ from __future__ import annotations
 from datetime import datetime
 
 import flet as ft
-from papernestextension.controls.material.papernest_date_picker import PaperNestDatePicker
+from papernestextension import PaperNestDatePicker
 
 from app.theme.tokens import AppColors, AppRadius, AppSpacing, AppText
 
 
-class BaseDatePickerField(ft.Row):
-    """Adaptateur PaperNest conservant une valeur publique au format ISO.
-
-    Le rendu, l'ouverture du calendrier, le focus, le clavier et l'effacement
-    sont gérés directement par ``PaperNestDatePicker``. L'adaptateur conserve
-    temporairement l'interface historique utilisée par les formulaires de
-    PaperNest pendant la migration progressive.
-    """
+class BaseDatePickerField(PaperNestDatePicker):
+    """PaperNestDatePicker thématisé avec une valeur ISO dédiée aux services."""
 
     def __init__(
         self,
@@ -31,12 +25,13 @@ class BaseDatePickerField(ft.Row):
     ):
         self.app_page = page
         self.external_on_change = on_change
+        parsed_value = self._parse_value(value)
 
-        self.picker = PaperNestDatePicker(
-            value=self._parse_value(value),
+        super().__init__(
+            value=parsed_value,
             first_date=first_date,
             last_date=last_date,
-            current_date=self._parse_value(value) or datetime.now(),
+            current_date=parsed_value or datetime.now(),
             label=ft.Text(label),
             hint_text="JJ/MM/AAAA",
             prefix_icon=icon,
@@ -67,52 +62,22 @@ class BaseDatePickerField(ft.Row):
                 horizontal=AppSpacing.MD,
                 vertical=0,
             ),
-            expand=True,
-            on_change=self._handle_change,
-            on_cleared=self._handle_cleared,
-        )
-
-        super().__init__(
             expand=expand,
-            spacing=0,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[self.picker],
+            on_change=self._handle_change,
             **kwargs,
         )
 
     @property
-    def value(self) -> str:
-        return self._format_value(self.picker.value)
+    def iso_value(self) -> str:
+        return self._format_value(self.value)
 
-    @value.setter
-    def value(self, value: str | datetime | None) -> None:
-        self.picker.value = self._parse_value(value)
+    def set_iso_value(self, value: str | datetime | None) -> None:
+        self.value = self._parse_value(value)
         self._safe_update()
-
-    @property
-    def disabled(self) -> bool:
-        return bool(self.picker.disabled)
-
-    @disabled.setter
-    def disabled(self, value: bool) -> None:
-        self.picker.disabled = bool(value)
-
-    def open_picker(self, _event=None) -> None:
-        if not self.disabled:
-            self.app_page.run_task(self.picker.open)
-
-    def clear(self, _event=None) -> None:
-        if not self.disabled:
-            self.app_page.run_task(self.picker.clear)
 
     def _handle_change(self, event) -> None:
         if self.external_on_change:
             self.external_on_change(event)
-
-    def _handle_cleared(self, _event) -> None:
-        # Flutter déclenche ensuite ``change`` avec une valeur vide. Le rappel
-        # externe est donc envoyé une seule fois par ``_handle_change``.
-        self._safe_update()
 
     def _safe_update(self) -> None:
         try:
