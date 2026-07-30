@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Callable, Iterable, Optional, Union
 
 import flet as ft
@@ -8,13 +7,15 @@ from papernestextension.controls.material.papernest_dropdown import (
     PaperNestDropdown,
     PaperNestDropdownOption,
 )
-from papernestextension.controls.material.papernest_textfield import PaperNestTextField, KeyboardType
+from papernestextension.controls.material.papernest_textfield import (
+    KeyboardType,
+    PaperNestTextField,
+)
 
+from app.theme.buttons import PrimaryButton, SecondaryButton
 from app.theme.tokens import AppColors, AppRadius, AppSizes, AppSpacing, AppText
-from app.theme.buttons import IconAction, PrimaryButton, SecondaryButton
 
 LabelValue = Union[str, ft.Control, None]
-FilePickerErrorHandler = Callable[[RuntimeError], None]
 
 
 def _label_control(value: LabelValue):
@@ -41,7 +42,14 @@ class _InputMixin:
 
 
 class BaseTextField(_InputMixin, PaperNestTextField):
-    def __init__(self, label: LabelValue = None, icon=None, compact: bool = False, expand: Optional[bool] = False, **kwargs):
+    def __init__(
+        self,
+        label: LabelValue = None,
+        icon=None,
+        compact: bool = False,
+        expand: Optional[bool] = False,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.label = _label_control(label)
         if icon is not None:
@@ -52,7 +60,13 @@ class BaseTextField(_InputMixin, PaperNestTextField):
 
 
 class SearchTextField(BaseTextField):
-    def __init__(self, hint_text: str = "Rechercher…", on_search=None, debounce_ms: int = 350, **kwargs):
+    def __init__(
+        self,
+        hint_text: str = "Rechercher…",
+        on_search=None,
+        debounce_ms: int = 350,
+        **kwargs,
+    ):
         kwargs.setdefault("hint_text", hint_text)
         kwargs.setdefault("search_mode", True)
         kwargs.setdefault("clear_button", True)
@@ -72,7 +86,13 @@ class PasswordTextField(BaseTextField):
 
 
 class BaseTextArea(BaseTextField):
-    def __init__(self, label: LabelValue = None, min_lines: int = 3, max_lines: int = 6, **kwargs):
+    def __init__(
+        self,
+        label: LabelValue = None,
+        min_lines: int = 3,
+        max_lines: int = 6,
+        **kwargs,
+    ):
         kwargs.setdefault("multiline", True)
         kwargs.setdefault("min_lines", min_lines)
         kwargs.setdefault("max_lines", max_lines)
@@ -89,7 +109,15 @@ class BaseNumberField(BaseTextField):
 
 
 class BaseDropDown(_InputMixin, PaperNestDropdown):
-    def __init__(self, label: LabelValue = None, icon=None, leading_icon=None, compact: bool = False, expand: Optional[bool | int] = None, **kwargs):
+    def __init__(
+        self,
+        label: LabelValue = None,
+        icon=None,
+        leading_icon=None,
+        compact: bool = False,
+        expand: Optional[bool | int] = None,
+        **kwargs,
+    ):
         on_select = kwargs.pop("on_select", None)
         if on_select is not None and "on_change" not in kwargs:
             kwargs["on_change"] = on_select
@@ -109,7 +137,10 @@ class BaseDropDown(_InputMixin, PaperNestDropdown):
         self.menu_border_width = 1
         self.menu_border_radius = AppRadius.MD
         self.menu_padding = ft.Padding.symmetric(horizontal=5, vertical=8)
-        self.menu_item_padding = ft.Padding.symmetric(horizontal=AppSpacing.MD, vertical=AppSpacing.SM)
+        self.menu_item_padding = ft.Padding.symmetric(
+            horizontal=AppSpacing.MD,
+            vertical=AppSpacing.SM,
+        )
 
 
 class SearchDropDown(BaseDropDown):
@@ -122,7 +153,13 @@ class SearchDropDown(BaseDropDown):
 
 
 class BaseCheckbox(ft.Checkbox):
-    def __init__(self, label: LabelValue = None, value: bool = False, on_change=None, **kwargs):
+    def __init__(
+        self,
+        label: LabelValue = None,
+        value: bool = False,
+        on_change=None,
+        **kwargs,
+    ):
         super().__init__(
             label=_label_control(label),
             value=value,
@@ -134,7 +171,13 @@ class BaseCheckbox(ft.Checkbox):
 
 
 class BaseSwitch(ft.Switch):
-    def __init__(self, label: LabelValue = None, value: bool = False, on_change=None, **kwargs):
+    def __init__(
+        self,
+        label: LabelValue = None,
+        value: bool = False,
+        on_change=None,
+        **kwargs,
+    ):
         super().__init__(
             label=_label_control(label),
             value=value,
@@ -174,134 +217,8 @@ class BaseRadioGroup(ft.RadioGroup):
         super().__init__(content=layout, value=value, on_change=on_change, **kwargs)
 
 
-class BaseDatePickerField(ft.Row):
-    """Champ de date ISO utilisant le DatePicker natif de Flet."""
-
-    def __init__(
-        self,
-        page: ft.Page,
-        label: str,
-        value: str | datetime | None = None,
-        icon=ft.Icons.EVENT_ROUNDED,
-        first_date: datetime = datetime(1900, 1, 1),
-        last_date: datetime = datetime(2100, 12, 31),
-        on_change=None,
-        expand: bool = True,
-        **kwargs,
-    ):
-        self.app_page = page
-        self.external_on_change = on_change
-        parsed_value = self._parse_value(value)
-        self.field = BaseTextField(
-            label=label,
-            value=self._format_value(parsed_value),
-            hint_text="AAAA-MM-JJ",
-            read_only=True,
-            prefix_icon=icon,
-            expand=True,
-            on_click=self.open_picker,
-        )
-        self.picker = ft.DatePicker(
-            value=parsed_value,
-            first_date=first_date,
-            last_date=last_date,
-            current_date=parsed_value or datetime.now(),
-            confirm_text="Valider",
-            cancel_text="Annuler",
-            help_text=label,
-            field_label_text=label,
-            field_hint_text="AAAA-MM-JJ",
-            error_format_text="Format de date invalide",
-            error_invalid_text="Date hors limites",
-            on_change=self._handle_change,
-        )
-        self.clear_button = IconAction(
-            ft.Icons.CLOSE_ROUNDED,
-            tooltip="Effacer la date",
-            compact=True,
-            visible=parsed_value is not None,
-            on_click=self.clear,
-        )
-        super().__init__(
-            expand=expand,
-            spacing=AppSpacing.XS,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[self.field, self.clear_button],
-            **kwargs,
-        )
-
-    @property
-    def value(self) -> str:
-        return self.field.value or ""
-
-    @value.setter
-    def value(self, value: str | datetime | None) -> None:
-        parsed = self._parse_value(value)
-        self.field.value = self._format_value(parsed)
-        self.picker.value = parsed
-        self.clear_button.visible = parsed is not None
-        self._safe_update()
-
-    @property
-    def disabled(self) -> bool:
-        return bool(self.field.disabled)
-
-    @disabled.setter
-    def disabled(self, value: bool) -> None:
-        self.field.disabled = value
-        self.clear_button.disabled = value
-
-    def open_picker(self, _event=None) -> None:
-        if not self.disabled:
-            self.app_page.show_dialog(self.picker)
-
-    def clear(self, event=None) -> None:
-        if self.disabled:
-            return
-        self.field.value = ""
-        self.picker.value = None
-        self.clear_button.visible = False
-        self._safe_update()
-        if self.external_on_change:
-            self.external_on_change(event)
-
-    def _handle_change(self, event) -> None:
-        self.field.value = self._format_value(self.picker.value)
-        self.clear_button.visible = self.picker.value is not None
-        self._safe_update()
-        if self.external_on_change:
-            self.external_on_change(event)
-
-    def _safe_update(self) -> None:
-        try:
-            if self.page is not None:
-                self.update()
-        except RuntimeError:
-            pass
-
-    @staticmethod
-    def _parse_value(value: str | datetime | None) -> datetime | None:
-        if isinstance(value, datetime):
-            return value
-        if value:
-            try:
-                return datetime.fromisoformat(str(value))
-            except ValueError:
-                return None
-        return None
-
-    @staticmethod
-    def _format_value(value: datetime | None) -> str:
-        return value.date().isoformat() if value else ""
-
-
 class BaseIconField(ft.Column):
-    """Champ compact ouvrant une galerie d’icônes responsive.
-
-    ``options`` associe le libellé affiché au nom de constante ``ft.Icons``.
-    La valeur publique est le nom de constante, par exemple
-    ``"FOLDER_ROUNDED"``.
-    """
+    """Champ compact ouvrant une galerie d’icônes responsive."""
 
     def __init__(
         self,
@@ -398,7 +315,6 @@ class BaseIconField(ft.Column):
     def open_picker(self, _event=None) -> None:
         if self.disabled:
             return
-
         from app.theme.dialogs import AppDialog
 
         self._temporary_value = self._value
@@ -449,10 +365,7 @@ class BaseIconField(ft.Column):
     def _build_icon_tile(self, label: str, icon_name: str) -> ft.Control:
         selected = icon_name == self._temporary_value
         return ft.Container(
-            padding=ft.Padding.symmetric(
-                horizontal=AppSpacing.MD,
-                vertical=AppSpacing.SM,
-            ),
+            padding=ft.Padding.symmetric(horizontal=AppSpacing.MD, vertical=AppSpacing.SM),
             border_radius=AppRadius.MD,
             bgcolor=AppColors.PRIMARY_SOFT if selected else AppColors.SURFACE,
             border=ft.Border.all(
@@ -535,37 +448,6 @@ class BaseIconField(ft.Column):
         return getattr(ft.Icons, icon_name, ft.Icons.FOLDER_ROUNDED)
 
 
-class BaseFilePicker(ft.FilePicker):
-    """FilePicker centralisé avec verrou anti-double ouverture et gestion du timeout."""
-
-    def __init__(self, on_error: FilePickerErrorHandler | None = None, **kwargs):
-        super().__init__(**kwargs)
-        self._busy = False
-        self.on_picker_error = on_error
-        self.last_error: RuntimeError | None = None
-
-    @property
-    def busy(self) -> bool:
-        return self._busy
-
-    async def pick_files(self, *, on_error: FilePickerErrorHandler | None = None, **kwargs):
-        if self._busy:
-            return []
-
-        self._busy = True
-        self.last_error = None
-        try:
-            return await super().pick_files(**kwargs)
-        except RuntimeError as error:
-            self.last_error = error
-            handler = on_error or self.on_picker_error
-            if handler is not None:
-                handler(error)
-            return []
-        finally:
-            self._busy = False
-
-
 class FormLabel(ft.Text):
     def __init__(self, value: str, required: bool = False, **kwargs):
         text = f"{value} *" if required else value
@@ -611,5 +493,15 @@ class FormGroup(ft.Column):
 
 
 class FormRow(ft.ResponsiveRow):
-    def __init__(self, controls: Iterable[ft.Control], spacing: int = AppSpacing.MD, **kwargs):
-        super().__init__(controls=list(controls), spacing=spacing, run_spacing=spacing, **kwargs)
+    def __init__(
+        self,
+        controls: Iterable[ft.Control],
+        spacing: int = AppSpacing.MD,
+        **kwargs,
+    ):
+        super().__init__(
+            controls=list(controls),
+            spacing=spacing,
+            run_spacing=spacing,
+            **kwargs,
+        )
