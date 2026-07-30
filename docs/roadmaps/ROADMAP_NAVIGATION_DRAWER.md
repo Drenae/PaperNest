@@ -2,7 +2,7 @@
 
 ## État
 
-Prototype natif démarré. Aucun fork de `NavigationDrawer` ou `NavigationDrawerDestination` n’est prévu tant qu’une limite réelle et bloquante n’a pas été démontrée.
+Prototype natif démarré dans `src/app/navigation/navigation_drawer_prototype.py`. Il n’est pas encore intégré à `MainWindow`, afin de préserver entièrement la navigation actuelle pendant l’étude. Aucun fork de `NavigationDrawer` ou `NavigationDrawerDestination` n’est prévu tant qu’une limite réelle et bloquante n’a pas été démontrée.
 
 ## Objectif
 
@@ -29,15 +29,16 @@ Remplacer la sidebar construite manuellement avec `Container`, `Row` et `Column`
 
 ## Prototype natif
 
-- [ ] Créer un module de prototype séparé sans remplacer immédiatement la sidebar actuelle.
-- [ ] Construire le drawer avec `NavigationDrawer` et `NavigationDrawerDestination`.
-- [ ] Reproduire la largeur et la couleur de fond actuelles.
-- [ ] Reproduire l’indicateur sélectionné avec `indicator_color` et `indicator_shape`.
-- [ ] Ajouter le bloc de marque en haut.
-- [ ] Ajouter les séparateurs et les destinations secondaires.
-- [ ] Brancher `selected_index` et `on_change` sur la navigation actuelle.
-- [ ] Ajouter le bouton d’ouverture du drawer.
+- [x] Créer un module de prototype séparé sans remplacer immédiatement la sidebar actuelle.
+- [x] Construire le drawer avec `NavigationDrawer` et `NavigationDrawerDestination`.
+- [x] Reproduire la largeur et la couleur de fond actuelles.
+- [x] Reproduire l’indicateur sélectionné avec `indicator_color` et `indicator_shape`.
+- [x] Ajouter un bloc de marque provisoire en haut en attendant le logo validé.
+- [x] Ajouter les séparateurs et les destinations secondaires.
+- [ ] Brancher le prototype sur les destinations réelles de `MainWindow`.
+- [ ] Ajouter un bouton temporaire d’ouverture du drawer.
 - [ ] Vérifier la fermeture après sélection d’une destination.
+- [ ] Vérifier la compatibilité exacte des méthodes `show_drawer()` et `close_drawer()` avec Flet 0.85.3 lors du premier essai Windows.
 
 ## Comparaison visuelle
 
@@ -47,6 +48,7 @@ Remplacer la sidebar construite manuellement avec `Container`, `Row` et `Column`
 - [ ] Vérifier les couleurs et l’état sélectionné.
 - [ ] Vérifier l’en-tête avec le futur logo.
 - [ ] Vérifier le comportement d’ouverture, de fermeture et de redimensionnement.
+- [ ] Vérifier si la destination Administration peut être positionnée suffisamment bas avec le contrôle natif.
 - [ ] Lister précisément les différences impossibles à corriger par le thème natif.
 
 ## Décision de fork
