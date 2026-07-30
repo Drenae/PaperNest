@@ -21,7 +21,8 @@ dependencies = [
     "pymupdf>=1.24,<2",
     "pillow>=10,<12",
     "flet-dropzone==0.3.1",
-    "papernestextension @ file:///C:/PaperNestExtension",
+    "papernestextension @ file:///C:/ProjetPaperNest/Extension",
+    "flet-color-pickers==0.85.3",
 ]
 
 [dependency-groups]
