@@ -8,7 +8,7 @@ from typing import Callable
 import flet as ft
 
 from app.admin.state import AdminState
-from app.theme.forms import BaseFilePicker
+from app.theme.file_picker import BaseFilePicker
 from core.errors.exceptions import PaperNestError
 from services.backup.service import BackupService
 from services.files.archive import ArchiveFileService
@@ -56,6 +56,7 @@ class AdminController:
             allow_multiple=False,
             allowed_extensions=["zip"],
             dialog_title="Sélectionner une sauvegarde PaperNest",
+            with_data=False,
             on_error=on_picker_error,
         )
         if not files or not files[0].path:
