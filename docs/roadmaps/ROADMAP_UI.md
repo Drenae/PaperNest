@@ -18,25 +18,32 @@ Stabiliser l’interface de PaperNest et migrer progressivement les champs vers 
 - [x] Remplacement de l’utilisation de l’ancien `BaseColorField`.
 - [x] Suppression de l’ancien code couleur devenu inutile après validation.
 - [x] Validation visuelle et fonctionnelle de `PaperNestColorPicker` sous Windows.
-
-## En cours
-
-- [ ] Migration de `PaperNestDatePicker`.
+- [x] Migration de `PaperNestDatePicker`.
   - [x] Lecture de l’API Python réelle.
   - [x] Lecture de l’implémentation Flutter réelle.
   - [x] Création de l’adaptateur thématique conservant la valeur ISO historique.
   - [x] Remplacement des usages de `BaseDatePickerField` dans le dialogue des métadonnées.
-  - [ ] Validation visuelle et fonctionnelle sous Windows.
-  - [ ] Suppression de l’ancien champ après validation.
+  - [x] Validation visuelle et fonctionnelle sous Windows.
+  - [x] Validation du build Windows.
 
-## À faire
+## En cours
 
 - [ ] Migration de `PaperNestFilePicker`.
+  - [x] Lecture de la roadmap dédiée de l’extension.
+  - [x] Lecture de l’API Python réelle.
+  - [x] Identification du wrapper historique `BaseFilePicker`.
+  - [x] Identification du sélecteur partagé créé dans `MainWindow`.
+  - [x] Identification de la sélection multiple et du glisser-déposer dans `UploadPanel`.
+  - [x] Identification de la sélection simple de sauvegarde dans `AdminController`.
+  - [ ] Comparaison détaillée des événements et de la source de vérité.
+  - [ ] Création d’un adaptateur thématique uniquement si nécessaire.
+  - [ ] Migration progressive des parcours réels.
+  - [ ] Validation visuelle et fonctionnelle sous Windows.
 
 ## Après migration de tous les contrôles
 
 - [ ] Vérifier l’ensemble de `forms.py`.
-- [ ] Supprimer définitivement les wrappers devenus inutiles.
+- [ ] Supprimer définitivement les wrappers devenus inutiles, dont l’ancien `BaseDatePickerField` et `BaseFilePicker`.
 - [ ] Nettoyer globalement les imports obsolètes.
 - [ ] Effectuer une validation visuelle et fonctionnelle complète sous Windows.
 
