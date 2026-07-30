@@ -8,8 +8,15 @@ from papernestextension import PaperNestDatePicker
 from app.theme.tokens import AppColors, AppRadius, AppSpacing, AppText
 
 
+class _IsoDateTime(datetime):
+    """Datetime natif fournissant aussi la représentation ISO attendue par PaperNest."""
+
+    def strip(self) -> str:
+        return self.date().isoformat()
+
+
 class BaseDatePickerField(PaperNestDatePicker):
-    """PaperNestDatePicker thématisé avec une valeur ISO dédiée aux services."""
+    """PaperNestDatePicker thématisé, sans conteneur intermédiaire."""
 
     def __init__(
         self,
@@ -26,7 +33,6 @@ class BaseDatePickerField(PaperNestDatePicker):
         self.app_page = page
         self.external_on_change = on_change
         parsed_value = self._parse_value(value)
-
         super().__init__(
             value=parsed_value,
             first_date=first_date,
@@ -53,15 +59,9 @@ class BaseDatePickerField(PaperNestDatePicker):
             border_radius=AppRadius.MD,
             text_style=ft.TextStyle(color=AppColors.TEXT, size=AppText.BODY),
             hint_style=ft.TextStyle(color=AppColors.TEXT_MUTED, size=AppText.BODY),
-            label_style=ft.TextStyle(
-                color=AppColors.TEXT_SECONDARY,
-                size=AppText.CAPTION,
-            ),
+            label_style=ft.TextStyle(color=AppColors.TEXT_SECONDARY, size=AppText.CAPTION),
             hover_color=ft.Colors.TRANSPARENT,
-            content_padding=ft.Padding.symmetric(
-                horizontal=AppSpacing.MD,
-                vertical=0,
-            ),
+            content_padding=ft.Padding.symmetric(horizontal=AppSpacing.MD, vertical=0),
             expand=expand,
             on_change=self._handle_change,
             **kwargs,
@@ -69,35 +69,22 @@ class BaseDatePickerField(PaperNestDatePicker):
 
     @property
     def iso_value(self) -> str:
-        return self._format_value(self.value)
-
-    def set_iso_value(self, value: str | datetime | None) -> None:
-        self.value = self._parse_value(value)
-        self._safe_update()
+        return self.value.date().isoformat() if self.value else ""
 
     def _handle_change(self, event) -> None:
+        if self.value and not isinstance(self.value, _IsoDateTime):
+            self.value = self._parse_value(self.value)
         if self.external_on_change:
             self.external_on_change(event)
 
-    def _safe_update(self) -> None:
-        try:
-            if self.page is not None:
-                self.update()
-        except RuntimeError:
-            pass
-
     @staticmethod
-    def _parse_value(value: str | datetime | None) -> datetime | None:
+    def _parse_value(value: str | datetime | None) -> _IsoDateTime | None:
         if isinstance(value, datetime):
-            return datetime(value.year, value.month, value.day)
+            return _IsoDateTime(value.year, value.month, value.day)
         if value:
             try:
                 parsed = datetime.fromisoformat(str(value))
-                return datetime(parsed.year, parsed.month, parsed.day)
+                return _IsoDateTime(parsed.year, parsed.month, parsed.day)
             except ValueError:
                 return None
         return None
-
-    @staticmethod
-    def _format_value(value: datetime | None) -> str:
-        return value.date().isoformat() if value else ""
