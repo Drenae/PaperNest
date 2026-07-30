@@ -7,7 +7,6 @@ from typing import Callable
 
 import flet as ft
 from papernestextension import (
-    PaperNestFilePicker,
     PaperNestFilePickerFile,
     PaperNestFilePickerFilesChangedEvent,
     PaperNestFilePickerValidationEvent,
@@ -16,6 +15,7 @@ from papernestextension import (
 from app.notifications import notifications
 from app.theme.buttons import IconAction, PrimaryButton
 from app.theme.cards import Section
+from app.theme.file_picker import BaseFilePicker
 from app.theme.forms import BaseCheckbox, BaseDropDown, PaperNestDropdownOption
 from app.theme.tokens import AppColors
 from core.errors.exceptions import PaperNestError
@@ -48,7 +48,7 @@ class UploadPanel(Section):
         self.loading = False
         self._mounted = True
 
-        self.file_picker = PaperNestFilePicker(
+        self.file_picker = BaseFilePicker(
             allow_multiple=True,
             drag_and_drop=True,
             with_data=False,
@@ -57,14 +57,20 @@ class UploadPanel(Section):
             use_file_type_colors=True,
             dialog_title="Sélectionner des documents",
             drop_text="Déposez vos documents ici",
-            drop_subtitle="ou cliquez pour les sélectionner",
+            drop_subtitle="ou utilisez le bouton ci-dessous",
             icon=ft.Icons.UPLOAD_FILE_ROUNDED,
+            click_to_pick=True,
             show_constraints=False,
             on_files_changed=self.handle_files_changed,
             on_validation_error=self.handle_validation_error,
             on_duplicate_file=self.handle_duplicate_file,
         )
-
+        self.browse_trigger = PrimaryButton(
+            "Ajouter des fichiers",
+            icon=ft.Icons.FOLDER_OPEN_ROUNDED,
+            on_click=self.browse_files,
+            expand=True,
+        )
         self.clear_trigger = IconAction(
             icon=ft.Icons.CLOSE_ROUNDED,
             icon_color=AppColors.TEXT_MUTED,
@@ -79,7 +85,6 @@ class UploadPanel(Section):
         )
         self.category_selector.disabled = True
         self.category_selector.on_select = self.apply_default_category
-
         self.keep_duplicates = BaseCheckbox(
             label="Importer aussi les doublons détectés",
             value=False,
@@ -97,11 +102,7 @@ class UploadPanel(Section):
                 controls=[
                     ft.Row(
                         controls=[
-                            ft.Text(
-                                "Classement des documents",
-                                expand=True,
-                                weight=ft.FontWeight.BOLD,
-                            ),
+                            ft.Text("Classement des documents", expand=True, weight=ft.FontWeight.BOLD),
                             self.clear_trigger,
                         ]
                     ),
@@ -123,9 +124,7 @@ class UploadPanel(Section):
             expand=True,
         )
         self.commit_trigger.disabled = True
-        self.summary_text = ft.Text(
-            "", size=11, color=AppColors.TEXT_MUTED, visible=False
-        )
+        self.summary_text = ft.Text("", size=11, color=AppColors.TEXT_MUTED, visible=False)
 
         self.processing_bar.visible = False
         self.processing_bar.value = 0
@@ -139,6 +138,7 @@ class UploadPanel(Section):
                 spacing=14,
                 controls=[
                     self.file_picker,
+                    ft.Row([self.browse_trigger]),
                     self.files_container,
                     self.processing_bar,
                     self.summary_text,
@@ -149,48 +149,44 @@ class UploadPanel(Section):
         )
         self.refresh_categories()
 
+    async def browse_files(self, _event=None) -> None:
+        if self.loading:
+            return
+        await self.file_picker.pick_files(
+            dialog_title="Ajouter des documents",
+            allow_multiple=True,
+            with_data=False,
+            on_error=self.handle_picker_error,
+        )
+
+    def handle_picker_error(self, _error: RuntimeError) -> None:
+        notifications(self.app_page).error("Impossible d’ouvrir le sélecteur de fichiers.")
+
     def refresh_categories(self) -> None:
         categories = category_repository.list_all()
         self.category_options = [
             PaperNestDropdownOption(
                 key=str(category["key"]),
-                text=(
-                    f"↳ {category['name']}"
-                    if category.get("parent_key")
-                    else str(category["name"])
-                ),
+                text=f"↳ {category['name']}" if category.get("parent_key") else str(category["name"]),
             )
             for category in categories
         ]
         self.category_selector.options = list(self.category_options)
         self._safe_update()
 
-    def handle_files_changed(
-        self, event: PaperNestFilePickerFilesChangedEvent
-    ) -> None:
+    def handle_files_changed(self, event: PaperNestFilePickerFilesChangedEvent) -> None:
         previous_categories = {
-            str(item.path.resolve()).casefold(): item.category_key
-            for item in self.staged_files
+            str(item.path.resolve()).casefold(): item.category_key for item in self.staged_files
         }
-        default_category = (
-            str(self.category_selector.value)
-            if self.category_selector.value
-            else None
-        )
+        default_category = str(self.category_selector.value) if self.category_selector.value else None
         staged: list[StagedFile] = []
         invalid_paths = 0
-
         for selected in event.selected_files:
-            staged_file = self._to_staged_file(
-                selected,
-                previous_categories,
-                default_category,
-            )
-            if staged_file is None:
+            item = self._to_staged_file(selected, previous_categories, default_category)
+            if item is None:
                 invalid_paths += 1
-                continue
-            staged.append(staged_file)
-
+            else:
+                staged.append(item)
         self.staged_files = staged
         if invalid_paths:
             notifications(self.app_page).warning(
@@ -216,17 +212,13 @@ class UploadPanel(Section):
             category_key=previous_categories.get(key, default_category),
         )
 
-    def handle_validation_error(
-        self, event: PaperNestFilePickerValidationEvent
-    ) -> None:
+    def handle_validation_error(self, event: PaperNestFilePickerValidationEvent) -> None:
         notifications(self.app_page).warning(
             event.message or "Ce fichier ne respecte pas les contraintes de sélection."
         )
 
     def handle_duplicate_file(self, _event) -> None:
-        notifications(self.app_page).warning(
-            "Ce fichier est déjà présent dans la sélection."
-        )
+        notifications(self.app_page).warning("Ce fichier est déjà présent dans la sélection.")
 
     def _refresh_selection_ui(self) -> None:
         has_files = bool(self.staged_files)
@@ -266,17 +258,8 @@ class UploadPanel(Section):
                     content=ft.Row(
                         spacing=8,
                         controls=[
-                            ft.Icon(
-                                ft.Icons.INSERT_DRIVE_FILE_OUTLINED,
-                                size=18,
-                                color=AppColors.TEXT_MUTED,
-                            ),
-                            ft.Text(
-                                item.path.name,
-                                expand=True,
-                                max_lines=1,
-                                overflow=ft.TextOverflow.ELLIPSIS,
-                            ),
+                            ft.Icon(ft.Icons.INSERT_DRIVE_FILE_OUTLINED, size=18, color=AppColors.TEXT_MUTED),
+                            ft.Text(item.path.name, expand=True, max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
                             dropdown,
                             IconAction(
                                 icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
@@ -291,11 +274,7 @@ class UploadPanel(Section):
         self.files_list.controls = rows
 
     def apply_default_category(self, _event=None) -> None:
-        category = (
-            str(self.category_selector.value)
-            if self.category_selector.value
-            else None
-        )
+        category = str(self.category_selector.value) if self.category_selector.value else None
         for item in self.staged_files:
             item.category_key = category
         self.render_file_rows()
@@ -305,17 +284,12 @@ class UploadPanel(Section):
         file_id = int(event.control.data)
         for item in self.staged_files:
             if item.file_id == file_id:
-                item.category_key = (
-                    str(event.control.value) if event.control.value else None
-                )
+                item.category_key = str(event.control.value) if event.control.value else None
                 break
 
     def remove_file(self, event) -> None:
         if not self.loading:
-            self.app_page.run_task(
-                self.file_picker.remove_file,
-                int(event.control.data),
-            )
+            self.app_page.run_task(self.file_picker.remove_file, int(event.control.data))
 
     def clear_staged_files(self, _event=None) -> None:
         if not self.loading:
@@ -324,28 +298,19 @@ class UploadPanel(Section):
     def finalize_storage(self, _event=None) -> None:
         if self.loading or not self.staged_files:
             return
-        missing = [
-            item.path.name for item in self.staged_files if not item.category_key
-        ]
-        if missing:
-            notifications(self.app_page).warning(
-                "Choisissez un classeur pour chaque document."
-            )
+        if any(not item.category_key for item in self.staged_files):
+            notifications(self.app_page).warning("Choisissez un classeur pour chaque document.")
             return
         self.app_page.run_task(self.run_batch_storage)
 
     async def run_batch_storage(self) -> None:
         self.set_loading(True)
-        imported = 0
-        duplicates = 0
-        errors = 0
+        imported = duplicates = errors = 0
         total = len(self.staged_files)
         try:
             for index, item in enumerate(list(self.staged_files), start=1):
                 self.processing_bar.value = (index - 1) / total
-                self.summary_text.value = (
-                    f"Traitement de {item.path.name} ({index}/{total})"
-                )
+                self.summary_text.value = f"Traitement de {item.path.name} ({index}/{total})"
                 self.summary_text.visible = True
                 self._safe_page_update()
                 try:
@@ -354,9 +319,7 @@ class UploadPanel(Section):
                         str(item.path),
                         item.path.stem,
                     )
-                    if analysis.has_matches and not bool(
-                        self.keep_duplicates.value
-                    ):
+                    if analysis.has_matches and not bool(self.keep_duplicates.value):
                         duplicates += 1
                         continue
                     await asyncio.to_thread(
@@ -364,21 +327,15 @@ class UploadPanel(Section):
                         str(item.path),
                         item.path.stem,
                         str(item.category_key),
-                        allow_duplicate=bool(
-                            analysis.has_matches and self.keep_duplicates.value
-                        ),
+                        allow_duplicate=bool(analysis.has_matches and self.keep_duplicates.value),
                         source_sha256=analysis.source_sha256,
                     )
                     imported += 1
-                except PaperNestError:
+                except (PaperNestError, Exception):
                     errors += 1
-                except Exception:
-                    errors += 1
-
             self.processing_bar.value = 1
             notifications(self.app_page).success(
-                f"Import terminé : {imported} classé(s), "
-                f"{duplicates} doublon(s) ignoré(s), {errors} erreur(s)."
+                f"Import terminé : {imported} classé(s), {duplicates} doublon(s) ignoré(s), {errors} erreur(s)."
             )
             await self.file_picker.clear_files()
             if self.on_storage_done is not None:
@@ -394,6 +351,7 @@ class UploadPanel(Section):
         if not loading:
             self.processing_bar.value = 0
         self.file_picker.disabled = loading
+        self.browse_trigger.disabled = loading
         self.clear_trigger.disabled = loading
         self.category_selector.disabled = loading or not bool(self.staged_files)
         self.keep_duplicates.disabled = loading or not bool(self.staged_files)
