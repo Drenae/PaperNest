@@ -21,8 +21,11 @@ Stabiliser l’interface de PaperNest et migrer progressivement les champs vers 
 - [x] Migration de `PaperNestDatePicker`.
   - [x] Lecture de l’API Python réelle.
   - [x] Lecture de l’implémentation Flutter réelle.
-  - [x] Création de l’adaptateur thématique conservant la valeur ISO historique.
-  - [x] Remplacement des usages de `BaseDatePickerField` dans le dialogue des métadonnées.
+  - [x] Création du fichier thématique dédié `date_picker.py`.
+  - [x] Héritage direct de `PaperNestDatePicker`, sans conteneur `ft.Row`.
+  - [x] Conservation de la valeur ISO attendue par les services PaperNest.
+  - [x] Remplacement des usages dans le dialogue des métadonnées.
+  - [x] Suppression de l’ancien DatePicker natif de `forms.py`.
   - [x] Validation visuelle et fonctionnelle sous Windows.
   - [x] Validation du build Windows.
 
@@ -31,25 +34,25 @@ Stabiliser l’interface de PaperNest et migrer progressivement les champs vers 
 - [ ] Migration de `PaperNestFilePicker`.
   - [x] Lecture de la roadmap dédiée de l’extension.
   - [x] Lecture de l’API Python réelle.
-  - [x] Identification du wrapper historique `BaseFilePicker`.
-  - [x] Identification du sélecteur partagé créé dans `MainWindow`.
-  - [x] Identification de la sélection multiple et du glisser-déposer dans `UploadPanel`.
-  - [x] Identification de la sélection simple de sauvegarde dans `AdminController`.
-  - [x] Comparaison détaillée des événements et de la source de vérité.
-  - [x] Décision de ne pas créer d’adaptateur thématique pour le parcours d’import.
-  - [x] Migration de la sélection multiple de `UploadPanel`.
-  - [x] Migration du glisser-déposer de `UploadPanel`.
-  - [x] Suppression de la dépendance de `DashboardView` au `BaseFilePicker` partagé.
+  - [x] Lecture de l’exemple fonctionnel de l’extension.
+  - [x] Création du wrapper thématique dédié `file_picker.py` héritant de `PaperNestFilePicker`.
+  - [x] Migration de la sélection multiple et du glisser-déposer de `UploadPanel`.
+  - [x] Conservation du bouton « Ajouter des fichiers » utilisant `pick_files()`.
+  - [x] Utilisation de la sélection interne du contrôle comme source de vérité.
   - [x] Utilisation des identifiants du contrôle comme lien avec les métadonnées de classement.
-  - [ ] Validation visuelle et fonctionnelle de l’import sous Windows.
-  - [ ] Migration de la sélection simple de sauvegarde dans l’administration.
+  - [x] Migration du bouton `restore_button` de l’administration.
+  - [x] Migration de la sélection simple des sauvegardes ZIP.
+  - [x] Suppression du FilePicker historique partagé de `MainWindow`.
+  - [x] Suppression de l’ancien wrapper `ft.FilePicker` de `forms.py`.
+  - [ ] Nouvelle validation visuelle et fonctionnelle de l’import sous Windows.
   - [ ] Validation visuelle et fonctionnelle du parcours de restauration sous Windows.
+  - [ ] Validation du build Windows après nettoyage.
 
 ## Après migration de tous les contrôles
 
-- [ ] Vérifier l’ensemble de `forms.py`.
-- [ ] Supprimer définitivement les wrappers devenus inutiles, dont l’ancien `BaseDatePickerField` et `BaseFilePicker`.
-- [ ] Nettoyer globalement les imports obsolètes.
+- [x] Vérifier l’ensemble de `forms.py` pour les anciens DatePicker et FilePicker.
+- [x] Supprimer les anciens wrappers DatePicker et FilePicker devenus inutiles.
+- [x] Nettoyer les imports liés à ces anciens wrappers.
 - [ ] Effectuer une validation visuelle et fonctionnelle complète sous Windows.
 
 ## Règle de migration
