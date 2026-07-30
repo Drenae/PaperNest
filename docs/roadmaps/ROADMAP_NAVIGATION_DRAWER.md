@@ -1,68 +1,99 @@
-# Roadmap — NavigationDrawer PaperNest
+# Roadmap — Sidebar PaperNest déployable au survol
 
 ## État
 
-Prototype natif démarré dans `src/app/navigation/navigation_drawer_prototype.py`. Il n’est pas encore intégré à `MainWindow`, afin de préserver entièrement la navigation actuelle pendant l’étude. Aucun fork de `NavigationDrawer` ou `NavigationDrawerDestination` n’est prévu tant qu’une limite réelle et bloquante n’a pas été démontrée.
+Le besoin a été redéfini. PaperNest ne doit pas utiliser un `NavigationDrawer` modal ouvert par bouton.
+
+La future navigation sera une rail compacte toujours visible, développée comme nouveau contrôle dans PaperNestExtension. Elle s’agrandira au survol, se superposera au contenu et se repliera lorsque la souris quittera sa zone.
 
 ## Objectif
 
-Remplacer la sidebar construite manuellement avec `Container`, `Row` et `Column` par un `NavigationDrawer` natif Flet, tout en conservant autant que possible le rendu visuel actuel et en ajoutant l’effet drawer.
+Remplacer la sidebar manuelle actuelle par une navigation latérale animée qui conserve les icônes visibles en permanence et affiche les libellés uniquement lorsque la souris survole la sidebar.
 
-## Contraintes validées
+## Structure attendue
 
-- [x] Conserver les destinations actuelles et leur ordre.
-- [x] Conserver les couleurs, arrondis, icônes et libellés de PaperNest.
-- [x] Ajouter un en-tête de marque en haut du drawer.
-- [x] Conserver l’administration comme destination secondaire visuellement séparée.
-- [x] Utiliser d’abord les contrôles natifs Flet sans fork.
-- [x] Ne forker qu’après comparaison visuelle et identification précise d’une limite du contrôle natif.
-- [x] Ne pas complexifier la navigation au-delà du besoin réel de PaperNest.
+### État compact
 
-## Étude de l’existant
+- [ ] Logo PaperNest compact.
+- [ ] Séparateur.
+- [ ] Icône Accueil.
+- [ ] Icône Recherche.
+- [ ] Icône Documents importants.
+- [ ] Icône Corbeille.
+- [ ] Espace extensible.
+- [ ] Séparateur.
+- [ ] Icône Administration.
 
-- [x] Lire `SidebarNavigation`, `NavigationButton` et `MainWindow`.
-- [x] Inventorier les largeurs, espacements, couleurs et états sélectionnés actuels.
-- [x] Identifier le comportement responsive actuel sous le seuil de 900 px.
-- [x] Lire l’API Python de `NavigationDrawer` et `NavigationDrawerDestination`.
-- [x] Lire l’implémentation Dart Flet correspondante.
-- [x] Identifier les limites potentielles : hauteur des destinations, padding interne, bordure sélectionnée, mode compact et ancrage inférieur.
+### État déployé
 
-## Prototype natif
+- [ ] Logo PaperNest complet.
+- [ ] Séparateur.
+- [ ] Icône Accueil et libellé « Accueil ».
+- [ ] Icône Recherche et libellé « Recherche ».
+- [ ] Icône Documents importants et libellé « Documents importants ».
+- [ ] Icône Corbeille et libellé « Corbeille ».
+- [ ] Espace extensible.
+- [ ] Séparateur.
+- [ ] Icône Administration et libellé « Administration ».
 
-- [x] Créer un module de prototype séparé sans remplacer immédiatement la sidebar actuelle.
-- [x] Construire le drawer avec `NavigationDrawer` et `NavigationDrawerDestination`.
-- [x] Reproduire la largeur et la couleur de fond actuelles.
-- [x] Reproduire l’indicateur sélectionné avec `indicator_color` et `indicator_shape`.
-- [x] Ajouter un bloc de marque provisoire en haut en attendant le logo validé.
-- [x] Ajouter les séparateurs et les destinations secondaires.
-- [ ] Brancher le prototype sur les destinations réelles de `MainWindow`.
-- [ ] Ajouter un bouton temporaire d’ouverture du drawer.
-- [ ] Vérifier la fermeture après sélection d’une destination.
-- [ ] Vérifier la compatibilité exacte des méthodes `show_drawer()` et `close_drawer()` avec Flet 0.85.3 lors du premier essai Windows.
+## Comportement validé
 
-## Comparaison visuelle
+- [x] La sidebar compacte reste visible en permanence.
+- [x] Le survol de n’importe quelle zone compacte déclenche le déploiement.
+- [x] La sidebar reste ouverte tant que la souris se trouve dans toute sa zone déployée.
+- [x] La sortie complète de la souris déclenche le repli.
+- [x] L’ouverture et la fermeture utilisent un glissement horizontal animé.
+- [x] Le contenu de la page ne change jamais de taille.
+- [x] La partie déployée se superpose au contenu.
+- [x] Aucun bouton d’ouverture n’est nécessaire.
+- [x] Le contrôle sera développé dans PaperNestExtension.
 
-- [ ] Comparer le rendu natif à la sidebar actuelle sous Windows.
-- [ ] Vérifier les dimensions des destinations.
-- [ ] Vérifier l’espacement entre icône et libellé.
-- [ ] Vérifier les couleurs et l’état sélectionné.
-- [ ] Vérifier l’en-tête avec le futur logo.
-- [ ] Vérifier le comportement d’ouverture, de fermeture et de redimensionnement.
-- [ ] Vérifier si la destination Administration peut être positionnée suffisamment bas avec le contrôle natif.
-- [ ] Lister précisément les différences impossibles à corriger par le thème natif.
+## Étude technique
 
-## Décision de fork
+- [x] Lire la sidebar manuelle actuelle et `MainWindow`.
+- [x] Lire l’API Python de `NavigationDrawer`.
+- [x] Lire l’implémentation Dart de `NavigationDrawer`.
+- [x] Constater que le contrôle natif est modal et ne correspond pas au comportement demandé.
+- [x] Abandonner le prototype modal précédent.
+- [x] Décider de construire un nouveau contrôle autonome dans PaperNestExtension.
+- [ ] Définir le nom public final du contrôle et de ses destinations.
+- [ ] Définir l’API exacte avec PaperNestExtension.
 
-- [ ] Confirmer que le rendu natif est suffisamment proche et poursuivre sans fork.
-- [ ] Ou documenter une limite réellement bloquante avant de créer un fork PaperNestExtension.
-- [ ] Si un fork devient nécessaire, limiter les modifications aux propriétés manquantes dont PaperNest a réellement besoin.
+## Développement PaperNestExtension
 
-## Migration finale
+Roadmap de référence :
 
-- [ ] Intégrer le drawer validé dans `MainWindow`.
-- [ ] Retirer la sidebar historique uniquement après validation.
-- [ ] Supprimer `NavigationButton` et le code manuel devenu inutile.
-- [ ] Préserver la création, la destruction et le rafraîchissement des vues actuelles.
+- `PaperNestExtension/docs/roadmaps/ROADMAP_HOVER_SIDEBAR.md`
+
+- [ ] Créer l’API Python.
+- [ ] Créer l’implémentation Flutter.
+- [ ] Créer les destinations typées.
+- [ ] Implémenter le survol global de la zone.
+- [ ] Implémenter l’animation de largeur.
+- [ ] Implémenter la superposition sans redimensionnement du contenu.
+- [ ] Implémenter l’état sélectionné.
+- [ ] Implémenter les séparateurs, l’espace extensible et les logos.
+- [ ] Créer et valider un exemple Windows.
+
+## Intégration PaperNest
+
+- [ ] Conserver la sidebar actuelle pendant le développement du contrôle.
+- [ ] Installer le nouveau contrôle dans une structure superposée.
+- [ ] Réserver uniquement la largeur compacte dans le layout principal.
+- [ ] Brancher les destinations sur `MainWindow.navigate_to`.
+- [ ] Synchroniser `selected_index`.
+- [ ] Conserver la création, la destruction et le rafraîchissement actuels des vues.
+- [ ] Intégrer les futurs assets PaperNest.
+- [ ] Comparer le rendu compact à la sidebar actuelle.
+- [ ] Comparer le rendu déployé à la sidebar actuelle.
+- [ ] Vérifier que le contenu ne bouge jamais pendant l’animation.
+
+## Nettoyage après validation
+
+- [ ] Supprimer `NavigationButton`.
+- [ ] Supprimer `SidebarNavigation`.
+- [ ] Supprimer le code manuel devenu inutile.
+- [ ] Supprimer les imports obsolètes.
 - [ ] Valider toutes les destinations.
 - [ ] Valider le comportement sous Windows.
 - [ ] Valider le build Windows.
@@ -70,4 +101,4 @@ Remplacer la sidebar construite manuellement avec `Container`, `Row` et `Column`
 
 ## Critère de finalisation
 
-La migration sera terminée uniquement lorsque le drawer natif ou son éventuel fork reproduira suffisamment le rendu PaperNest, que toutes les destinations fonctionneront, que l’ancien code sera supprimé et que le comportement Windows sera validé par l’utilisateur.
+La migration sera terminée lorsque la rail compacte restera visible en permanence, que son déploiement et son repli seront fluides au survol, que la partie ouverte se superposera au contenu sans provoquer le moindre redimensionnement et que toutes les destinations seront validées sous Windows.
