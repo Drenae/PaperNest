@@ -1,63 +1,68 @@
 # Roadmap UI — PaperNest
 
+## État
+
+La roadmap UI est terminée. PaperNest est considéré comme finalisé dans son périmètre actuel.
+
 ## Objectif
 
-Stabiliser l’interface de PaperNest et migrer progressivement les champs vers PaperNestExtension sans dégrader les comportements déjà validés.
+Stabiliser l’interface de PaperNest et migrer les champs vers PaperNestExtension sans dégrader les comportements validés ni complexifier l’application.
 
-## Fait
+## Contrôles intégrés
 
-- [x] Intégration de `PaperNestTextField`.
-- [x] Intégration de `PaperNestDropdown`.
-- [x] Création de `SearchDropDown` pour les filtres de recherche.
-- [x] Bouton d’effacement réservé aux filtres concernés.
-- [x] Correction de l’affichage des libellés des options de dropdown.
-- [x] Résolution des problèmes causés par d’anciens dossiers de build.
-- [x] Étude du champ couleur actuel dans PaperNest.
-- [x] Création de `BaseColorPicker` à partir de l’API réelle de `PaperNestColorPicker`.
-- [x] Intégration de `PaperNestColorPicker` dans le formulaire d’édition des classeurs.
-- [x] Remplacement de l’utilisation de l’ancien `BaseColorField`.
-- [x] Suppression de l’ancien code couleur devenu inutile après validation.
-- [x] Validation visuelle et fonctionnelle de `PaperNestColorPicker` sous Windows.
-- [x] Migration de `PaperNestDatePicker`.
-  - [x] Lecture de l’API Python réelle.
-  - [x] Lecture de l’implémentation Flutter réelle.
-  - [x] Création du fichier thématique dédié `date_picker.py`.
-  - [x] Héritage direct de `PaperNestDatePicker`, sans conteneur `ft.Row`.
-  - [x] Harmonisation du wrapper avec `BaseColorPicker` et `BaseFilePicker` via des `kwargs.setdefault(...)` surchargeables.
-  - [x] Conservation de `value` au type natif `datetime`.
-  - [x] Exposition explicite de `iso_value` pour les services PaperNest.
-  - [x] Remplacement des usages dans le dialogue des métadonnées.
-  - [x] Suppression de l’ancien DatePicker natif de `forms.py`.
-  - [x] Validation visuelle et fonctionnelle sous Windows.
-  - [x] Validation du build Windows.
-- [x] Migration de `PaperNestFilePicker`.
-  - [x] Lecture de la roadmap dédiée de l’extension.
-  - [x] Lecture de l’API Python réelle.
-  - [x] Lecture de l’exemple fonctionnel de l’extension.
-  - [x] Création du wrapper thématique dédié `file_picker.py` héritant de `PaperNestFilePicker`.
-  - [x] Migration de la sélection multiple et du glisser-déposer de `UploadPanel`.
-  - [x] Conservation du bouton « Ajouter des fichiers » utilisant `pick_files()`.
-  - [x] Utilisation de la sélection interne du contrôle comme source de vérité.
-  - [x] Utilisation des identifiants du contrôle comme lien avec les métadonnées de classement.
-  - [x] Migration du bouton `restore_button` de l’administration.
-  - [x] Migration de la sélection simple des sauvegardes ZIP.
-  - [x] Suppression du FilePicker historique partagé de `MainWindow`.
-  - [x] Suppression de l’ancien wrapper `ft.FilePicker` de `forms.py`.
-  - [x] Suppression de `FileDropZone`.
-  - [x] Suppression de la dépendance `flet-dropzone`.
-  - [x] Validation visuelle et fonctionnelle de l’import sous Windows.
-  - [x] Validation visuelle et fonctionnelle du parcours de restauration sous Windows.
-  - [x] Validation du build Windows après migration.
+- [x] `PaperNestTextField`.
+- [x] `PaperNestDropdown` et `PaperNestDropdownOption`.
+- [x] `SearchDropDown` pour les filtres concernés.
+- [x] `PaperNestColorPicker` via `BaseColorPicker`.
+- [x] `PaperNestDatePicker` via `BaseDatePickerField`.
+- [x] `PaperNestFilePicker` via `BaseFilePicker`.
+
+## Migration ColorPicker
+
+- [x] Étude de l’ancien champ couleur.
+- [x] Création du wrapper thématique dédié avec des valeurs par défaut surchargeables.
+- [x] Intégration dans le formulaire d’édition des classeurs.
+- [x] Suppression de l’ancien `BaseColorField` et de son code devenu inutile.
+- [x] Validation visuelle, fonctionnelle et du build Windows.
+
+## Migration DatePicker
+
+- [x] Lecture de l’API Python, de l’implémentation Flutter et de l’exemple.
+- [x] Création de `date_picker.py`.
+- [x] Héritage direct de `PaperNestDatePicker`, sans conteneur `ft.Row`.
+- [x] Application du thème avec des `kwargs.setdefault(...)` surchargeables.
+- [x] Conservation de `value` au type natif `datetime`.
+- [x] Exposition de `iso_value` pour les services PaperNest.
+- [x] Remplacement des usages dans le dialogue des métadonnées.
+- [x] Suppression de l’ancien DatePicker natif de `forms.py`.
+- [x] Validation visuelle, fonctionnelle et du build Windows.
+
+## Migration FilePicker
+
+- [x] Lecture de la roadmap, de l’API réelle et de l’exemple fonctionnel.
+- [x] Création de `file_picker.py`.
+- [x] Héritage direct de `PaperNestFilePicker`.
+- [x] Application du thème avec des `kwargs.setdefault(...)` surchargeables.
+- [x] Migration de la sélection multiple et du glisser-déposer de `UploadPanel`.
+- [x] Conservation du bouton « Ajouter des fichiers » utilisant `pick_files()`.
+- [x] Utilisation de la sélection interne comme source de vérité.
+- [x] Conservation des métadonnées de classement via les identifiants des fichiers.
+- [x] Migration du bouton `restore_button` et de la sélection simple ZIP.
+- [x] Suppression du FilePicker historique partagé de `MainWindow`.
+- [x] Suppression de l’ancien wrapper `ft.FilePicker` de `forms.py`.
+- [x] Suppression de `FileDropZone` et de la dépendance `flet-dropzone`.
+- [x] Validation de l’import, de la restauration et du build Windows.
 
 ## Nettoyage final
 
-- [x] Vérifier l’ensemble de `forms.py` pour les anciens DatePicker et FilePicker.
-- [x] Supprimer les anciens wrappers DatePicker et FilePicker devenus inutiles.
-- [x] Supprimer l’ancien `FileDropZone` devenu inutile.
-- [x] Nettoyer les imports liés à ces anciens wrappers.
-- [x] Retirer la dépendance `flet-dropzone` devenue inutile.
-- [x] Effectuer une validation visuelle et fonctionnelle complète sous Windows.
+- [x] Vérification complète de `forms.py`.
+- [x] Suppression des anciens wrappers DatePicker et FilePicker.
+- [x] Suppression de `FileDropZone`.
+- [x] Nettoyage des imports obsolètes.
+- [x] Retrait de `flet-dropzone`.
+- [x] Validation visuelle et fonctionnelle complète sous Windows.
+- [x] Mise à jour des roadmaps et changelogs de PaperNest et PaperNestExtension.
 
-## Règle de migration
+## Principe de maintenance
 
-Chaque migration doit être réalisée à partir de l’API réelle du contrôle présent dans PaperNestExtension. Les variantes spécialisées ne doivent être utilisées que dans les contextes qui les justifient.
+PaperNest est terminé et doit rester simple. Les futures modifications doivent se limiter aux corrections nécessaires ou à de petites améliorations apportant une valeur directe, sans transformer l’application en système complexe.
