@@ -23,15 +23,14 @@ Stabiliser l’interface de PaperNest et migrer progressivement les champs vers 
   - [x] Lecture de l’implémentation Flutter réelle.
   - [x] Création du fichier thématique dédié `date_picker.py`.
   - [x] Héritage direct de `PaperNestDatePicker`, sans conteneur `ft.Row`.
-  - [x] Conservation de la valeur ISO attendue par les services PaperNest.
+  - [x] Harmonisation du wrapper avec `BaseColorPicker` et `BaseFilePicker` via des `kwargs.setdefault(...)` surchargeables.
+  - [x] Conservation de `value` au type natif `datetime`.
+  - [x] Exposition explicite de `iso_value` pour les services PaperNest.
   - [x] Remplacement des usages dans le dialogue des métadonnées.
   - [x] Suppression de l’ancien DatePicker natif de `forms.py`.
   - [x] Validation visuelle et fonctionnelle sous Windows.
   - [x] Validation du build Windows.
-
-## En cours
-
-- [ ] Migration de `PaperNestFilePicker`.
+- [x] Migration de `PaperNestFilePicker`.
   - [x] Lecture de la roadmap dédiée de l’extension.
   - [x] Lecture de l’API Python réelle.
   - [x] Lecture de l’exemple fonctionnel de l’extension.
@@ -44,16 +43,20 @@ Stabiliser l’interface de PaperNest et migrer progressivement les champs vers 
   - [x] Migration de la sélection simple des sauvegardes ZIP.
   - [x] Suppression du FilePicker historique partagé de `MainWindow`.
   - [x] Suppression de l’ancien wrapper `ft.FilePicker` de `forms.py`.
-  - [ ] Nouvelle validation visuelle et fonctionnelle de l’import sous Windows.
-  - [ ] Validation visuelle et fonctionnelle du parcours de restauration sous Windows.
-  - [ ] Validation du build Windows après nettoyage.
+  - [x] Suppression de `FileDropZone`.
+  - [x] Suppression de la dépendance `flet-dropzone`.
+  - [x] Validation visuelle et fonctionnelle de l’import sous Windows.
+  - [x] Validation visuelle et fonctionnelle du parcours de restauration sous Windows.
+  - [x] Validation du build Windows après migration.
 
-## Après migration de tous les contrôles
+## Nettoyage final
 
 - [x] Vérifier l’ensemble de `forms.py` pour les anciens DatePicker et FilePicker.
 - [x] Supprimer les anciens wrappers DatePicker et FilePicker devenus inutiles.
+- [x] Supprimer l’ancien `FileDropZone` devenu inutile.
 - [x] Nettoyer les imports liés à ces anciens wrappers.
-- [ ] Effectuer une validation visuelle et fonctionnelle complète sous Windows.
+- [x] Retirer la dépendance `flet-dropzone` devenue inutile.
+- [x] Effectuer une validation visuelle et fonctionnelle complète sous Windows.
 
 ## Règle de migration
 
