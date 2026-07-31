@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">PaperNest — Nid classique</title>
+  <desc id="desc">Un document protégé dans un nid stylisé.</desc>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M185 92h106l60 60v170c0 20-16 36-36 36H185c-20 0-36-16-36-36V128c0-20 16-36 36-36Z" stroke="#17191F" stroke-width="22"/>
+    <path d="M291 92v60h60" stroke="#17191F" stroke-width="22"/>
+    <path d="M208 222h96M208 264h96" stroke="#F9A825" stroke-width="18"/>
+
+    <path d="M80 326c49 54 105 78 176 78s127-24 176-78" stroke="#17191F" stroke-width="24"/>
+    <path d="M96 292c45 48 98 70 160 70s115-22 160-70" stroke="#17191F" stroke-width="22"/>
+    <path d="M122 258c37 39 82 58 134 58s97-19 134-58" stroke="#17191F" stroke-width="20"/>
+    <path d="M115 366c42 28 88 42 141 42s99-14 141-42" stroke="#17191F" stroke-width="18"/>
+
+    <path d="M111 306 82 259M135 286l-12-58M401 306l29-47M377 286l12-58" stroke="#17191F" stroke-width="16"/>
+    <path d="M84 259 62 239M123 228l-8-28M430 259l22-20M389 228l8-28" stroke="#17191F" stroke-width="14"/>
+  </g>
+</svg>
