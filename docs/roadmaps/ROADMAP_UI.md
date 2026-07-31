@@ -2,11 +2,11 @@
 
 ## État
 
-La version actuelle de PaperNest reste terminée et stable. Trois améliorations limitées sont désormais à l’étude sans remettre en cause ce périmètre : `PaperNestIconPicker`, une navigation native avec effet drawer et les assets visuels PaperNest.
+La version actuelle de PaperNest reste stable. Trois améliorations limitées sont suivies : l’intégration de `PaperNestGlideRail`, la future identité visuelle et l’étude de `PaperNestIconPicker`.
 
 ## Objectif
 
-Préserver une interface simple et stable tout en étudiant uniquement les améliorations qui apportent une valeur visuelle ou ergonomique directe.
+Préserver une interface simple et stable tout en ajoutant uniquement les améliorations qui apportent une valeur visuelle ou ergonomique directe.
 
 ## Contrôles intégrés et validés
 
@@ -26,38 +26,40 @@ Préserver une interface simple et stable tout en étudiant uniquement les amél
 - [x] Validation visuelle, fonctionnelle et des builds Windows.
 - [x] Mise à jour des roadmaps et changelogs des deux projets.
 
-## Nouvelles pistes encadrées
+## PaperNestGlideRail
 
-### PaperNestIconPicker
+- [x] Redéfinir le besoin réel : rail compacte permanente, déploiement au survol et superposition.
+- [x] Abandonner le prototype `NavigationDrawer` modal.
+- [x] Développer `PaperNestGlideRail` dans PaperNestExtension.
+- [x] Valider son build, son exemple et son comportement sous Windows.
+- [x] Intégrer une première version dans `MainWindow`.
+- [x] Conserver la logique de navigation et le cycle de vie des vues.
+- [ ] Valider l’intégration dans PaperNest.
+- [ ] Supprimer l’ancienne sidebar après validation.
+- [ ] Valider le build Windows de PaperNest.
+
+Voir `ROADMAP_GLIDE_RAIL.md`.
+
+## Identité visuelle
+
+- [x] Définir les assets nécessaires.
+- [x] Créer une roadmap dédiée.
+- [ ] Créer et valider le symbole compact PaperNest en SVG.
+- [ ] Créer et valider le logo horizontal PaperNest en SVG.
+- [ ] Produire les déclinaisons PNG et l’icône Windows nécessaires.
+- [ ] Intégrer les assets dans `PaperNestGlideRail` après validation graphique.
+
+Voir `ROADMAP_BRANDING.md`.
+
+## PaperNestIconPicker
 
 - [x] Identifier le besoin réel autour de `BaseIconField`.
 - [x] Créer une roadmap dédiée dans PaperNestExtension.
 - [ ] Étudier puis développer le contrôle autonome sans fonctions inutiles.
 - [ ] Intégrer le contrôle uniquement après validation de l’exemple Windows.
 
-Voir la roadmap `PaperNestExtension/docs/roadmaps/ROADMAP_ICON_PICKER.md`.
-
-### NavigationDrawer
-
-- [x] Étudier la sidebar actuelle.
-- [x] Étudier les sources Python et Dart du `NavigationDrawer` natif Flet.
-- [x] Créer une roadmap dédiée.
-- [ ] Réaliser un prototype natif séparé sans supprimer la sidebar actuelle.
-- [ ] Comparer le rendu sous Windows.
-- [ ] Décider d’un éventuel fork uniquement si une limite réelle est démontrée.
-
-Voir `ROADMAP_NAVIGATION_DRAWER.md`.
-
-### Identité visuelle
-
-- [x] Définir les assets nécessaires.
-- [x] Créer une roadmap dédiée.
-- [ ] Créer et valider l’icône PaperNest.
-- [ ] Créer et valider le logo destiné au drawer.
-- [ ] Intégrer les assets uniquement après validation graphique.
-
-Voir `ROADMAP_BRANDING.md`.
+Voir `PaperNestExtension/docs/roadmaps/ROADMAP_ICON_PICKER.md`.
 
 ## Principe de maintenance
 
-PaperNest reste une application simple. Ces pistes ne doivent pas devenir une refonte générale ni entraîner l’ajout de fonctions sans besoin concret. La version actuelle doit rester fonctionnelle pendant toute la durée des prototypes, et aucun ancien composant ne doit être supprimé avant validation de son remplacement.
+PaperNest reste une application simple. Aucun nouveau comportement ne doit être ajouté sans besoin concret, et aucun ancien composant ne doit être supprimé avant validation complète de son remplacement.
