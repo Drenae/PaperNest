@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 
 import flet as ft
@@ -8,6 +9,9 @@ from papernestextension.controls.material.papernest_color_picker import (
 )
 
 from app.theme.tokens import AppColors, AppRadius, AppSpacing, AppText
+
+
+_HEX_COLOR_PATTERN = re.compile(r"^#[0-9A-F]{6}$")
 
 
 class BaseColorPicker(PaperNestColorPicker):
@@ -78,8 +82,29 @@ class BaseColorPicker(PaperNestColorPicker):
 
     @classmethod
     def normalize_value(cls, value: str | None, default: str = "#1E88E5") -> str:
-        """Normalise une couleur via l'implémentation de PaperNestExtension."""
-        return cls._normalize_hex(value) or default
+        """Retourne toujours une couleur hexadécimale ``#RRGGBB`` valide.
+
+        Certaines anciennes catégories peuvent encore contenir une constante
+        Flet nommée, par exemple ``AMBER_600``. Ces valeurs restent utilisables
+        par Flet pour l'affichage, mais ne peuvent pas être traitées comme du
+        RGB par les calculs de prévisualisation. Elles sont donc remplacées par
+        la couleur par défaut jusqu'à leur prochain enregistrement.
+        """
+        normalized_default = cls._normalize_hex(default)
+        if not normalized_default or not _HEX_COLOR_PATTERN.fullmatch(
+            normalized_default.upper()
+        ):
+            normalized_default = "#1E88E5"
+
+        normalized = cls._normalize_hex(value)
+        if not normalized:
+            return normalized_default
+
+        normalized = normalized.upper()
+        if not _HEX_COLOR_PATTERN.fullmatch(normalized):
+            return normalized_default
+
+        return normalized
 
     def _handle_change(self, event) -> None:
         if self._external_on_change is not None:
