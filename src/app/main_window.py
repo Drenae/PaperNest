@@ -127,7 +127,12 @@ class MainWindow:
             item_spacing=AppSpacing.XS,
             hover_scale=1.025,
             hover_animation_duration=140,
-            brand_icon=ft.Icons.FOLDER_COPY_ROUNDED,
+            brand_icon=ft.Image(
+                src="branding/papernest_symbol.svg",
+                width=40,
+                height=40,
+                fit=ft.BoxFit.CONTAIN,
+            ),
             brand_title="PaperNest",
             brand_subtitle="Documents personnels",
             destinations=[
