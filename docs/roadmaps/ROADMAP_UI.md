@@ -2,9 +2,9 @@
 
 ## État
 
-La version actuelle de PaperNest reste terminée et stable. `PaperNestGlideRail` est intégré et validé dans l’application. Le symbole PaperNest final est intégré dans la zone de marque de la rail et son rendu a été validé.
+La version actuelle de PaperNest reste terminée et stable.
 
-La navigation a également été recentralisée dans `src/app/navigation/navigation.py` afin de séparer clairement la définition des destinations et la construction de la rail du cycle de vie général de `MainWindow`.
+`PaperNestGlideRail` et l’identité visuelle PaperNest sont désormais officiellement terminés, intégrés et validés sous Windows. Le prochain chantier UI actif est `PaperNestIconPicker`.
 
 ## Objectif
 
@@ -30,34 +30,49 @@ Préserver une interface simple et stable tout en ajoutant uniquement les améli
 - [x] Centralisation de la navigation dans `src/app/navigation/navigation.py`.
 - [x] Réduction de `MainWindow` au cycle de vie de la vue affichée.
 - [x] Utilisation de `ft.Text` personnalisés pour le titre et le sous-titre de marque.
-- [x] Nettoyage complet de `forms.py` et des imports obsolètes.
-- [x] Validation visuelle, fonctionnelle et des builds Windows des migrations terminées.
+- [x] Sélection, nettoyage et intégration du symbole officiel PaperNest.
+- [x] Validation visuelle du branding dans la rail.
+- [x] Nettoyage complet de `forms.py` et des imports obsolètes liés aux migrations terminées.
+- [x] Validation visuelle, fonctionnelle et des builds Windows.
 - [x] Mise à jour des roadmaps concernées.
 
-## Prochains chantiers encadrés
+## Chantiers terminés
+
+### PaperNestGlideRail
+
+- [x] Contrôle finalisé dans PaperNestExtension.
+- [x] Intégration réelle dans PaperNest.
+- [x] Navigation centralisée dans son module dédié.
+- [x] Validation finale par l’utilisateur.
+
+Voir `PaperNestExtension/docs/roadmaps/ROADMAP_GLIDE_RAIL.md`.
 
 ### Identité visuelle
 
-- [x] Définir les assets nécessaires.
-- [x] Créer une roadmap dédiée.
-- [x] Sélectionner le symbole compact PaperNest.
-- [x] Créer une version SVG finale nettoyée.
-- [x] Intégrer le symbole dans `PaperNestGlideRail`.
-- [x] Valider le rendu du symbole dans la rail.
-- [ ] Générer les déclinaisons PNG nécessaires au build Windows.
-- [ ] Intégrer et tester l’icône du build de l’application.
-- [ ] Créer un logo horizontal uniquement si un besoin réel est confirmé.
+- [x] Symbole compact sélectionné.
+- [x] SVG final nettoyé.
+- [x] Intégration dans `PaperNestGlideRail`.
+- [x] Validation dans les états replié et déployé.
+- [x] Validation finale par l’utilisateur.
 
 Voir `ROADMAP_BRANDING.md`.
+
+## Chantier actif
 
 ### PaperNestIconPicker
 
 - [x] Identifier le besoin réel autour de `BaseIconField`.
 - [x] Créer une roadmap dédiée dans PaperNestExtension.
-- [ ] Étudier puis développer le contrôle autonome sans fonctions inutiles.
-- [ ] Intégrer le contrôle uniquement après validation de l’exemple Windows.
+- [x] Relire l’implémentation actuelle de `BaseIconField`.
+- [ ] Finaliser l’API minimale du nouveau contrôle.
+- [ ] Développer le contrôle autonome dans PaperNestExtension.
+- [ ] Ajouter l’exemple au projet principal de l’extension.
+- [ ] Valider l’exemple sous Windows.
+- [ ] Intégrer le contrôle dans l’éditeur des classeurs.
+- [ ] Supprimer `BaseIconField` après validation.
+- [ ] Valider le build Windows de PaperNest.
 
-Voir la roadmap `PaperNestExtension/docs/roadmaps/ROADMAP_ICON_PICKER.md`.
+Voir `PaperNestExtension/docs/roadmaps/ROADMAP_ICON_PICKER.md`.
 
 ## Principe de maintenance
 
