@@ -12,34 +12,36 @@ from services.categories.service import category_service
 from app.theme.buttons import GhostButton, PrimaryButton
 from app.theme.color_picker import BaseColorPicker
 from app.theme.dialogs import AppDialog
-from app.theme.forms import BaseIconField, BaseTextField
+from app.theme.forms import BaseTextField
+from app.theme.icon_picker import BaseIconPicker, PaperNestIconPickerOption
 
 
 logger = logging.getLogger(__name__)
 
-AVAILABLE_ICONS = {
-    "Dossier": "FOLDER_ROUNDED",
-    "Identité": "BADGE_ROUNDED",
-    "Logement": "OTHER_HOUSES_ROUNDED",
-    "Santé": "HEALTH_AND_SAFETY_ROUNDED",
-    "Fiscalité": "REQUEST_QUOTE_ROUNDED",
-    "Banque": "ACCOUNT_BALANCE_ROUNDED",
-    "Assurance": "VERIFIED_USER_ROUNDED",
-    "Travail": "WORK_ROUNDED",
-    "Véhicule": "DIRECTIONS_CAR_ROUNDED",
-    "Famille": "FAMILY_RESTROOM_ROUNDED",
-    "Études": "SCHOOL_ROUNDED",
-    "Contrats": "DESCRIPTION_ROUNDED",
-    "Énergie": "BOLT_ROUNDED",
-    "Télécom": "ROUTER_ROUNDED",
-    "Voyages": "FLIGHT_ROUNDED",
-    "Animaux": "PETS_ROUNDED",
-    "Loisirs": "SPORTS_ESPORTS_ROUNDED",
-    "Achats": "SHOPPING_BAG_ROUNDED",
-    "Abonnements": "AUTORENEW_ROUNDED",
-    "Archives": "ARCHIVE_ROUNDED",
-}
+AVAILABLE_ICONS = [
+    PaperNestIconPickerOption(label="Dossier", value="FOLDER_ROUNDED", icon=ft.Icons.FOLDER_ROUNDED),
+    PaperNestIconPickerOption(label="Identité", value="BADGE_ROUNDED", icon=ft.Icons.BADGE_ROUNDED),
+    PaperNestIconPickerOption(label="Logement", value="OTHER_HOUSES_ROUNDED", icon=ft.Icons.OTHER_HOUSES_ROUNDED),
+    PaperNestIconPickerOption(label="Santé", value="HEALTH_AND_SAFETY_ROUNDED", icon=ft.Icons.HEALTH_AND_SAFETY_ROUNDED),
+    PaperNestIconPickerOption(label="Fiscalité", value="REQUEST_QUOTE_ROUNDED", icon=ft.Icons.REQUEST_QUOTE_ROUNDED),
+    PaperNestIconPickerOption(label="Banque", value="ACCOUNT_BALANCE_ROUNDED", icon=ft.Icons.ACCOUNT_BALANCE_ROUNDED),
+    PaperNestIconPickerOption(label="Assurance", value="VERIFIED_USER_ROUNDED", icon=ft.Icons.VERIFIED_USER_ROUNDED),
+    PaperNestIconPickerOption(label="Travail", value="WORK_ROUNDED", icon=ft.Icons.WORK_ROUNDED),
+    PaperNestIconPickerOption(label="Véhicule", value="DIRECTIONS_CAR_ROUNDED", icon=ft.Icons.DIRECTIONS_CAR_ROUNDED),
+    PaperNestIconPickerOption(label="Famille", value="FAMILY_RESTROOM_ROUNDED", icon=ft.Icons.FAMILY_RESTROOM_ROUNDED),
+    PaperNestIconPickerOption(label="Études", value="SCHOOL_ROUNDED", icon=ft.Icons.SCHOOL_ROUNDED),
+    PaperNestIconPickerOption(label="Contrats", value="DESCRIPTION_ROUNDED", icon=ft.Icons.DESCRIPTION_ROUNDED),
+    PaperNestIconPickerOption(label="Énergie", value="BOLT_ROUNDED", icon=ft.Icons.BOLT_ROUNDED),
+    PaperNestIconPickerOption(label="Télécom", value="ROUTER_ROUNDED", icon=ft.Icons.ROUTER_ROUNDED),
+    PaperNestIconPickerOption(label="Voyages", value="FLIGHT_ROUNDED", icon=ft.Icons.FLIGHT_ROUNDED),
+    PaperNestIconPickerOption(label="Animaux", value="PETS_ROUNDED", icon=ft.Icons.PETS_ROUNDED),
+    PaperNestIconPickerOption(label="Loisirs", value="SPORTS_ESPORTS_ROUNDED", icon=ft.Icons.SPORTS_ESPORTS_ROUNDED),
+    PaperNestIconPickerOption(label="Achats", value="SHOPPING_BAG_ROUNDED", icon=ft.Icons.SHOPPING_BAG_ROUNDED),
+    PaperNestIconPickerOption(label="Abonnements", value="AUTORENEW_ROUNDED", icon=ft.Icons.AUTORENEW_ROUNDED),
+    PaperNestIconPickerOption(label="Archives", value="ARCHIVE_ROUNDED", icon=ft.Icons.ARCHIVE_ROUNDED),
+]
 
+DEFAULT_ICON = "FOLDER_ROUNDED"
 DEFAULT_COLOR = "#1E88E5"
 
 
@@ -60,7 +62,7 @@ class CategoryEditorDialog:
 
     def show(self) -> None:
         editing = self.category is not None
-        current_icon = str((self.category or {}).get("icon") or "FOLDER_ROUNDED")
+        current_icon = str((self.category or {}).get("icon") or DEFAULT_ICON)
         current_color = BaseColorPicker.normalize_value(
             (self.category or {}).get("color"),
             DEFAULT_COLOR,
@@ -71,13 +73,13 @@ class CategoryEditorDialog:
             value=str((self.category or {}).get("name") or ""),
             prefix_icon=ft.Icons.DRIVE_FILE_RENAME_OUTLINE_ROUNDED,
             autofocus=True,
-            expand=True
+            expand=True,
         )
-        self.icon_field = BaseIconField(
-            page=self.page,
+        self.icon_field = BaseIconPicker(
             label="Icône",
             options=AVAILABLE_ICONS,
             value=current_icon,
+            fallback_value=DEFAULT_ICON,
             on_change=self.update_preview,
         )
         self.color_field = BaseColorPicker(
@@ -85,9 +87,17 @@ class CategoryEditorDialog:
             value=current_color,
             on_change=self.update_preview,
         )
-        self.preview_icon = ft.Icon(getattr(ft.Icons, current_icon, ft.Icons.FOLDER_ROUNDED), color=current_color, size=30)
+        self.preview_icon = ft.Icon(
+            getattr(ft.Icons, self.icon_field.value or DEFAULT_ICON, ft.Icons.FOLDER_ROUNDED),
+            color=current_color,
+            size=30,
+        )
         default_title = "Nouvelle sous-catégorie" if self.parent else "Nouveau classeur"
-        self.preview_title = ft.Text(self.name_field.value or default_title, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN)
+        self.preview_title = ft.Text(
+            self.name_field.value or default_title,
+            weight=ft.FontWeight.BOLD,
+            color=AppColors.TEXT_MAIN,
+        )
         self.preview = ft.Container(
             padding=AppSpacing.MD,
             border_radius=AppRadius.LG,
@@ -97,12 +107,26 @@ class CategoryEditorDialog:
         )
         self.error_text = ft.Text("", size=12, color=AppColors.ERROR)
         self.name_field.on_change = self.update_preview
-        self.save_button = PrimaryButton("Enregistrer" if editing else "Créer", icon=ft.Icons.SAVE_ROUNDED, on_click=self.save)
+        self.save_button = PrimaryButton(
+            "Enregistrer" if editing else "Créer",
+            icon=ft.Icons.SAVE_ROUNDED,
+            on_click=self.save,
+        )
         self.dialog = AppDialog(
             title=("Modifier la sous-catégorie" if editing and self.category and self.category.get("parent_key") else "Modifier le classeur") if editing else (f"Ajouter dans {self.parent['name']}" if self.parent else "Ajouter un classeur"),
             icon=ft.Icons.EDIT_ROUNDED if editing else ft.Icons.CREATE_NEW_FOLDER_ROUNDED,
             width=560,
-            content=ft.Column(tight=True, spacing=AppSpacing.MD, controls=[self.preview, self.name_field, self.icon_field, self.color_field, self.error_text]),
+            content=ft.Column(
+                tight=True,
+                spacing=AppSpacing.MD,
+                controls=[
+                    self.preview,
+                    self.name_field,
+                    self.icon_field,
+                    self.color_field,
+                    self.error_text,
+                ],
+            ),
             actions=[GhostButton("Annuler", on_click=self.close), self.save_button],
         )
         self.page.overlay.append(self.dialog)
@@ -114,7 +138,7 @@ class CategoryEditorDialog:
             self.name_field.state = PaperNestTextFieldState.NORMAL
             self.name_field.state_message = None
         color = BaseColorPicker.normalize_value(self.color_field.value, DEFAULT_COLOR)
-        icon_name = self.icon_field.value or "FOLDER_ROUNDED"
+        icon_name = self.icon_field.value or DEFAULT_ICON
         self.preview_icon.icon = getattr(
             ft.Icons,
             icon_name,
@@ -142,7 +166,7 @@ class CategoryEditorDialog:
         self.error_text.value = ""
         self.page.update()
         try:
-            icon = self.icon_field.value or "FOLDER_ROUNDED"
+            icon = self.icon_field.value or DEFAULT_ICON
             color = BaseColorPicker.normalize_value(self.color_field.value, DEFAULT_COLOR)
             background = light_background(color)
             if self.category is None:
