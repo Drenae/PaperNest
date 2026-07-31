@@ -4,7 +4,7 @@
 
 La version actuelle de PaperNest reste terminée et stable.
 
-`PaperNestGlideRail` et l’identité visuelle PaperNest sont désormais officiellement terminés, intégrés et validés sous Windows. Le prochain chantier UI actif est `PaperNestIconPicker`.
+`PaperNestGlideRail` et l’identité visuelle PaperNest sont officiellement terminés. `PaperNestIconPicker` est désormais intégré dans l’éditeur des classeurs et attend sa validation finale dans PaperNest avant suppression de l’ancien `BaseIconField`.
 
 ## Objectif
 
@@ -61,16 +61,20 @@ Voir `ROADMAP_BRANDING.md`.
 
 ### PaperNestIconPicker
 
-- [x] Identifier le besoin réel autour de `BaseIconField`.
-- [x] Créer une roadmap dédiée dans PaperNestExtension.
-- [x] Relire l’implémentation actuelle de `BaseIconField`.
-- [ ] Finaliser l’API minimale du nouveau contrôle.
-- [ ] Développer le contrôle autonome dans PaperNestExtension.
-- [ ] Ajouter l’exemple au projet principal de l’extension.
-- [ ] Valider l’exemple sous Windows.
-- [ ] Intégrer le contrôle dans l’éditeur des classeurs.
-- [ ] Supprimer `BaseIconField` après validation.
-- [ ] Valider le build Windows de PaperNest.
+- [x] Finaliser et valider le contrôle dans PaperNestExtension.
+- [x] Créer `src/app/theme/icon_picker.py`.
+- [x] Créer `BaseIconPicker` héritant directement de `PaperNestIconPicker`.
+- [x] Convertir `AVAILABLE_ICONS` vers `PaperNestIconPickerOption`.
+- [x] Remplacer l’usage de `BaseIconField` dans l’éditeur des classeurs.
+- [x] Préserver les noms Material enregistrés et le fallback `FOLDER_ROUNDED`.
+- [x] Préserver la prévisualisation de l’icône sélectionnée.
+- [ ] Tester la création d’un classeur.
+- [ ] Tester la modification d’un classeur existant.
+- [ ] Tester une ancienne valeur d’icône inconnue et le fallback.
+- [ ] Tester le build Windows de PaperNest.
+- [ ] Supprimer définitivement `BaseIconField` de `forms.py` après validation.
+- [ ] Nettoyer les imports devenus inutiles.
+- [ ] Clôturer les roadmaps et changelogs des deux dépôts.
 
 Voir `PaperNestExtension/docs/roadmaps/ROADMAP_ICON_PICKER.md`.
 
