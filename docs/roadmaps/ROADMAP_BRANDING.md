@@ -2,9 +2,9 @@
 
 ## État
 
-La création graphique est lancée après validation complète de `PaperNestGlideRail` dans PaperNest.
+Le symbole PaperNest a été choisi par l’utilisateur, nettoyé et intégré dans `PaperNestGlideRail`.
 
-Trois premières pistes de symbole compact ont été créées en SVG dans `src/assets/branding/concepts`. Elles ne sont pas encore utilisées par l’application : leur rôle est de permettre une comparaison honnête avant de figer l’identité finale.
+La source de travail reste conservée dans `src/assets/branding/concepts/logo.svg`. Une version finale nettoyée et portable a été créée dans `src/assets/branding/papernest_symbol.svg`.
 
 ## Objectif
 
@@ -14,17 +14,16 @@ Créer une identité PaperNest cohérente avec l’interface actuelle, lisible s
 
 ### Sources vectorielles
 
-- [ ] `src/assets/branding/papernest_symbol.svg` — symbole compact final sans texte.
-- [ ] `src/assets/branding/papernest_logo.svg` — logo horizontal complet final.
+- [x] `src/assets/branding/papernest_symbol.svg` — symbole compact final sans texte.
+- [ ] `src/assets/branding/papernest_logo.svg` — logo horizontal complet final, uniquement si un besoin réel apparaît.
 - [x] Conserver les SVG comme sources principales, simples à redimensionner et à modifier.
 
-### Concepts de travail
+### Source de travail
 
-- [x] `src/assets/branding/concepts/papernest_symbol_fold.svg`.
-- [x] `src/assets/branding/concepts/papernest_symbol_stack.svg`.
-- [x] `src/assets/branding/concepts/papernest_symbol_box.svg`.
-- [x] `src/assets/branding/concepts/papernest_concepts_board.svg`.
-- [x] Documenter les pistes dans `src/assets/branding/concepts/README.md`.
+- [x] `src/assets/branding/concepts/logo.svg` — fichier original importé par l’utilisateur.
+- [x] Nettoyer les métadonnées Inkscape et conserver uniquement le dessin utile dans le symbole final.
+- [x] Conserver un fond transparent.
+- [x] Conserver les couleurs anthracite et jaune du symbole validé.
 
 ### Déclinaisons raster
 
@@ -35,37 +34,36 @@ Créer une identité PaperNest cohérente avec l’interface actuelle, lisible s
 ## Direction visuelle
 
 - [x] Reprendre l’identité actuelle de PaperNest plutôt que créer une marque sans lien avec l’application.
-- [x] Conserver le jaune PaperNest `#F9A825`, cohérent avec `ft.Colors.YELLOW_800`.
-- [x] Utiliser l’anthracite `#17191F`, cohérent avec le fond de `PaperNestGlideRail`.
-- [x] Explorer des symboles simples liés aux documents, au classement ou au rangement.
+- [x] Conserver le jaune PaperNest proche de `#F9A825`.
+- [x] Utiliser un anthracite cohérent avec le fond de `PaperNestGlideRail`.
+- [x] Retenir un monogramme `PN` identifiable comme symbole de marque.
 - [x] Prévoir un rendu propre sur fond sombre et sur fond clair.
-- [x] Utiliser un fond réellement transparent dans chaque symbole SVG.
+- [x] Utiliser un fond réellement transparent dans le SVG final.
 - [x] Éviter les détails trop fins, les dégradés gratuits et les effets inutiles.
-- [ ] Garantir la lisibilité finale aux très petites tailles après sélection du symbole.
+- [ ] Confirmer la lisibilité finale à 24, 32 et 40 px dans l’application réelle.
 
 ## Validation graphique
 
 - [x] Créer plusieurs pistes de symbole compact.
-- [ ] Comparer leur lisibilité à 16, 24, 32, 48 et 256 px.
-- [ ] Sélectionner ou combiner une piste avec l’utilisateur.
-- [ ] Affiner le symbole retenu, ses proportions et ses courbes.
-- [ ] Construire le logo horizontal à partir du symbole validé.
-- [ ] Vérifier le rendu sur fond clair et sur le fond sombre de `PaperNestGlideRail`.
-- [ ] Vérifier la validité et la portabilité des SVG finaux.
+- [x] Sélectionner le symbole avec l’utilisateur.
+- [x] Produire un SVG final propre et réutilisable.
+- [x] Vérifier la validité structurelle et la transparence du SVG final.
+- [ ] Valider le rendu sur le fond sombre de `PaperNestGlideRail`.
+- [ ] Valider le rendu dans les états replié et déployé.
 - [ ] Exporter ensuite les PNG nécessaires.
 - [ ] Vérifier la transparence réelle et la netteté des fichiers raster.
 
 ## Intégration dans PaperNest
 
-- [ ] Ajouter les fichiers finaux dans `src/assets/branding`.
-- [ ] Utiliser le symbole SVG dans `brand_icon` de `PaperNestGlideRail`.
-- [ ] Déterminer si le titre texte natif de la rail reste préférable au logo horizontal complet.
+- [x] Ajouter le symbole final dans `src/assets/branding`.
+- [x] Utiliser le symbole SVG dans `brand_icon` de `PaperNestGlideRail`.
+- [x] Conserver le titre texte natif de la rail plutôt qu’un logo horizontal complet.
+- [ ] Ajuster la taille du symbole si le test visuel le nécessite.
 - [ ] Configurer l’icône du build Windows selon les conventions Flet du projet.
 - [ ] Tester l’icône dans l’exécutable Windows.
-- [ ] Tester le symbole dans les états replié et déployé.
-- [ ] Valider le build Windows.
-- [ ] Mettre à jour le changelog et les roadmaps concernées.
+- [ ] Valider le build Windows avec les assets finaux.
+- [x] Mettre à jour les roadmaps concernées.
 
 ## Critère de finalisation
 
-Le chantier sera terminé lorsque le symbole et le logo auront été validés graphiquement, que les SVG sources seront propres et réutilisables, que les déclinaisons raster nécessaires auront été produites et que l’ensemble aura été testé dans `PaperNestGlideRail` et le build Windows.
+Le chantier sera terminé lorsque le symbole SVG intégré aura été validé dans `PaperNestGlideRail`, que les déclinaisons PNG nécessaires auront été produites et que l’icône aura été testée dans le build Windows.
