@@ -110,8 +110,8 @@ class NavigationManager:
             hover_animation_duration=140,
             brand_icon=ft.Image(
                 src="branding/papernest_symbol.svg",
-                width=40,
-                height=40,
+                width=30,
+                height=30,
                 fit=ft.BoxFit.CONTAIN,
             ),
             brand_title=ft.Text(
@@ -124,7 +124,7 @@ class NavigationManager:
             ),
             brand_subtitle=ft.Text(
                 "Documents personnels",
-                color=ft.Colors.GREY_500,
+                color=AppColors.PRIMARY,
                 size=11,
                 max_lines=1,
                 overflow=ft.TextOverflow.ELLIPSIS,
