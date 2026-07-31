@@ -2,7 +2,9 @@
 
 ## État
 
-La version actuelle de PaperNest reste terminée et stable. `PaperNestGlideRail` est intégré et validé dans l’application. Le symbole PaperNest final est désormais intégré dans la zone de marque de la rail et attend sa validation visuelle dans l’application réelle.
+La version actuelle de PaperNest reste terminée et stable. `PaperNestGlideRail` est intégré et validé dans l’application. Le symbole PaperNest final est intégré dans la zone de marque de la rail et son rendu a été validé.
+
+La navigation a également été recentralisée dans `src/app/navigation/navigation.py` afin de séparer clairement la définition des destinations et la construction de la rail du cycle de vie général de `MainWindow`.
 
 ## Objectif
 
@@ -25,6 +27,9 @@ Préserver une interface simple et stable tout en ajoutant uniquement les améli
 - [x] Migration FilePicker, suppression de `FileDropZone` et retrait de `flet-dropzone`.
 - [x] Migration de la sidebar manuelle vers `PaperNestGlideRail`.
 - [x] Suppression de l’ancienne navigation après validation sous Windows.
+- [x] Centralisation de la navigation dans `src/app/navigation/navigation.py`.
+- [x] Réduction de `MainWindow` au cycle de vie de la vue affichée.
+- [x] Utilisation de `ft.Text` personnalisés pour le titre et le sous-titre de marque.
 - [x] Nettoyage complet de `forms.py` et des imports obsolètes.
 - [x] Validation visuelle, fonctionnelle et des builds Windows des migrations terminées.
 - [x] Mise à jour des roadmaps concernées.
@@ -38,7 +43,7 @@ Préserver une interface simple et stable tout en ajoutant uniquement les améli
 - [x] Sélectionner le symbole compact PaperNest.
 - [x] Créer une version SVG finale nettoyée.
 - [x] Intégrer le symbole dans `PaperNestGlideRail`.
-- [ ] Valider le rendu du symbole dans la rail.
+- [x] Valider le rendu du symbole dans la rail.
 - [ ] Générer les déclinaisons PNG nécessaires au build Windows.
 - [ ] Intégrer et tester l’icône du build de l’application.
 - [ ] Créer un logo horizontal uniquement si un besoin réel est confirmé.
