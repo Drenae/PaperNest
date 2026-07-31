@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">PaperNest — concept Stack</title>
+  <desc id="desc">Trois documents superposés dans une forme compacte évoquant le classement.</desc>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="10" y="18" width="38" height="34" rx="5" fill="#17191F" stroke="#17191F" stroke-width="4"/>
+    <rect x="16" y="12" width="38" height="34" rx="5" fill="#F9A825" stroke="#F9A825" stroke-width="4"/>
+    <path d="M26 23h18M26 31h18M26 39h12" stroke="#17191F" stroke-width="4"/>
+    <path d="M13 52h34" stroke="#F9A825" stroke-width="4"/>
+  </g>
+</svg>
