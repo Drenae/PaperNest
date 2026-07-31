@@ -2,7 +2,7 @@
 
 ## État
 
-La version actuelle de PaperNest reste terminée et stable. `PaperNestGlideRail` est désormais intégré et validé dans l’application. Les prochains chantiers limités sont l’identité visuelle PaperNest et, séparément, l’étude de `PaperNestIconPicker`.
+La version actuelle de PaperNest reste terminée et stable. `PaperNestGlideRail` est intégré et validé dans l’application. Le symbole PaperNest final est désormais intégré dans la zone de marque de la rail et attend sa validation visuelle dans l’application réelle.
 
 ## Objectif
 
@@ -35,11 +35,13 @@ Préserver une interface simple et stable tout en ajoutant uniquement les améli
 
 - [x] Définir les assets nécessaires.
 - [x] Créer une roadmap dédiée.
-- [ ] Créer et valider le symbole compact PaperNest en SVG.
-- [ ] Créer et valider le logo horizontal PaperNest en SVG.
+- [x] Sélectionner le symbole compact PaperNest.
+- [x] Créer une version SVG finale nettoyée.
+- [x] Intégrer le symbole dans `PaperNestGlideRail`.
+- [ ] Valider le rendu du symbole dans la rail.
 - [ ] Générer les déclinaisons PNG nécessaires au build Windows.
-- [ ] Intégrer le symbole dans `PaperNestGlideRail`.
-- [ ] Intégrer l’icône au build de l’application.
+- [ ] Intégrer et tester l’icône du build de l’application.
+- [ ] Créer un logo horizontal uniquement si un besoin réel est confirmé.
 
 Voir `ROADMAP_BRANDING.md`.
 
