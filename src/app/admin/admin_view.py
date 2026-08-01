@@ -14,7 +14,7 @@ from app.admin.dialogs.delete_category_dialog import DeleteCategoryDialog
 from app.admin.dialogs.restore_backup_dialog import RestoreBackupDialog
 from app.admin.state import AdminState
 from app.notifications import notifications
-from app.theme.file_picker import BaseFilePicker
+from app.theme.pickers import BaseFilePicker
 from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppSpacing
 
