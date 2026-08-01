@@ -15,7 +15,7 @@ from papernestextension import (
 from app.notifications import notifications
 from app.theme.buttons import IconAction, PrimaryButton
 from app.theme.cards import Section
-from app.theme.file_picker import BaseFilePicker
+from app.theme.pickers import BaseFilePicker
 from app.theme.forms import BaseCheckbox, BaseDropDown, PaperNestDropdownOption
 from app.theme.tokens import AppColors
 from core.errors.exceptions import PaperNestError
