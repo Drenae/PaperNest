@@ -6,7 +6,7 @@ from app.admin.builder import AdminBuilder
 from app.admin.state import AdminState
 from app.theme.buttons import IconAction, OutlineButton, PrimaryButton
 from app.theme.cards import Section
-from app.theme.file_picker import BaseFilePicker
+from app.theme.pickers import BaseFilePicker
 from app.theme.status_bar import StatusBar
 from app.theme.tokens import AppColors, AppSpacing
 
