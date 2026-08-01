@@ -5,7 +5,7 @@ import flet as ft
 from app.notifications import notifications
 from app.shared.tag_editor import TagEditor
 from app.theme.buttons import PrimaryButton, GhostButton
-from app.theme.date_picker import BaseDatePickerField
+from app.theme.pickers import BaseDatePickerField
 from app.theme.dialogs import AppDialog
 from app.theme.forms import BaseTextField
 from app.theme.forms import BaseSwitch, BaseTextArea
