@@ -2,9 +2,9 @@
 
 ## État
 
-Chantier en cours.
+Implémentation terminée. Validation Windows à effectuer.
 
-Les wrappers thématiques des pickers sont maintenant regroupés dans `src/app/theme/pickers`. Tous les imports applicatifs identifiés ont été migrés et les anciens fichiers ont été supprimés. Le nettoyage de `BaseIconField` dans `forms.py` reste à terminer avant validation Windows.
+Les wrappers thématiques des pickers sont regroupés dans `src/app/theme/pickers`. Tous les imports applicatifs identifiés ont été migrés, les anciens fichiers ont été supprimés et `BaseIconField` a été retiré de `forms.py`.
 
 ## Objectif
 
@@ -24,11 +24,11 @@ Centraliser les wrappers applicatifs liés aux contrôles `PaperNest*Picker` san
 
 ## Nettoyage associé
 
-- [ ] Supprimer définitivement `BaseIconField` de `forms.py`.
-- [ ] Supprimer ses imports devenus inutiles.
-- [ ] Vérifier que `forms.py` ne contient plus de picker historique.
-- [ ] Mettre à jour le changelog.
+- [x] Supprimer définitivement `BaseIconField` de `forms.py`.
+- [x] Supprimer ses imports devenus inutiles.
+- [x] Vérifier que `forms.py` ne contient plus de picker historique.
+- [ ] Mettre à jour le changelog après validation.
 
 ## Critère de finalisation
 
-Le chantier sera terminé lorsque `BaseIconField` aura été supprimé, que `forms.py` aura été nettoyé et que PaperNest aura été validé sous Windows.
+Le chantier sera terminé après validation du lancement et du build Windows de PaperNest.
