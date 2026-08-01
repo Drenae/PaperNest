@@ -10,10 +10,13 @@ from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppColors, AppRadius, AppSpacing
 from services.categories.service import category_service
 from app.theme.buttons import GhostButton, PrimaryButton
-from app.theme.color_picker import BaseColorPicker
 from app.theme.dialogs import AppDialog
 from app.theme.forms import BaseTextField
-from app.theme.icon_picker import BaseIconPicker, PaperNestIconPickerOption
+from app.theme.pickers import (
+    BaseColorPicker,
+    BaseIconPicker,
+    PaperNestIconPickerOption,
+)
 
 
 logger = logging.getLogger(__name__)
