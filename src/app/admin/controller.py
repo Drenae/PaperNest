@@ -8,7 +8,7 @@ from typing import Callable
 import flet as ft
 
 from app.admin.state import AdminState
-from app.theme.file_picker import BaseFilePicker
+from app.theme.pickers import BaseFilePicker
 from core.errors.exceptions import PaperNestError
 from services.backup.service import BackupService
 from services.files.archive import ArchiveFileService
