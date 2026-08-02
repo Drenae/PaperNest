@@ -5,7 +5,7 @@ import flet as ft
 
 from app.theme.buttons import PrimaryButton, GhostButton
 from app.theme.forms import BaseDropDown, PaperNestDropdownOption
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 
 from core.errors.exceptions import PaperNestError
 from services.trash.service import TrashService
@@ -63,7 +63,17 @@ class BatchTrashDialog:
         action_button.on_click = execute
         self.dialog = AppDialog(
             modal=True,
-            title=ft.Text("Restaurer plusieurs documents" if restoring else "Suppression définitive"),
+            title="Restaurer plusieurs documents" if restoring else "Suppression définitive",
+            icon=(
+                ft.Icons.RESTORE_FROM_TRASH_ROUNDED
+                if restoring
+                else ft.Icons.DELETE_FOREVER_ROUNDED
+            ),
+            variant=(
+                DialogVariant.SUCCESS
+                if restoring
+                else DialogVariant.DANGER
+            ),
             content=ft.Column(
                 tight=True,
                 spacing=12,
