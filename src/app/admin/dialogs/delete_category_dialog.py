@@ -6,7 +6,7 @@ import flet as ft
 from core.errors.exceptions import PaperNestError
 from services.categories.service import category_service
 from app.theme.buttons import GhostButton, DangerButton
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +75,7 @@ class DeleteCategoryDialog:
             modal=True,
             title="Supprimer le classeur",
             icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
+            variant=DialogVariant.DANGER,
             content=ft.Column(
                 tight=True,
                 spacing=12,
@@ -182,6 +183,7 @@ class DeleteCategoryDialog:
             modal=True,
             title="Supprimer un classeur non vide",
             icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
+            variant=DialogVariant.DANGER,
             content=ft.Column(
                 tight=True,
                 spacing=12,
