@@ -10,7 +10,7 @@ from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppColors, AppRadius, AppSpacing
 from services.categories.service import category_service
 from app.theme.buttons import GhostButton, PrimaryButton
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 from app.theme.forms import BaseTextField
 from app.theme.pickers import (
     BaseColorPicker,
@@ -118,6 +118,7 @@ class CategoryEditorDialog:
         self.dialog = AppDialog(
             title=("Modifier la sous-catégorie" if editing and self.category and self.category.get("parent_key") else "Modifier le classeur") if editing else (f"Ajouter dans {self.parent['name']}" if self.parent else "Ajouter un classeur"),
             icon=ft.Icons.EDIT_ROUNDED if editing else ft.Icons.CREATE_NEW_FOLDER_ROUNDED,
+            variant=DialogVariant.PRIMARY,
             width=560,
             content=ft.Column(
                 tight=True,
