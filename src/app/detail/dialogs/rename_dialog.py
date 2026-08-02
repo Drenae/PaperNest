@@ -6,7 +6,7 @@ from papernestextension.controls.material.papernest_textfield import PaperNestTe
 
 from app.theme.buttons import PrimaryButton, GhostButton
 from app.theme.forms import BaseTextField
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 
 from core.errors.exceptions import PaperNestError
 from services.documents.rename import document_rename_service
@@ -51,6 +51,7 @@ class RenameDialog:
             modal=True,
             title="Renommer le document",
             icon=ft.Icons.DRIVE_FILE_RENAME_OUTLINE_ROUNDED,
+            variant=DialogVariant.PRIMARY,
             content=ft.Column(
                 tight=True,
                 spacing=12,
