@@ -5,7 +5,7 @@ from pathlib import Path
 import flet as ft
 
 from app.theme.buttons import PrimaryButton, GhostButton
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppColors
 from services.backup.service import BackupService
@@ -41,6 +41,7 @@ class RestoreBackupDialog:
             modal=True,
             title="Restaurer une sauvegarde",
             icon=ft.Icons.SETTINGS_BACKUP_RESTORE_ROUNDED,
+            variant=DialogVariant.WARNING,
             content=ft.Column(
                 tight=True,
                 spacing=12,
