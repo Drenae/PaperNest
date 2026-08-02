@@ -6,7 +6,7 @@ from app.notifications import notifications
 from app.shared.tag_editor import TagEditor
 from app.theme.buttons import PrimaryButton, GhostButton
 from app.theme.pickers import BaseDatePickerField
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 from app.theme.forms import BaseTextField
 from app.theme.forms import BaseSwitch, BaseTextArea
 from core.errors.exceptions import PaperNestError
@@ -137,6 +137,7 @@ class MetadataDialog:
             modal=True,
             title="Informations du document",
             icon=ft.Icons.INFO_OUTLINE_ROUNDED,
+            variant=DialogVariant.PRIMARY,
             title_action=self.favorite_field,
             content=ft.Container(
                 width=650,
