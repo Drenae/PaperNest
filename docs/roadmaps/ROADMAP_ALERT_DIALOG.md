@@ -2,37 +2,56 @@
 
 ## État
 
-Chantier planifié. Le développement ne commencera qu’après l’étude complète des sources Python et Flutter d’`AlertDialog` pour la version Flet utilisée par les projets.
+Migration implémentée dans PaperNest, en attente de validation applicative et du build Windows.
+
+`PaperNestAlertDialog` et `PaperNestDialogSurface` sont validés dans PaperNestExtension. Les dialogues internes compatibles des ColorPicker et IconPicker utilisent la surface partagée. Le DatePicker conserve son dialogue Material natif avec un thème PaperNest. Le FilePicker ne possède aucun dialogue Flutter interne à migrer : ses fenêtres sont fournies par le système via `file_picker`.
 
 ## Objectif
 
-Faire évoluer `AppDialog` pour qu’il hérite du futur contrôle `PaperNestAlertDialog` fourni par PaperNestExtension, tout en conservant les variantes et les comportements actuellement validés dans PaperNest.
+Faire évoluer `AppDialog` pour qu’il hérite de `PaperNestAlertDialog` fourni par PaperNestExtension, tout en conservant les variantes et les comportements validés dans PaperNest.
 
-## Architecture prévue
+## Architecture
 
-- [ ] Étudier l’API Python et le code Flutter d’`AlertDialog`.
-- [ ] Définir l’API minimale de `PaperNestAlertDialog` avec PaperNestExtension.
-- [ ] Conserver un composant Flutter interne partagé par les pickers.
-- [ ] Faire hériter `AppDialog` de `PaperNestAlertDialog`.
-- [ ] Conserver `DialogVariant`, `ConfirmDialog`, `DangerDialog` et `FormDialog`.
-- [ ] Préserver l’en-tête sombre, les palettes, les espacements, les actions et la barrière.
-- [ ] Migrer les dialogues applicatifs sans régression.
+- [x] Étudier l’API Python et le code Flutter d’`AlertDialog`.
+- [x] Définir l’API de `PaperNestAlertDialog` avec PaperNestExtension.
+- [x] Créer un composant Flutter interne partagé par les pickers.
+- [x] Faire hériter `AppDialog` de `PaperNestAlertDialog`.
+- [x] Conserver l’API publique `DialogVariant` par alias vers `PaperNestDialogVariant`.
+- [x] Conserver `ConfirmDialog`, `DangerDialog` et `FormDialog`.
+- [x] Préserver l’en-tête sombre, les espacements, les actions et la barrière.
+- [x] Conserver la personnalisation des actions avec les boutons PaperNest.
+- [x] Supprimer la construction Python manuelle de l’en-tête et des palettes.
 
 ## Pickers
 
-- [ ] Utiliser le composant de dialogue partagé dans ColorPicker et IconPicker.
-- [ ] Étudier FilePicker selon les dialogues réellement concernés.
-- [ ] Utiliser le nouveau dialogue pour DatePicker uniquement si toutes les fonctions natives sont préservées.
-- [ ] Conserver le dialogue natif du DatePicker si la migration dégrade son ergonomie ou ses fonctions.
+- [x] Utiliser `PaperNestDialogSurface` dans ColorPicker.
+- [x] Utiliser `PaperNestDialogSurface` dans IconPicker.
+- [x] Conserver le DatePicker Material natif et lui appliquer un thème PaperNest via son `builder`.
+- [x] Vérifier FilePicker : aucun `AlertDialog` Flutter interne à migrer.
+- [x] Conserver les fenêtres natives de sélection, sauvegarde et dossier du système.
+
+## Dialogues PaperNest à vérifier
+
+- [ ] Ouvrir et fermer un `AppDialog` standard.
+- [ ] Tester `ConfirmDialog` et ses deux actions.
+- [ ] Tester `DangerDialog`, ses détails et son action irréversible.
+- [ ] Tester `FormDialog` avec formulaire.
+- [ ] Tester l’état de chargement du bouton de soumission.
+- [ ] Tester les variantes standard, primary, success, warning et danger.
+- [ ] Tester `title_action`.
+- [ ] Tester les contenus courts et scrollables.
+- [ ] Tester les états modal et dismissible.
+- [ ] Vérifier plusieurs dialogues successifs ou superposés.
 
 ## Validation
 
-- [ ] Tester les variantes standard, primary, success, warning et danger.
-- [ ] Tester les dialogues avec formulaires et contenus scrollables.
-- [ ] Tester les états modal et dismissible.
+- [ ] Lancer PaperNest avec `flet run --recursive`.
+- [ ] Vérifier les dialogues des catégories, recherches, déplacements, renommages, sauvegardes et corbeille.
+- [ ] Vérifier qu’aucun import historique ou héritage direct de `ft.AlertDialog` ne subsiste dans `AppDialog`.
 - [ ] Valider PaperNest sous Windows.
 - [ ] Valider le build Windows.
+- [ ] Faire valider visuellement et fonctionnellement la migration par l’utilisateur.
 
 ## Critère de finalisation
 
-Le chantier sera terminé lorsque `AppDialog` utilisera le contrôle de l’extension, que les pickers compatibles partageront le même rendu Flutter, et qu’aucune fonctionnalité native utile n’aura été perdue.
+Le chantier sera terminé lorsque tous les dialogues applicatifs auront été testés, que `AppDialog` utilisera le contrôle de PaperNestExtension sans régression et que le build Windows aura été validé.
