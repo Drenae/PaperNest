@@ -4,7 +4,7 @@ import logging
 import flet as ft
 
 from app.theme.buttons import GhostButton, DangerButton
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 
 from core.errors.exceptions import PaperNestError
 from services.trash.service import TrashService, TrashedDocument
@@ -75,6 +75,7 @@ class PermanentDeleteDialog:
             modal=True,
             title="Supprimer définitivement",
             icon=ft.Icons.DELETE_FOREVER_ROUNDED,
+            variant=DialogVariant.DANGER,
             content=ft.Column(
                 tight=True,
                 spacing=12,
