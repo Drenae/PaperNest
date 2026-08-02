@@ -4,7 +4,7 @@ import flet as ft
 
 from app.notifications import notifications
 from app.theme.buttons import GhostButton, DangerButton
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 from core.errors.exceptions import PaperNestError
 from services.documents.delete import document_delete_service
 
@@ -39,6 +39,7 @@ class DeleteDialog:
             modal=True,
             title="Mettre à la corbeille",
             icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
+            variant=DialogVariant.DANGER,
             content=ft.Column(
                 tight=True,
                 spacing=12,
