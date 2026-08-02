@@ -5,7 +5,7 @@ import flet as ft
 
 from app.notifications import notifications
 from app.theme.buttons import GhostButton, SuccessButton
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 from app.theme.forms import BaseDropDown, PaperNestDropdownOption
 from core.errors.exceptions import PaperNestError
 from services.trash.service import TrashService, TrashedDocument
@@ -78,6 +78,7 @@ class RestoreDialog:
             modal=True,
             title="Restaurer le document",
             icon=ft.Icons.RESTORE_FROM_TRASH_ROUNDED,
+            variant=DialogVariant.SUCCESS,
             content=ft.Column(
                 tight=True,
                 spacing=12,
