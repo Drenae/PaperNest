@@ -4,7 +4,7 @@ import flet as ft
 
 from app.notifications import notifications
 from app.theme.buttons import PrimaryButton, GhostButton
-from app.theme.dialogs import AppDialog
+from app.theme.dialogs import AppDialog, DialogVariant
 from app.theme.forms import BaseDropDown, PaperNestDropdownOption
 from core.errors.exceptions import PaperNestError
 from repositories.category_repository import category_repository
@@ -67,6 +67,7 @@ class MoveDialog:
             modal=True,
             title="Déplacer le document",
             icon=ft.Icons.DRIVE_FILE_MOVE_ROUNDED,
+            variant=DialogVariant.PRIMARY,
             content=ft.Column(
                 tight=True,
                 spacing=12,
