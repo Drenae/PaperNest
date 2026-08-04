@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import flet as ft
 
+
 class AppColors:
     """Palette unique de PaperNest."""
 
@@ -11,18 +12,22 @@ class AppColors:
     PRIMARY_SOFT = ft.Colors.YELLOW_50
 
     SUCCESS = ft.Colors.GREEN_700
+    SUCCESS_DARK = ft.Colors.GREEN_800
     SUCCESS_LIGHT = ft.Colors.GREEN_100
     SUCCESS_SOFT = ft.Colors.GREEN_50
 
     ERROR = ft.Colors.RED_700
+    ERROR_DARK = ft.Colors.RED_800
     ERROR_LIGHT = ft.Colors.RED_100
     ERROR_SOFT = ft.Colors.RED_50
 
     WARNING = ft.Colors.ORANGE_700
+    WARNING_DARK = ft.Colors.ORANGE_800
     WARNING_LIGHT = ft.Colors.ORANGE_100
     WARNING_SOFT = ft.Colors.ORANGE_50
 
     INFO = ft.Colors.BLUE_700
+    INFO_DARK = ft.Colors.BLUE_800
     INFO_LIGHT = ft.Colors.BLUE_100
 
     BACKGROUND = ft.Colors.GREY_100
@@ -30,6 +35,7 @@ class AppColors:
     SURFACE_ALT = ft.Colors.GREY_200
 
     PANEL = ft.Colors.GREY_300
+    PANEL_STRONG = ft.Colors.GREY_400
     PANEL_DARK = ft.Colors.GREY_900
     PANEL_DARK_SOFT = ft.Colors.GREY_800
 
@@ -61,6 +67,7 @@ class AppColors:
     SERVER_OFFLINE = ERROR
     SERVER_UNKNOWN = ft.Colors.GREY_600
 
+
 class AppSpacing:
     XXS = 4
     XS = 6
@@ -71,6 +78,7 @@ class AppSpacing:
     XXL = 24
     XXXL = 32
 
+
 class AppRadius:
     XS = 6
     SM = 8
@@ -78,6 +86,7 @@ class AppRadius:
     LG = 12
     XL = 16
     PILL = 999
+
 
 class AppSizes:
     BUTTON_HEIGHT = 44
@@ -97,12 +106,14 @@ class AppSizes:
 
     DIALOG_WIDTH = 520
 
+
 class AppText:
     PAGE_TITLE = 28
     SECTION_TITLE = 20
     CARD_TITLE = 15
     BODY = 14
     CAPTION = 12
+
 
 class AppShadows:
     @staticmethod
@@ -139,6 +150,18 @@ class AppTheme:
     ) -> ft.RoundedRectangleBorder:
         return ft.RoundedRectangleBorder(
             radius=radius,
+        )
+
+    @staticmethod
+    def button_gradient(
+        color: str,
+        dark_color: str,
+    ) -> ft.LinearGradient:
+        """Construit le gradient standard des boutons PaperNest."""
+        return ft.LinearGradient(
+            begin=ft.Alignment.CENTER_LEFT,
+            end=ft.Alignment.CENTER_RIGHT,
+            colors=[color, dark_color],
         )
 
     @staticmethod
