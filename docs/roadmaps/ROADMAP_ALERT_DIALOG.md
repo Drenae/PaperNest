@@ -1,53 +1,69 @@
-# Roadmap — Migration vers PaperNestAlertDialog
+# Roadmap — Intégration du nouveau PaperNestAlertDialog
 
 ## État
 
-Terminé, intégré et validé sous Windows.
+**Phase 7 implémentée et en attente de validation dans PaperNest.**
 
-`AppDialog` hérite maintenant de `PaperNestAlertDialog`. Les dialogues applicatifs ont été audités, leurs variants ont été attribués selon leur rôle et la correction de hauteur naturelle des contenus a été validée.
+PaperNest utilise désormais le nouveau fork `PaperNestAlertDialog`, sans dépendre d’un variant fourni par PaperNestExtension. Les variantes restent disponibles uniquement dans l’application et déterminent la palette Python de la pastille d’icône.
 
-## Architecture validée
+## Architecture retenue
 
-- [x] Étudier l’API Python et le code Flutter d’`AlertDialog`.
-- [x] Définir l’API de `PaperNestAlertDialog` avec PaperNestExtension.
-- [x] Créer un composant Flutter interne partagé par les pickers.
 - [x] Faire hériter `AppDialog` de `PaperNestAlertDialog`.
-- [x] Conserver l’API publique `DialogVariant` par alias vers `PaperNestDialogVariant`.
+- [x] Supprimer l’import de `PaperNestDialogVariant`.
+- [x] Définir `DialogVariant` localement dans PaperNest.
+- [x] Ne jamais transmettre `variant` à l’extension.
+- [x] Construire les palettes `STANDARD`, `PRIMARY`, `SUCCESS`, `WARNING` et `DANGER` côté Python.
 - [x] Conserver `ConfirmDialog`, `DangerDialog` et `FormDialog`.
-- [x] Préserver l’en-tête sombre, les espacements, les actions et la barrière.
-- [x] Conserver la personnalisation des actions avec les boutons PaperNest.
-- [x] Supprimer la construction Python manuelle de l’en-tête et des palettes.
-- [x] Corriger la hauteur naturelle des dialogues non scrollables.
+- [x] Conserver les boutons PaperNest dans les actions.
+- [x] Préserver l’API existante des dialogues applicatifs.
 
-## Attribution des variants
+## Apparence PaperNest
 
-- [x] Catégories, métadonnées, déplacement, renommage et recherche enregistrée : `PRIMARY`.
-- [x] Restauration de documents : `SUCCESS`.
-- [x] Restauration de sauvegarde : `WARNING`.
-- [x] Mise à la corbeille, suppression définitive, vidage de corbeille et suppression de classeur : `DANGER`.
-- [x] Actions multiples de la corbeille : variant conditionnel `SUCCESS` ou `DANGER`.
-- [x] Auditer tous les appels directs à `AppDialog`.
+- [x] En-tête `GREY_900`.
+- [x] Pastille d’icône colorée selon le variant local.
+- [x] Titre blanc et gras.
+- [x] Sous-titre facultatif.
+- [x] `title_action` facultatif.
+- [x] Contenu blanc et compact.
+- [x] Actions alignées à droite avec espacement PaperNest.
+- [x] Forme arrondie et clipping anti-aliasé.
+- [x] Barrière et ombre PaperNest.
+- [x] Support de `max_height` et du scroll limité au contenu.
 
-## Pickers
+## Compatibilité des dialogues existants
 
-- [x] Utiliser `PaperNestDialogSurface` dans ColorPicker.
-- [x] Utiliser `PaperNestDialogSurface` dans IconPicker.
-- [x] Conserver le DatePicker Material natif avec un thème PaperNest via son `builder`.
-- [x] Conserver les fenêtres natives du FilePicker.
+- [x] Conserver les imports `DialogVariant` existants.
+- [x] Conserver les appels directs à `AppDialog(variant=...)`.
+- [x] Conserver les variantes attribuées aux formulaires, restaurations et suppressions.
+- [x] Conserver le chargement de `FormDialog` via `PaperNestButton`.
+- [x] Ne migrer aucun picker pendant cette phase.
 
-## Validation
+## Validation à effectuer
 
-- [x] Vérifier la hauteur naturelle des formulaires.
-- [x] Vérifier que les actions restent directement sous les contenus courts.
-- [x] Vérifier les grands formulaires et les contenus scrollables.
-- [x] Tester les variants primary, success, warning et danger dans leurs écrans réels.
-- [x] Tester `title_action`, modalité et fermeture.
-- [x] Vérifier plusieurs dialogues successifs.
-- [x] Lancer PaperNest avec `flet run --recursive`.
-- [x] Valider PaperNest sous Windows.
-- [x] Valider le build Windows.
-- [x] Faire valider visuellement et fonctionnellement la migration par l’utilisateur.
+- [ ] Lancer `flet run --recursive`.
+- [ ] Vérifier les dialogues de formulaires.
+- [ ] Vérifier les confirmations.
+- [ ] Vérifier les suppressions et la corbeille.
+- [ ] Vérifier les restaurations de documents et sauvegardes.
+- [ ] Vérifier `title_action`.
+- [ ] Vérifier les contenus courts.
+- [ ] Vérifier les contenus longs et scrollables.
+- [ ] Vérifier la fermeture extérieure et la modalité.
+- [ ] Valider le build Windows.
+- [ ] Validation visuelle et fonctionnelle par l’utilisateur.
+
+## Pickers — phase séparée
+
+La migration des pickers ne commence pas maintenant.
+
+Elle sera réalisée uniquement après la refonte de :
+
+- `PaperNestColorPicker` ;
+- `PaperNestIconPicker` ;
+- `PaperNestDatePicker`.
+
+Jusqu’à cette refonte, les pickers actuels conservent leur fonctionnement interne existant.
 
 ## Critère de finalisation
 
-Atteint : tous les dialogues applicatifs utilisent `PaperNestAlertDialog` sans régression, avec une hauteur et un variant corrects, et le build Windows est validé.
+La phase 7 sera terminée lorsque tous les dialogues applicatifs auront été validés dans PaperNest et que le build Windows sera réussi. La migration des pickers restera hors de cette clôture.
