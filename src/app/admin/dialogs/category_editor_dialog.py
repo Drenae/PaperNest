@@ -76,6 +76,8 @@ class CategoryEditorDialog:
             value=str((self.category or {}).get("name") or ""),
             prefix_icon=ft.Icons.DRIVE_FILE_RENAME_OUTLINE_ROUNDED,
             autofocus=True,
+            expand=True,
+            expand_loose=True,
         )
         self.icon_field = BaseIconPicker(
             label="Icône",
