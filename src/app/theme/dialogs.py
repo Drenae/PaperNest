@@ -1,16 +1,27 @@
 from __future__ import annotations
 
+from enum import Enum
 from typing import Iterable, Optional
 
 import flet as ft
-from papernestextension import PaperNestAlertDialog, PaperNestDialogVariant
+from papernestextension import PaperNestAlertDialog
 
 from app.theme.buttons import DangerButton, PrimaryButton, SecondaryButton
 from app.theme.tokens import AppColors, AppRadius, AppSizes, AppSpacing, AppText
 
 
-# Compatibilité avec les imports existants de PaperNest.
-DialogVariant = PaperNestDialogVariant
+class DialogVariant(str, Enum):
+    """Variantes visuelles propres à PaperNest.
+
+    PaperNestAlertDialog ne connaît aucun variant. Cet enum choisit uniquement
+    la palette de la pastille d'icône dans le wrapper Python de l'application.
+    """
+
+    STANDARD = "standard"
+    PRIMARY = "primary"
+    SUCCESS = "success"
+    WARNING = "warning"
+    DANGER = "danger"
 
 
 class AppDialog(PaperNestAlertDialog):
@@ -20,34 +31,51 @@ class AppDialog(PaperNestAlertDialog):
         self,
         *,
         title: str | ft.Control,
+        subtitle: str | ft.Control | None = None,
         content: Optional[ft.Control] = None,
         icon=None,
         variant: DialogVariant = DialogVariant.STANDARD,
         actions: Optional[Iterable[ft.Control]] = None,
         title_action: Optional[ft.Control] = None,
         width: float = AppSizes.DIALOG_WIDTH,
+        max_height: Optional[float] = None,
         modal: bool = False,
         dismissible: bool = True,
         scrollable: bool = False,
         **kwargs,
     ):
+        palette = self._get_palette(variant)
+
         kwargs.setdefault("title", title)
+        kwargs.setdefault("subtitle", subtitle)
         kwargs.setdefault("content", content)
         kwargs.setdefault("icon", icon)
-        kwargs.setdefault("variant", variant)
         kwargs.setdefault("actions", list(actions or []))
         kwargs.setdefault("title_action", title_action)
         kwargs.setdefault("width", width)
+        kwargs.setdefault("max_height", max_height)
         kwargs.setdefault("modal", modal)
         kwargs.setdefault("dismissible", dismissible)
         kwargs.setdefault("scrollable", scrollable)
 
         kwargs.setdefault("bgcolor", AppColors.SURFACE)
-        kwargs.setdefault("header_bgcolor", ft.Colors.GREY_900)
-        kwargs.setdefault("header_color", AppColors.TEXT_LIGHT)
-        kwargs.setdefault("barrier_color", ft.Colors.with_opacity(0.48, ft.Colors.BLACK))
-        kwargs.setdefault("shadow_color", ft.Colors.with_opacity(0.22, ft.Colors.BLACK))
+        kwargs.setdefault("header_bgcolor", AppColors.PANEL_DARK)
+        kwargs.setdefault("icon_bgcolor", palette["icon_background"])
+        kwargs.setdefault("icon_color", palette["icon_color"])
+        kwargs.setdefault("icon_size", AppSizes.ICON_MD)
+        kwargs.setdefault("icon_container_size", 38)
+        kwargs.setdefault("icon_border_radius", AppRadius.MD)
+        kwargs.setdefault("header_spacing", AppSpacing.MD)
+        kwargs.setdefault(
+            "barrier_color",
+            ft.Colors.with_opacity(0.48, ft.Colors.BLACK),
+        )
+        kwargs.setdefault(
+            "shadow_color",
+            ft.Colors.with_opacity(0.22, ft.Colors.BLACK),
+        )
         kwargs.setdefault("shape", ft.RoundedRectangleBorder(radius=AppRadius.XL))
+        kwargs.setdefault("clip_behavior", ft.ClipBehavior.ANTI_ALIAS)
         kwargs.setdefault(
             "header_padding",
             ft.Padding.symmetric(
@@ -74,6 +102,7 @@ class AppDialog(PaperNestAlertDialog):
             ),
         )
         kwargs.setdefault("actions_alignment", ft.MainAxisAlignment.END)
+        kwargs.setdefault("actions_spacing", AppSpacing.SM)
         kwargs.setdefault(
             "title_text_style",
             ft.TextStyle(
@@ -82,8 +111,40 @@ class AppDialog(PaperNestAlertDialog):
                 color=AppColors.TEXT_LIGHT,
             ),
         )
+        kwargs.setdefault(
+            "subtitle_text_style",
+            ft.TextStyle(
+                size=AppText.CAPTION,
+                color=ft.Colors.GREY_400,
+            ),
+        )
 
         super().__init__(**kwargs)
+
+    @staticmethod
+    def _get_palette(variant: DialogVariant) -> dict[str, str]:
+        return {
+            DialogVariant.STANDARD: {
+                "icon_background": AppColors.PANEL_DARK_SOFT,
+                "icon_color": AppColors.TEXT_LIGHT,
+            },
+            DialogVariant.PRIMARY: {
+                "icon_background": AppColors.PRIMARY,
+                "icon_color": AppColors.TEXT,
+            },
+            DialogVariant.SUCCESS: {
+                "icon_background": AppColors.SUCCESS,
+                "icon_color": AppColors.TEXT_LIGHT,
+            },
+            DialogVariant.WARNING: {
+                "icon_background": AppColors.WARNING,
+                "icon_color": AppColors.TEXT_LIGHT,
+            },
+            DialogVariant.DANGER: {
+                "icon_background": AppColors.ERROR,
+                "icon_color": AppColors.TEXT_LIGHT,
+            },
+        }[variant]
 
 
 class ConfirmDialog(AppDialog):
