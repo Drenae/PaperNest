@@ -36,18 +36,21 @@ class DialogHeader(ft.Container):
         icon_container_size: float = 38,
         icon_border_radius: float = AppRadius.MD,
         spacing: float = AppSpacing.MD,
-        padding: ft.PaddingValue = ft.Padding.symmetric(
-            horizontal=AppSpacing.XL,
-            vertical=AppSpacing.MD,
-        ),
+        padding=None,
         title_text_style: Optional[ft.TextStyle] = None,
         subtitle_text_style: Optional[ft.TextStyle] = None,
         **kwargs,
     ):
-        title_control = (
-            title
-            if isinstance(title, ft.Control)
-            else ft.Text(
+        if padding is None:
+            padding = ft.Padding.symmetric(
+                horizontal=AppSpacing.XL,
+                vertical=AppSpacing.MD,
+            )
+
+        if isinstance(title, ft.Control):
+            title_control = title
+        else:
+            title_control = ft.Text(
                 title,
                 style=title_text_style
                 or ft.TextStyle(
@@ -56,14 +59,13 @@ class DialogHeader(ft.Container):
                     color=AppColors.TEXT_LIGHT,
                 ),
             )
-        )
 
-        subtitle_control: Optional[ft.Control] = None
+        title_column_controls: list[ft.Control] = [title_control]
         if subtitle is not None:
-            subtitle_control = (
-                subtitle
-                if isinstance(subtitle, ft.Control)
-                else ft.Text(
+            if isinstance(subtitle, ft.Control):
+                subtitle_control = subtitle
+            else:
+                subtitle_control = ft.Text(
                     subtitle,
                     style=subtitle_text_style
                     or ft.TextStyle(
@@ -71,45 +73,56 @@ class DialogHeader(ft.Container):
                         color=ft.Colors.GREY_400,
                     ),
                 )
-            )
+            title_column_controls.append(subtitle_control)
 
-        icon_control: Optional[ft.Control] = None
+        leading_controls: list[ft.Control] = []
         if icon is not None:
-            raw_icon = (
+            icon_control = (
                 icon
                 if isinstance(icon, ft.Control)
-                else ft.Icon(icon, size=icon_size, color=icon_color)
+                else ft.Icon(
+                    icon,
+                    size=icon_size,
+                    color=icon_color,
+                )
             )
-            icon_control = ft.Container(
-                width=icon_container_size,
-                height=icon_container_size,
-                alignment=ft.Alignment.CENTER,
-                bgcolor=icon_bgcolor,
-                border_radius=icon_border_radius,
-                content=raw_icon,
+            leading_controls.append(
+                ft.Container(
+                    width=icon_container_size,
+                    height=icon_container_size,
+                    alignment=ft.Alignment.CENTER,
+                    border_radius=icon_border_radius,
+                    bgcolor=icon_bgcolor,
+                    content=icon_control,
+                )
             )
 
-        title_controls: list[ft.Control] = [title_control]
-        if subtitle_control is not None:
-            title_controls.append(subtitle_control)
-
-        row_controls: list[ft.Control] = []
-        if icon_control is not None:
-            row_controls.append(icon_control)
-        row_controls.append(
+        leading_controls.append(
             ft.Column(
-                controls=title_controls,
+                controls=title_column_controls,
                 spacing=2,
                 tight=True,
-                expand=True,
             )
         )
+
+        row_controls: list[ft.Control] = [
+            ft.Row(
+                controls=leading_controls,
+                spacing=spacing,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                expand=True,
+            )
+        ]
         if title_action is not None:
             row_controls.append(title_action)
 
         super().__init__(
             bgcolor=bgcolor,
             padding=padding,
+            border_radius=ft.BorderRadius.only(
+                top_left=AppRadius.XL,
+                top_right=AppRadius.XL,
+            ),
             content=ft.Row(
                 controls=row_controls,
                 spacing=spacing,
@@ -120,7 +133,7 @@ class DialogHeader(ft.Container):
 
 
 class AppDialog(ft.AlertDialog):
-    """AlertDialog Flet natif habillé entièrement côté Python."""
+    """Dialogue PaperNest compact basé sur le AlertDialog natif de Flet."""
 
     def __init__(
         self,
@@ -141,89 +154,54 @@ class AppDialog(ft.AlertDialog):
     ):
         palette = self._get_palette(variant)
 
-        header_bgcolor = kwargs.pop("header_bgcolor", AppColors.PANEL_DARK)
-        icon_bgcolor = kwargs.pop(
-            "icon_bgcolor",
-            palette["icon_background"],
-        )
-        icon_color = kwargs.pop("icon_color", palette["icon_color"])
-        icon_size = kwargs.pop("icon_size", AppSizes.ICON_MD)
-        icon_container_size = kwargs.pop("icon_container_size", 38)
-        icon_border_radius = kwargs.pop(
-            "icon_border_radius",
-            AppRadius.MD,
-        )
-        header_spacing = kwargs.pop("header_spacing", AppSpacing.MD)
-        header_padding = kwargs.pop(
-            "header_padding",
-            ft.Padding.symmetric(
-                horizontal=AppSpacing.XL,
-                vertical=AppSpacing.MD,
-            ),
-        )
-        title_text_style = kwargs.pop(
-            "title_text_style",
-            ft.TextStyle(
-                size=AppText.SECTION_TITLE,
-                weight=ft.FontWeight.BOLD,
-                color=AppColors.TEXT_LIGHT,
-            ),
-        )
-        subtitle_text_style = kwargs.pop(
-            "subtitle_text_style",
-            ft.TextStyle(
-                size=AppText.CAPTION,
-                color=ft.Colors.GREY_400,
-            ),
-        )
-        actions_spacing = kwargs.pop("actions_spacing", AppSpacing.SM)
-
-        dialog_header = DialogHeader(
+        header = DialogHeader(
             title=title,
             subtitle=subtitle,
             icon=icon,
             title_action=title_action,
-            bgcolor=header_bgcolor,
-            icon_bgcolor=icon_bgcolor,
-            icon_color=icon_color,
-            icon_size=icon_size,
-            icon_container_size=icon_container_size,
-            icon_border_radius=icon_border_radius,
-            spacing=header_spacing,
-            padding=header_padding,
-            title_text_style=title_text_style,
-            subtitle_text_style=subtitle_text_style,
+            bgcolor=kwargs.pop("header_bgcolor", AppColors.PANEL_DARK),
+            icon_bgcolor=kwargs.pop(
+                "icon_bgcolor",
+                palette["icon_background"],
+            ),
+            icon_color=kwargs.pop("icon_color", palette["icon_color"]),
+            icon_size=kwargs.pop("icon_size", AppSizes.ICON_MD),
+            icon_container_size=kwargs.pop("icon_container_size", 38),
+            icon_border_radius=kwargs.pop(
+                "icon_border_radius",
+                AppRadius.MD,
+            ),
+            spacing=kwargs.pop("header_spacing", AppSpacing.MD),
+            padding=kwargs.pop("header_padding", None),
+            title_text_style=kwargs.pop("title_text_style", None),
+            subtitle_text_style=kwargs.pop("subtitle_text_style", None),
         )
 
         effective_width = getattr(content, "width", None) or width
-        dialog_content = content
+        content_controls = [content] if content is not None else []
 
-        if content is not None:
-            if scrollable:
-                dialog_content = ft.Container(
-                    width=effective_width,
-                    height=max_height or 600,
-                    content=ft.Column(
-                        controls=[content],
-                        expand=True,
-                        scroll=ft.ScrollMode.AUTO,
-                    ),
-                )
-            else:
-                dialog_content = ft.Container(
-                    width=effective_width,
-                    content=content,
-                )
-
-        action_controls = list(actions or [])
-        if actions_spacing and len(action_controls) > 1:
-            action_controls = [
-                ft.Container(
-                    margin=ft.Margin.only(left=actions_spacing if index else 0),
-                    content=action,
-                )
-                for index, action in enumerate(action_controls)
-            ]
+        if scrollable:
+            dialog_content = ft.Container(
+                width=effective_width,
+                height=max_height or 600,
+                content=ft.Column(
+                    controls=content_controls,
+                    spacing=0,
+                    expand=True,
+                    scroll=ft.ScrollMode.AUTO,
+                ),
+            )
+        else:
+            dialog_content = ft.Container(
+                width=effective_width,
+                content=ft.Column(
+                    controls=content_controls,
+                    spacing=0,
+                    tight=True,
+                    expand=False,
+                ),
+                expand=False,
+            )
 
         kwargs.setdefault("bgcolor", AppColors.SURFACE)
         kwargs.setdefault(
@@ -239,7 +217,7 @@ class AppDialog(ft.AlertDialog):
             ft.RoundedRectangleBorder(radius=AppRadius.XL),
         )
         kwargs.setdefault("clip_behavior", ft.ClipBehavior.ANTI_ALIAS)
-        kwargs.setdefault("title_padding", ft.Padding.all(0))
+        kwargs.setdefault("title_padding", 0)
         kwargs.setdefault(
             "content_padding",
             ft.Padding.only(
@@ -259,16 +237,15 @@ class AppDialog(ft.AlertDialog):
             ),
         )
         kwargs.setdefault("actions_alignment", ft.MainAxisAlignment.END)
+        kwargs.pop("actions_spacing", None)
 
-        # Le contrôle natif ne possède pas de propriété dismissible séparée.
-        # Un dialogue non dismissible est donc rendu modal.
         effective_modal = modal or not dismissible
 
         super().__init__(
-            title=dialog_header,
-            content=dialog_content,
-            actions=action_controls,
             modal=effective_modal,
+            title=header,
+            content=dialog_content,
+            actions=list(actions or []),
             scrollable=False,
             **kwargs,
         )
