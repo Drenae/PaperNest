@@ -119,7 +119,6 @@ class MetadataDialog:
             max_lines=8,
             prefix_icon=ft.Icons.NOTES_ROUNDED,
             expand=True,
-            expand_loose=True,
         )
 
         self.error_text = ft.Text(
