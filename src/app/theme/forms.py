@@ -58,6 +58,17 @@ class BaseTextField(_InputMixin, PaperNestTextField):
         self.height = None
 
 
+class PickerTextField(BaseTextField):
+    """Champ en lecture seule avec bouton de sélection fourni côté Python."""
+
+    def __init__(self, picker_button: ft.Control, **kwargs):
+        kwargs.setdefault("read_only", True)
+        kwargs.setdefault("picker", True)
+        kwargs.setdefault("picker_button", picker_button)
+        kwargs.setdefault("clear_button", True)
+        super().__init__(**kwargs)
+
+
 class SearchTextField(BaseTextField):
     def __init__(
         self,
