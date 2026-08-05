@@ -10,7 +10,7 @@ from flet_color_pickers import MaterialPicker
 from app.theme.buttons import PrimaryButton, SecondaryButton
 from app.theme.dialogs import AppDialog, DialogVariant
 from app.theme.forms import PickerTextField
-from app.theme.tokens import AppColors, AppRadius, AppSpacing
+from app.theme.tokens import AppColors, AppSpacing
 
 
 _HEX_COLOR_PATTERN = re.compile(r"^#[0-9A-F]{6}$")
@@ -54,12 +54,9 @@ class BaseColorPicker(PickerTextField):
         self._temporary_value = self.normalize_value(value)
         self._dialog: AppDialog | None = None
 
-        self._swatch = ft.Container(
-            width=20,
-            height=20,
-            border_radius=AppRadius.PILL,
+        self._swatch = ft.CircleAvatar(
+            radius=8,
             bgcolor=self._temporary_value,
-            border=ft.Border.all(1, AppColors.BORDER),
         )
         self._picker_button = PrimaryButton(
             "Choisir",
@@ -70,6 +67,7 @@ class BaseColorPicker(PickerTextField):
 
         kwargs.setdefault("hint_text", "Sélectionner une couleur")
         kwargs.setdefault("prefix_icon", self._swatch)
+        kwargs.setdefault("width", float("inf"))
 
         super().__init__(
             picker_button=self._picker_button,
