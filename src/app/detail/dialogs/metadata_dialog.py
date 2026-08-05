@@ -118,7 +118,6 @@ class MetadataDialog:
             min_lines=5,
             max_lines=8,
             prefix_icon=ft.Icons.NOTES_ROUNDED,
-            expand=True
         )
 
         self.error_text = ft.Text(
@@ -143,7 +142,6 @@ class MetadataDialog:
                 width=650,
                 content=ft.Column(
                     tight=True,
-                    scroll=ft.ScrollMode.AUTO,
                     spacing=12,
                     controls=[
                         ft.Text(self.document.name, size=16, weight=ft.FontWeight.BOLD),
