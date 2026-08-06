@@ -8,16 +8,16 @@ import flet as ft
 
 from app.theme.buttons import PrimaryButton, SecondaryButton
 from app.theme.dialogs import AppDialog, DialogVariant
-from app.theme.forms import PickerTextField
+from app.theme.forms import PickerTextField, SearchTextField
 from app.theme.tokens import AppColors, AppRadius, AppSpacing, AppText
 
 
 @dataclass(frozen=True, slots=True)
 class PaperNestIconPickerOption:
-    """Option d'icône utilisée par :class:`BaseIconPicker`.
+    """Option proposée par :class:`BaseIconPicker`.
 
-    ``value`` est la valeur métier enregistrée par PaperNest, tandis que
-    ``icon`` est l'icône Flet affichée dans le champ et dans la galerie.
+    ``value`` est la valeur métier enregistrée par PaperNest. ``icon`` contient
+    l'icône Flet affichée dans le champ et dans la galerie.
     """
 
     label: str
@@ -52,13 +52,18 @@ class BaseIconPicker(ft.Column):
         option_icon_size: float = 24,
         **kwargs,
     ) -> None:
-        self.options = list(options)
-        self.fallback_value = self._normalize_value(fallback_value)
-        self._value = self._normalize_value(value)
+        self.options = [option for option in options if option.value]
+        values = {option.value for option in self.options}
+        self.fallback_value = (
+            fallback_value
+            if fallback_value in values
+            else (self.options[0].value if self.options else None)
+        )
+        self._value = value if value in values else self.fallback_value
         self._temporary_value = self._value
         self._external_on_change = on_change
-        self._disabled = disabled
-        self._read_only = read_only
+        self._disabled = bool(disabled)
+        self._read_only = bool(read_only)
         self._picker_title = picker_title
         self._picker_description = picker_description
         self._confirm_text = confirm_text
@@ -71,16 +76,18 @@ class BaseIconPicker(ft.Column):
         self._option_icon_size = option_icon_size
         self._dialog: AppDialog | None = None
         self._grid: ft.GridView | None = None
+        self._search_field: SearchTextField | None = None
+        self._filtered_options = list(self.options)
 
         self._preview_icon = ft.Icon(
-            self._selected_option.icon if self._selected_option else ft.Icons.EMOJI_SYMBOLS_ROUNDED,
+            self._icon_for_option(self._selected_option),
             size=20,
             color=AppColors.PRIMARY_DARK,
         )
         self._picker_button = PrimaryButton(
             "Choisir",
             compact=True,
-            disabled=disabled or read_only or not self.options,
+            disabled=self._disabled or self._read_only or not self.options,
             on_click=self._open_picker,
         )
         self._field = PickerTextField(
@@ -90,7 +97,7 @@ class BaseIconPicker(ft.Column):
             hint_text="Sélectionner une icône",
             prefix_icon=self._preview_icon,
             clear_button=clear_button,
-            disabled=disabled,
+            disabled=self._disabled,
             read_only=True,
             width=float("inf"),
             on_clear=self._handle_clear,
@@ -131,26 +138,28 @@ class BaseIconPicker(ft.Column):
     def _selected_option(self) -> PaperNestIconPickerOption | None:
         return self._option_for_value(self._value)
 
+    def _normalize_value(self, value: str | None) -> str | None:
+        if self._option_for_value(value) is not None:
+            return value
+        return self.fallback_value
+
     def _option_for_value(self, value: str | None) -> PaperNestIconPickerOption | None:
         if value is None:
             return None
         return next((option for option in self.options if option.value == value), None)
 
-    def _normalize_value(self, value: str | None) -> str | None:
-        values = {option.value for option in self.options if option.value}
-        if value in values:
-            return value
-        if self.fallback_value if hasattr(self, "fallback_value") else None in values:
-            return self.fallback_value
-        fallback = next((option.value for option in self.options if option.value), None)
-        return fallback
+    @staticmethod
+    def _icon_for_option(option: PaperNestIconPickerOption | None):
+        return (
+            option.icon
+            if option is not None and option.icon is not None
+            else ft.Icons.EMOJI_SYMBOLS_ROUNDED
+        )
 
     def _sync_field(self) -> None:
         option = self._selected_option
         self._field.value = option.label if option else ""
-        self._preview_icon.icon = (
-            option.icon if option and option.icon is not None else ft.Icons.EMOJI_SYMBOLS_ROUNDED
-        )
+        self._preview_icon.icon = self._icon_for_option(option)
 
     def _open_picker(self, event: ft.ControlEvent) -> None:
         if self._disabled or self._read_only or not self.options:
@@ -158,18 +167,25 @@ class BaseIconPicker(ft.Column):
 
         page = event.page
         self._temporary_value = self._value
+        self._filtered_options = list(self.options)
+        self._search_field = SearchTextField(
+            hint_text="Rechercher une icône…",
+            prefix_icon=ft.Icons.SEARCH_ROUNDED,
+            on_search=lambda _event: self._filter_options(page),
+            width=float("inf"),
+        )
         self._grid = self._build_grid(page)
 
-        content_controls: list[ft.Control] = []
+        controls: list[ft.Control] = []
         if self._picker_description:
-            content_controls.append(
+            controls.append(
                 ft.Text(
                     self._picker_description,
                     size=AppText.BODY,
                     color=AppColors.TEXT_SECONDARY,
                 )
             )
-        content_controls.append(self._grid)
+        controls.extend([self._search_field, self._grid])
 
         self._dialog = AppDialog(
             title=self._picker_title,
@@ -177,7 +193,7 @@ class BaseIconPicker(ft.Column):
             variant=DialogVariant.PRIMARY,
             width=self._dialog_width,
             content=ft.Column(
-                controls=content_controls,
+                controls=controls,
                 spacing=AppSpacing.MD,
                 tight=True,
             ),
@@ -198,15 +214,52 @@ class BaseIconPicker(ft.Column):
         self._dialog.open = True
         page.update()
 
+    def _filter_options(self, page: ft.Page) -> None:
+        query = (
+            (self._search_field.value or "").strip().casefold()
+            if self._search_field is not None
+            else ""
+        )
+        self._filtered_options = [
+            option
+            for option in self.options
+            if not query
+            or query in option.label.casefold()
+            or query in option.value.casefold()
+        ]
+        self._refresh_grid(page)
+
     def _build_grid(self, page: ft.Page) -> ft.GridView:
         return ft.GridView(
-            controls=[self._build_option_tile(option, page) for option in self.options],
+            controls=[
+                self._build_option_tile(option, page)
+                for option in self._filtered_options
+            ],
             max_extent=self._grid_max_extent,
             child_aspect_ratio=self._grid_child_aspect_ratio,
             spacing=self._grid_spacing,
             run_spacing=self._grid_run_spacing,
-            height=420,
+            height=390,
         )
+
+    def _refresh_grid(self, page: ft.Page) -> None:
+        if self._grid is not None:
+            if self._filtered_options:
+                self._grid.controls = [
+                    self._build_option_tile(option, page)
+                    for option in self._filtered_options
+                ]
+            else:
+                self._grid.controls = [
+                    ft.Container(
+                        alignment=ft.Alignment.CENTER,
+                        content=ft.Text(
+                            "Aucune icône ne correspond à la recherche.",
+                            color=AppColors.TEXT_MUTED,
+                        ),
+                    )
+                ]
+        page.update()
 
     def _build_option_tile(
         self,
@@ -233,7 +286,7 @@ class BaseIconPicker(ft.Column):
             content=ft.Row(
                 controls=[
                     ft.Icon(
-                        option.icon or ft.Icons.EMOJI_SYMBOLS_ROUNDED,
+                        self._icon_for_option(option),
                         size=self._option_icon_size,
                         color=AppColors.PRIMARY_DARK,
                     ),
@@ -242,8 +295,16 @@ class BaseIconPicker(ft.Column):
                         max_lines=1,
                         overflow=ft.TextOverflow.ELLIPSIS,
                         size=AppText.BODY,
-                        weight=ft.FontWeight.W_600 if selected else ft.FontWeight.NORMAL,
-                        color=AppColors.PRIMARY_DARK if selected else AppColors.TEXT,
+                        weight=(
+                            ft.FontWeight.W_600
+                            if selected
+                            else ft.FontWeight.NORMAL
+                        ),
+                        color=(
+                            AppColors.PRIMARY_DARK
+                            if selected
+                            else AppColors.TEXT
+                        ),
                         expand=True,
                     ),
                     *(
@@ -265,11 +326,7 @@ class BaseIconPicker(ft.Column):
 
     def _select_temporary(self, value: str, page: ft.Page) -> None:
         self._temporary_value = value
-        if self._grid is not None:
-            self._grid.controls = [
-                self._build_option_tile(option, page) for option in self.options
-            ]
-        page.update()
+        self._refresh_grid(page)
 
     def _apply_value(self, page: ft.Page) -> None:
         if self._temporary_value is None:
