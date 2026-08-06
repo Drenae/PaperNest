@@ -10,6 +10,7 @@ import flet as ft
 
 from app.theme.buttons import PrimaryButton
 from app.theme.forms import PickerTextField
+from app.theme.tokens import AppColors, AppRadius, AppText
 
 
 class BaseDatePickerField(ft.Column):
@@ -48,6 +49,8 @@ class BaseDatePickerField(ft.Column):
         self._external_on_clear = on_clear
         self._disabled = bool(disabled)
         self._read_only = bool(read_only)
+
+        self._apply_picker_theme(page)
 
         first = self._parse_value(first_date) or datetime(1900, 1, 1)
         last = self._parse_value(last_date) or datetime(2100, 12, 31)
@@ -134,6 +137,8 @@ class BaseDatePickerField(ft.Column):
         self.app_page.show_dialog(self._picker)
 
     def _handle_picker_change(self, event: ft.ControlEvent) -> None:
+        # Les données brutes sont prioritaires : elles permettent de restaurer
+        # la date civile avant qu'une conversion UTC ne décale le calendrier.
         selected = self._date_from_event_data(event.data)
         if selected is None:
             selected = self._parse_value(self._picker.value)
@@ -163,12 +168,19 @@ class BaseDatePickerField(ft.Column):
     def _format_display(value: datetime | None) -> str:
         return value.strftime("%d/%m/%Y") if value else ""
 
+    @staticmethod
+    def _civil_datetime(value: datetime) -> datetime:
+        """Convertit d'abord vers l'heure locale, puis extrait la date civile."""
+        if value.tzinfo is not None:
+            value = value.astimezone()
+        return datetime(value.year, value.month, value.day)
+
     @classmethod
     def _parse_value(cls, value: Any) -> datetime | None:
         if value is None:
             return None
         if isinstance(value, datetime):
-            return datetime(value.year, value.month, value.day)
+            return cls._civil_datetime(value)
         if isinstance(value, date):
             return datetime(value.year, value.month, value.day)
 
@@ -176,17 +188,25 @@ class BaseDatePickerField(ft.Column):
         if not text:
             return None
 
-        for parser in (
-            lambda: datetime.fromisoformat(text),
-            lambda: datetime.strptime(text, "%d/%m/%Y"),
-            lambda: datetime.strptime(text, "%Y-%m-%d"),
-        ):
+        # Une date ISO sans heure est déjà une date civile et ne doit subir
+        # aucune conversion de fuseau.
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
             try:
-                parsed = parser()
-                return datetime(parsed.year, parsed.month, parsed.day)
+                return datetime.strptime(text, "%Y-%m-%d")
             except ValueError:
-                continue
-        return None
+                return None
+
+        try:
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+            return cls._civil_datetime(parsed)
+        except ValueError:
+            pass
+
+        try:
+            parsed = datetime.strptime(text, "%d/%m/%Y")
+            return datetime(parsed.year, parsed.month, parsed.day)
+        except ValueError:
+            return None
 
     @classmethod
     def _date_from_event_data(cls, event_data: Any) -> datetime | None:
@@ -220,6 +240,58 @@ class BaseDatePickerField(ft.Column):
             return datetime(local.year, local.month, local.day)
 
         return cls._parse_value(value)
+
+    @staticmethod
+    def _apply_picker_theme(page: ft.Page) -> None:
+        """Applique le thème PaperNest au DatePicker natif de la page."""
+        if page.theme is None:
+            page.theme = ft.Theme()
+
+        page.theme.date_picker_theme = ft.DatePickerTheme(
+            bgcolor=AppColors.SURFACE,
+            header_bgcolor=ft.Colors.GREY_900,
+            header_foreground_color=AppColors.TEXT_LIGHT,
+            divider_color=AppColors.BORDER,
+            shadow_color=ft.Colors.with_opacity(0.22, ft.Colors.BLACK),
+            elevation=8,
+            shape=ft.RoundedRectangleBorder(radius=AppRadius.XL),
+            day_foreground_color={
+                ft.ControlState.SELECTED: AppColors.TEXT,
+                ft.ControlState.DEFAULT: AppColors.TEXT,
+            },
+            day_bgcolor={
+                ft.ControlState.SELECTED: AppColors.PRIMARY,
+                ft.ControlState.DEFAULT: ft.Colors.TRANSPARENT,
+            },
+            today_foreground_color={
+                ft.ControlState.SELECTED: AppColors.TEXT,
+                ft.ControlState.DEFAULT: AppColors.PRIMARY_DARK,
+            },
+            today_bgcolor={
+                ft.ControlState.SELECTED: AppColors.PRIMARY,
+                ft.ControlState.DEFAULT: ft.Colors.TRANSPARENT,
+            },
+            today_border_side=ft.BorderSide(1, AppColors.PRIMARY_DARK),
+            year_foreground_color={
+                ft.ControlState.SELECTED: AppColors.TEXT,
+                ft.ControlState.DEFAULT: AppColors.TEXT,
+            },
+            year_bgcolor={
+                ft.ControlState.SELECTED: AppColors.PRIMARY,
+                ft.ControlState.DEFAULT: ft.Colors.TRANSPARENT,
+            },
+            weekday_text_style=ft.TextStyle(
+                size=AppText.CAPTION,
+                weight=ft.FontWeight.W_600,
+                color=AppColors.TEXT_SECONDARY,
+            ),
+            confirm_button_style=ft.ButtonStyle(
+                color=AppColors.PRIMARY_DARK,
+            ),
+            cancel_button_style=ft.ButtonStyle(
+                color=AppColors.TEXT_SECONDARY,
+            ),
+        )
 
 
 __all__ = ["BaseDatePickerField"]
