@@ -18,8 +18,9 @@ class BaseDatePickerField(ft.Column):
 
     Le contrôle visible reste un :class:`PickerTextField`. Le dialogue de
     sélection est le DatePicker Material natif de Flet, localisé en français.
-    La valeur publique est toujours une date civile représentée par un
-    ``datetime`` à minuit, sans conversion UTC susceptible de décaler le jour.
+    La valeur publique reste un ``datetime`` civil à minuit pour préserver
+    l'API PaperNest, mais le DatePicker reçoit exclusivement des objets
+    ``date`` afin d'éviter toute conversion UTC pendant le transport Flet.
     """
 
     def __init__(
@@ -57,10 +58,10 @@ class BaseDatePickerField(ft.Column):
         today = self._parse_value(current_date) or datetime.now()
 
         self._picker = ft.DatePicker(
-            value=self._value,
-            first_date=first,
-            last_date=last,
-            current_date=datetime(today.year, today.month, today.day),
+            value=self._to_picker_date(self._value),
+            first_date=first.date(),
+            last_date=last.date(),
+            current_date=today.date(),
             locale=ft.Locale("fr", "FR"),
             date_picker_mode=ft.DatePickerMode.DAY,
             entry_mode=ft.DatePickerEntryMode.CALENDAR,
@@ -110,7 +111,7 @@ class BaseDatePickerField(ft.Column):
     def value(self, new_value: str | date | datetime | None) -> None:
         self._value = self._parse_value(new_value)
         if hasattr(self, "_picker"):
-            self._picker.value = self._value
+            self._picker.value = self._to_picker_date(self._value)
         if hasattr(self, "_field"):
             self._field.value = self._format_display(self._value)
 
@@ -133,20 +134,26 @@ class BaseDatePickerField(ft.Column):
         if self._disabled or self._read_only:
             return
 
-        self._picker.value = self._value
+        self._picker.value = self._to_picker_date(self._value)
+        self._apply_picker_theme(self.app_page)
+
+        # Le thème doit être envoyé au client avant que Flutter construise la
+        # route du DatePicker. Sinon le dialogue utilise encore l'ancien thème.
+        self.app_page.update()
         self.app_page.show_dialog(self._picker)
 
     def _handle_picker_change(self, event: ft.ControlEvent) -> None:
-        # Les données brutes sont prioritaires : elles permettent de restaurer
-        # la date civile avant qu'une conversion UTC ne décale le calendrier.
-        selected = self._date_from_event_data(event.data)
+        # La valeur du contrôle natif est prioritaire. Lorsqu'elle est un objet
+        # date, elle représente directement le jour civil sélectionné et ne
+        # doit subir aucune conversion de fuseau.
+        selected = self._parse_value(self._picker.value)
         if selected is None:
-            selected = self._parse_value(self._picker.value)
+            selected = self._date_from_event_data(event.data)
         if selected is None:
             return
 
         self._value = selected
-        self._picker.value = selected
+        self._picker.value = selected.date()
         self._field.value = self._format_display(selected)
 
         if self._external_on_change is not None:
@@ -163,6 +170,10 @@ class BaseDatePickerField(ft.Column):
             self._external_on_clear(event)
         elif self._external_on_change is not None:
             self._external_on_change(event)
+
+    @staticmethod
+    def _to_picker_date(value: datetime | None) -> date | None:
+        return value.date() if value is not None else None
 
     @staticmethod
     def _format_display(value: datetime | None) -> str:
@@ -188,11 +199,17 @@ class BaseDatePickerField(ft.Column):
         if not text:
             return None
 
-        # Une date ISO sans heure est déjà une date civile et ne doit subir
-        # aucune conversion de fuseau.
-        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
+        # Comme dans le contrôle Flutter validé, une chaîne qui commence par
+        # YYYY-MM-DD est considérée d'abord comme une date civile. Le fuseau ou
+        # l'heure éventuellement ajoutés par Flet sont volontairement ignorés.
+        civil = re.match(r"^(\d{4})-(\d{2})-(\d{2})", text)
+        if civil is not None:
             try:
-                return datetime.strptime(text, "%Y-%m-%d")
+                return datetime(
+                    int(civil.group(1)),
+                    int(civil.group(2)),
+                    int(civil.group(3)),
+                )
             except ValueError:
                 return None
 
@@ -242,12 +259,8 @@ class BaseDatePickerField(ft.Column):
         return cls._parse_value(value)
 
     @staticmethod
-    def _apply_picker_theme(page: ft.Page) -> None:
-        """Applique le thème PaperNest au DatePicker natif de la page."""
-        if page.theme is None:
-            page.theme = ft.Theme()
-
-        page.theme.date_picker_theme = ft.DatePickerTheme(
+    def _date_picker_theme() -> ft.DatePickerTheme:
+        return ft.DatePickerTheme(
             bgcolor=AppColors.SURFACE,
             header_bgcolor=ft.Colors.GREY_900,
             header_foreground_color=AppColors.TEXT_LIGHT,
@@ -262,6 +275,12 @@ class BaseDatePickerField(ft.Column):
             day_bgcolor={
                 ft.ControlState.SELECTED: AppColors.PRIMARY,
                 ft.ControlState.DEFAULT: ft.Colors.TRANSPARENT,
+            },
+            day_overlay_color={
+                ft.ControlState.HOVERED: ft.Colors.with_opacity(
+                    0.12,
+                    AppColors.PRIMARY,
+                ),
             },
             today_foreground_color={
                 ft.ControlState.SELECTED: AppColors.TEXT,
@@ -292,6 +311,19 @@ class BaseDatePickerField(ft.Column):
                 color=AppColors.TEXT_SECONDARY,
             ),
         )
+
+    @classmethod
+    def _apply_picker_theme(cls, page: ft.Page) -> None:
+        """Applique le thème au thème clair et au thème sombre de la page."""
+        picker_theme = cls._date_picker_theme()
+
+        if page.theme is None:
+            page.theme = ft.Theme()
+        page.theme.date_picker_theme = picker_theme
+
+        if page.dark_theme is None:
+            page.dark_theme = ft.Theme()
+        page.dark_theme.date_picker_theme = cls._date_picker_theme()
 
 
 __all__ = ["BaseDatePickerField"]
