@@ -56,11 +56,11 @@ class BaseColorPicker(PickerTextField):
 
         self._swatch = ft.Icon(
             ft.Icons.CIRCLE,
-            size=16,
+            size=35,
             color=self._temporary_value,
         )
         self._picker_button = PrimaryButton(
-            "Choisir",
+            "Choisir la couleur",
             compact=True,
             disabled=disabled or read_only,
             on_click=self._open_picker,
