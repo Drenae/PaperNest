@@ -54,9 +54,10 @@ class BaseColorPicker(PickerTextField):
         self._temporary_value = self.normalize_value(value)
         self._dialog: AppDialog | None = None
 
-        self._swatch = ft.CircleAvatar(
-            radius=8,
-            bgcolor=self._temporary_value,
+        self._swatch = ft.Icon(
+            ft.Icons.CIRCLE,
+            size=16,
+            color=self._temporary_value,
         )
         self._picker_button = PrimaryButton(
             "Choisir",
@@ -136,9 +137,9 @@ class BaseColorPicker(PickerTextField):
             normalized = self.normalize_value(self.value)
             if normalized != self.value:
                 self.value = normalized
-            self._swatch.bgcolor = normalized
+            self._swatch.color = normalized
         else:
-            self._swatch.bgcolor = ft.Colors.TRANSPARENT
+            self._swatch.color = ft.Colors.TRANSPARENT
 
     def _open_picker(self, event: ft.ControlEvent) -> None:
         if self.disabled:
@@ -186,7 +187,7 @@ class BaseColorPicker(PickerTextField):
 
     def _apply_value(self, page: ft.Page) -> None:
         self.value = self.normalize_value(self._temporary_value)
-        self._swatch.bgcolor = self.value
+        self._swatch.color = self.value
         self._close_dialog(page, update=False)
 
         if self._external_on_change is not None:
@@ -197,7 +198,7 @@ class BaseColorPicker(PickerTextField):
     def _handle_clear(self, _event: ft.ControlEvent) -> None:
         self.value = None
         self._temporary_value = _DEFAULT_COLOR
-        self._swatch.bgcolor = ft.Colors.TRANSPARENT
+        self._swatch.color = ft.Colors.TRANSPARENT
 
         if self._external_on_clear is not None:
             self._external_on_clear(self.value)
