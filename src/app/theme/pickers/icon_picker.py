@@ -26,7 +26,12 @@ class PaperNestIconPickerOption:
 
 
 class BaseIconPicker(ft.Column):
-    """Sélecteur d'icône PaperNest composé entièrement côté Python."""
+    """Sélecteur d'icône PaperNest composé entièrement côté Python.
+
+    Les options fournies par l'application sont affichées comme recommandations.
+    La recherche parcourt en plus toutes les icônes arrondies disponibles dans
+    ``ft.Icons`` sans construire leurs contrôles avant qu'une recherche existe.
+    """
 
     def __init__(
         self,
@@ -50,16 +55,22 @@ class BaseIconPicker(ft.Column):
         grid_spacing: float = AppSpacing.SM,
         grid_run_spacing: float = AppSpacing.SM,
         option_icon_size: float = 24,
+        max_search_results: int = 160,
         **kwargs,
     ) -> None:
-        self.options = [option for option in options if option.value]
-        values = {option.value for option in self.options}
+        self.recommended_options = [option for option in options if option.value]
+        self._native_options = self._build_native_options(self.recommended_options)
+        self.options = [*self.recommended_options, *self._native_options]
+        self._options_by_value = {option.value: option for option in self.options}
+
         self.fallback_value = (
             fallback_value
-            if fallback_value in values
+            if fallback_value in self._options_by_value
             else (self.options[0].value if self.options else None)
         )
-        self._value = value if value in values else self.fallback_value
+        self._value = (
+            value if value in self._options_by_value else self.fallback_value
+        )
         self._temporary_value = self._value
         self._external_on_change = on_change
         self._disabled = bool(disabled)
@@ -74,10 +85,13 @@ class BaseIconPicker(ft.Column):
         self._grid_spacing = grid_spacing
         self._grid_run_spacing = grid_run_spacing
         self._option_icon_size = option_icon_size
+        self._max_search_results = max(20, int(max_search_results))
         self._dialog: AppDialog | None = None
         self._grid: ft.GridView | None = None
         self._search_field: SearchTextField | None = None
-        self._filtered_options = list(self.options)
+        self._result_text: ft.Text | None = None
+        self._filtered_options = list(self.recommended_options)
+        self._total_matches = len(self._filtered_options)
 
         self._preview_icon = ft.Icon(
             self._icon_for_option(self._selected_option),
@@ -110,6 +124,36 @@ class BaseIconPicker(ft.Column):
             expand=expand,
             **kwargs,
         )
+
+    @staticmethod
+    def _build_native_options(
+        recommended_options: Iterable[PaperNestIconPickerOption],
+    ) -> list[PaperNestIconPickerOption]:
+        recommended_values = {
+            option.value for option in recommended_options if option.value
+        }
+        native_options: list[PaperNestIconPickerOption] = []
+
+        for name in dir(ft.Icons):
+            if name.startswith("_") or not name.endswith("_ROUNDED"):
+                continue
+            if name in recommended_values:
+                continue
+
+            icon = getattr(ft.Icons, name, None)
+            if icon is None:
+                continue
+
+            label = name.removesuffix("_ROUNDED").replace("_", " ").title()
+            native_options.append(
+                PaperNestIconPickerOption(
+                    label=label,
+                    value=name,
+                    icon=icon,
+                )
+            )
+
+        return sorted(native_options, key=lambda option: option.label.casefold())
 
     @property
     def value(self) -> str | None:
@@ -146,7 +190,7 @@ class BaseIconPicker(ft.Column):
     def _option_for_value(self, value: str | None) -> PaperNestIconPickerOption | None:
         if value is None:
             return None
-        return next((option for option in self.options if option.value == value), None)
+        return self._options_by_value.get(value)
 
     @staticmethod
     def _icon_for_option(option: PaperNestIconPickerOption | None):
@@ -167,12 +211,19 @@ class BaseIconPicker(ft.Column):
 
         page = event.page
         self._temporary_value = self._value
-        self._filtered_options = list(self.options)
+        self._filtered_options = list(self.recommended_options)
+        self._total_matches = len(self._filtered_options)
         self._search_field = SearchTextField(
-            hint_text="Rechercher une icône…",
+            hint_text="Rechercher dans toutes les icônes Flet…",
             prefix_icon=ft.Icons.SEARCH_ROUNDED,
             on_search=lambda _event: self._filter_options(page),
             width=float("inf"),
+        )
+        self._result_text = ft.Text(
+            "Icônes recommandées",
+            size=AppText.CAPTION,
+            weight=ft.FontWeight.W_600,
+            color=AppColors.TEXT_MUTED,
         )
         self._grid = self._build_grid(page)
 
@@ -185,7 +236,7 @@ class BaseIconPicker(ft.Column):
                     color=AppColors.TEXT_SECONDARY,
                 )
             )
-        controls.extend([self._search_field, self._grid])
+        controls.extend([self._search_field, self._result_text, self._grid])
 
         self._dialog = AppDialog(
             title=self._picker_title,
@@ -220,14 +271,21 @@ class BaseIconPicker(ft.Column):
             if self._search_field is not None
             else ""
         )
-        self._filtered_options = [
-            option
-            for option in self.options
-            if not query
-            or query in option.label.casefold()
-            or query in option.value.casefold()
-        ]
-        self._refresh_grid(page)
+
+        if not query:
+            self._filtered_options = list(self.recommended_options)
+            self._total_matches = len(self._filtered_options)
+        else:
+            matches = [
+                option
+                for option in self.options
+                if query in option.label.casefold()
+                or query in option.value.casefold()
+            ]
+            self._total_matches = len(matches)
+            self._filtered_options = matches[: self._max_search_results]
+
+        self._refresh_grid(page, query=query)
 
     def _build_grid(self, page: ft.Page) -> ft.GridView:
         return ft.GridView(
@@ -242,7 +300,18 @@ class BaseIconPicker(ft.Column):
             height=390,
         )
 
-    def _refresh_grid(self, page: ft.Page) -> None:
+    def _refresh_grid(self, page: ft.Page, *, query: str = "") -> None:
+        if self._result_text is not None:
+            if not query:
+                self._result_text.value = "Icônes recommandées"
+            elif self._total_matches > self._max_search_results:
+                self._result_text.value = (
+                    f"{self._total_matches} résultats — "
+                    f"{self._max_search_results} affichés, précisez la recherche"
+                )
+            else:
+                self._result_text.value = f"{self._total_matches} résultat(s)"
+
         if self._grid is not None:
             if self._filtered_options:
                 self._grid.controls = [
@@ -326,7 +395,12 @@ class BaseIconPicker(ft.Column):
 
     def _select_temporary(self, value: str, page: ft.Page) -> None:
         self._temporary_value = value
-        self._refresh_grid(page)
+        query = (
+            (self._search_field.value or "").strip().casefold()
+            if self._search_field is not None
+            else ""
+        )
+        self._refresh_grid(page, query=query)
 
     def _apply_value(self, page: ft.Page) -> None:
         if self._temporary_value is None:
