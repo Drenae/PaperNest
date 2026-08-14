@@ -56,13 +56,13 @@ Référence :
 
 ## Identité visuelle
 
-Le bloc de marque reste provisoire jusqu’à la création des assets officiels.
+Le symbole compact officiel est intégré et validé. Le logo horizontal et de nouvelles déclinaisons d’icône ne sont pas nécessaires au périmètre actuel.
 
-- [ ] Créer le symbole compact PaperNest en SVG.
-- [ ] Créer le logo horizontal PaperNest en SVG.
-- [ ] Créer l’icône d’application dans les formats de build nécessaires.
-- [ ] Intégrer le symbole ou le logo dans `brand_icon`.
-- [ ] Vérifier le rendu replié et déployé.
+- [x] Créer le symbole compact PaperNest en SVG.
+- [x] Intégrer le symbole officiel dans `brand_icon`.
+- [x] Vérifier le rendu replié et déployé.
+- [x] Confirmer que le logo horizontal n’est pas requis actuellement.
+- [x] Conserver l’icône d’application existante validée par le build Windows.
 
 Voir `ROADMAP_BRANDING.md`.
 
@@ -71,7 +71,7 @@ Voir `ROADMAP_BRANDING.md`.
 - [x] Supprimer `NavigationButton`.
 - [x] Supprimer `SidebarNavigation`.
 - [x] Supprimer `NavigationItem` devenu inutile.
-- [x] Supprimer `src/app/navigation/navigation.py`.
+- [x] Remplacer l’ancienne sidebar par le `NavigationManager` centralisé dans `src/app/navigation/navigation.py`.
 - [x] Supprimer les imports et constantes devenus obsolètes dans `MainWindow`.
 - [x] Marquer cette roadmap comme terminée.
 

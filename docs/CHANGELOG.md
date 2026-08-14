@@ -11,18 +11,21 @@ PaperNest est considéré comme terminé dans son périmètre actuel. L’applic
 - Intégration de `PaperNestTextField`.
 - Intégration de `PaperNestDropdown` et de `PaperNestDropdownOption`.
 - Ajout de `SearchDropDown` pour les filtres disposant d’un effacement dédié.
-- Intégration de `PaperNestColorPicker` via `BaseColorPicker`.
-- Intégration de `PaperNestDatePicker` via `BaseDatePickerField`.
+- Remplacement de `PaperNestColorPicker` par `BaseColorPicker`, composé en Python autour de `MaterialPicker`.
+- Remplacement de `PaperNestDatePicker` par `BaseDatePickerField`, composé en Python autour de `ft.DatePicker`.
 - Intégration de `PaperNestFilePicker` via `BaseFilePicker`.
+- Remplacement de `PaperNestIconPicker` par `BaseIconPicker`, composé entièrement en Python avec recherche dans `ft.Icons`.
+- Retour définitif à `AppDialog(ft.AlertDialog)` pour tous les dialogues applicatifs.
 - Harmonisation des wrappers thématiques avec des valeurs par défaut surchargeables.
 
 ### DatePicker
 
-- Héritage direct de `PaperNestDatePicker` sans conteneur intermédiaire.
-- Conservation de la valeur native `datetime`.
+- Utilisation directe de `ft.DatePicker` depuis le wrapper Python.
+- Conservation d’une valeur publique `datetime` représentant une date civile.
 - Ajout de `iso_value` pour les services utilisant le format ISO.
 - Migration du dialogue des métadonnées.
-- Suppression de l’ancien DatePicker natif de `forms.py`.
+- Localisation française et thème PaperNest validés.
+- Correction du décalage d’un jour par l’utilisation de dates civiles.
 
 ### FilePicker
 
@@ -37,6 +40,7 @@ PaperNest est considéré comme terminé dans son périmètre actuel. L’applic
 
 - Nettoyage de `forms.py` et des imports obsolètes.
 - Suppression des anciens wrappers devenus inutiles.
+- Suppression de `PaperNestAlertDialog`, `PaperNestColorPicker`, `PaperNestDatePicker`, `PaperNestIconPicker` et `PaperNestDialogSurface` dans PaperNestExtension.
 - Validation visuelle et fonctionnelle complète sous Windows.
 - Validation des parcours d’import, de restauration, de couleur et de date.
 - Validation du build Windows.
