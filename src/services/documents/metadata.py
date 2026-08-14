@@ -166,6 +166,11 @@ class MetadataService:
                     "Le montant saisi est invalide."
                 ) from error
 
+        if not amount.is_finite():
+            raise InvalidMetadataError(
+                "Le montant saisi est invalide."
+            )
+
         if amount < 0:
             raise InvalidMetadataError(
                 "Le montant ne peut pas être négatif."

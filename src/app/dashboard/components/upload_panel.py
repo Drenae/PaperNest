@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
@@ -22,6 +23,9 @@ from core.errors.exceptions import PaperNestError
 from repositories.category_repository import category_repository
 from services.documents.duplicates import duplicate_detection_service
 from services.files.archive import ArchiveFileService
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -331,7 +335,18 @@ class UploadPanel(Section):
                         source_sha256=analysis.source_sha256,
                     )
                     imported += 1
-                except (PaperNestError, Exception):
+                except PaperNestError as error:
+                    logger.warning(
+                        "Import refusé pour %s : %s",
+                        item.path,
+                        error,
+                    )
+                    errors += 1
+                except Exception:
+                    logger.exception(
+                        "Erreur inattendue pendant l’import de %s.",
+                        item.path,
+                    )
                     errors += 1
             self.processing_bar.value = 1
             notifications(self.app_page).success(

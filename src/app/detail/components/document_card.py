@@ -325,12 +325,6 @@ class DocumentCard(BaseDocumentCard):
     async def _handle_metadata_saved(
         self,
     ) -> None:
-        notifications(
-            self.app_page
-        ).success(
-            "Informations du document enregistrées."
-        )
-
         await self._notify_changed()
 
     def show_rename_dialog(

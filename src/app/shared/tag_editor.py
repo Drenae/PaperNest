@@ -1,5 +1,7 @@
 import flet as ft
 
+from app.theme.buttons import IconAction
+from app.theme.forms import BaseTextField
 from utils.text import normalize_search_text
 from app.theme.tokens import AppColors
 from repositories.tag_repository import tag_repository
@@ -20,7 +22,7 @@ class TagEditor(ft.Column):
         self.base_suggestions = suggestions or []
         self.on_error = on_error
 
-        self.input_field = ft.TextField(
+        self.input_field = BaseTextField(
             label="Ajouter un tag",
             hint_text="Ex. assurance, maison, 2026",
             prefix_icon=ft.Icons.LABEL_OUTLINE_ROUNDED,
@@ -29,10 +31,11 @@ class TagEditor(ft.Column):
             on_change=self.handle_input_change,
         )
 
-        self.add_button = ft.IconButton(
+        self.add_button = IconAction(
             icon=ft.Icons.ADD_CIRCLE_ROUNDED,
             tooltip="Ajouter le tag",
             icon_color=AppColors.SECONDARY,
+            compact=True,
             on_click=self.add_from_input,
         )
 
@@ -202,9 +205,10 @@ class TagEditor(ft.Column):
                         size=11,
                         color=AppColors.SECONDARY,
                     ),
-                    ft.IconButton(
+                    IconAction(
                         icon=ft.Icons.CLOSE_ROUNDED,
                         icon_size=14,
+                        compact=True,
                         tooltip=f"Retirer {tag_name}",
                         on_click=(
                             lambda event, name=tag_name: self.remove_tag(name)

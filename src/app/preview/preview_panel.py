@@ -8,6 +8,7 @@ from app.notifications import notifications
 from app.preview.builder import PreviewBuilder
 from app.preview.components.preview_placeholder import PreviewPlaceholder
 from app.preview.controller import PreviewController
+from app.theme.buttons import IconAction
 from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppColors, AppRadius, AppSpacing
 from services.files.archive import ArchiveFileService
@@ -72,21 +73,21 @@ class PreviewPanel(ft.Container):
             overflow=ft.TextOverflow.ELLIPSIS,
         )
 
-        self.previous_document_button = ft.IconButton(
+        self.previous_document_button = IconAction(
             icon=ft.Icons.SKIP_PREVIOUS_ROUNDED,
             tooltip="Document précédent",
             disabled=True,
             on_click=self.previous_document,
         )
 
-        self.next_document_button = ft.IconButton(
+        self.next_document_button = IconAction(
             icon=ft.Icons.SKIP_NEXT_ROUNDED,
             tooltip="Document suivant",
             disabled=True,
             on_click=self.next_document,
         )
 
-        self.layout_button = ft.IconButton(
+        self.layout_button = IconAction(
             icon=ft.Icons.FULLSCREEN_ROUNDED,
             tooltip="Agrandir l’aperçu",
             on_click=self.toggle_layout,
@@ -105,42 +106,42 @@ class PreviewPanel(ft.Container):
             color=AppColors.TEXT_MUTED,
         )
 
-        self.previous_page_button = ft.IconButton(
+        self.previous_page_button = IconAction(
             icon=ft.Icons.CHEVRON_LEFT_ROUNDED,
             tooltip="Page précédente",
             disabled=True,
             on_click=self.previous_page,
         )
 
-        self.next_page_button = ft.IconButton(
+        self.next_page_button = IconAction(
             icon=ft.Icons.CHEVRON_RIGHT_ROUNDED,
             tooltip="Page suivante",
             disabled=True,
             on_click=self.next_page,
         )
 
-        self.zoom_out_button = ft.IconButton(
+        self.zoom_out_button = IconAction(
             icon=ft.Icons.REMOVE_ROUNDED,
             tooltip="Réduire",
             disabled=True,
             on_click=self.zoom_out,
         )
 
-        self.zoom_in_button = ft.IconButton(
+        self.zoom_in_button = IconAction(
             icon=ft.Icons.ADD_ROUNDED,
             tooltip="Agrandir",
             disabled=True,
             on_click=self.zoom_in,
         )
 
-        self.reset_zoom_button = ft.IconButton(
+        self.reset_zoom_button = IconAction(
             icon=ft.Icons.FIT_SCREEN_ROUNDED,
             tooltip="Taille normale",
             disabled=True,
             on_click=self.reset_zoom,
         )
 
-        self.rotate_button = ft.IconButton(
+        self.rotate_button = IconAction(
             icon=ft.Icons.ROTATE_RIGHT_ROUNDED,
             tooltip="Faire pivoter",
             disabled=True,
@@ -200,17 +201,17 @@ class PreviewPanel(ft.Container):
                             self.previous_document_button,
                             self.next_document_button,
                             self.layout_button,
-                            ft.IconButton(
+                            IconAction(
                                 icon=ft.Icons.FOLDER_OPEN_ROUNDED,
                                 tooltip="Ouvrir le dossier",
                                 on_click=self.open_parent_folder,
                             ),
-                            ft.IconButton(
+                            IconAction(
                                 icon=ft.Icons.OPEN_IN_NEW_ROUNDED,
                                 tooltip="Ouvrir dans Windows",
                                 on_click=self.open_document,
                             ),
-                            ft.IconButton(
+                            IconAction(
                                 icon=ft.Icons.CLOSE_ROUNDED,
                                 tooltip="Fermer l’aperçu",
                                 on_click=self.close,
