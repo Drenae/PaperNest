@@ -24,6 +24,7 @@ class MainWindow:
         self.navigation = NavigationManager(
             page=page,
             on_select=self.handle_navigation_select,
+            on_dashboard_detail_changed=self.handle_dashboard_detail_changed,
             on_categories_changed=self.handle_categories_changed,
             on_restore_done=self.handle_restore_done,
             on_trash_content_changed=self.handle_trash_content_changed,
@@ -70,6 +71,12 @@ class MainWindow:
 
     def refresh_current_view(self) -> None:
         self.navigate_to(self.selected_index, force=True)
+
+    def handle_dashboard_detail_changed(self, showing_detail: bool) -> None:
+        # Le détail d'un classeur est une sous-vue de l'accueil, pas la page
+        # d'accueil elle-même. Désélectionner temporairement le rail permet à
+        # un clic sur « Accueil » de déclencher de nouveau sa navigation.
+        self.navigation.select(-1 if showing_detail else 0)
 
     def dispose_current_view(self) -> None:
         if self.current_view is None:

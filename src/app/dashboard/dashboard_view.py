@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import flet as ft
 
 from app.theme.tokens import AppColors, AppSpacing
@@ -12,9 +14,14 @@ from app.detail.detail_view import DetailView
 class DashboardView(ft.Column):
     """Accueil volontairement simple : import à gauche, classeurs à droite."""
 
-    def __init__(self, page: ft.Page):
+    def __init__(
+        self,
+        page: ft.Page,
+        on_detail_changed: Callable[[bool], None] | None = None,
+    ):
         super().__init__(expand=True, spacing=AppSpacing.LG, scroll=ft.ScrollMode.AUTO)
         self.app_page = page
+        self.on_detail_changed = on_detail_changed
         self.detail_view: DetailView | None = None
 
         self.processing_bar = ft.ProgressBar(
@@ -72,6 +79,7 @@ class DashboardView(ft.Column):
             on_back=self.show_main_dashboard,
         )
         self.controls = [self.detail_view]
+        self._notify_detail_changed(True)
         self._safe_page_update()
 
     def show_main_dashboard(self, _event=None) -> None:
@@ -79,7 +87,12 @@ class DashboardView(ft.Column):
         self.scroll = ft.ScrollMode.AUTO
         self.cabinet_panel.refresh_grid_ui()
         self.controls = list(self.main_dashboard_controls)
+        self._notify_detail_changed(False)
         self._safe_page_update()
+
+    def _notify_detail_changed(self, showing_detail: bool) -> None:
+        if self.on_detail_changed is not None:
+            self.on_detail_changed(showing_detail)
 
     def _dispose_detail_view(self) -> None:
         if self.detail_view is None:

@@ -34,12 +34,14 @@ class NavigationManager:
         *,
         page: ft.Page,
         on_select: Callable[[int], None],
+        on_dashboard_detail_changed: Callable[[bool], None],
         on_categories_changed: Callable[[], None],
         on_restore_done: Callable[[], None],
         on_trash_content_changed: Callable[[], None],
     ) -> None:
         self.page = page
         self.on_select = on_select
+        self.on_dashboard_detail_changed = on_dashboard_detail_changed
         self.on_categories_changed = on_categories_changed
         self.on_restore_done = on_restore_done
         self.on_trash_content_changed = on_trash_content_changed
@@ -167,7 +169,10 @@ class NavigationManager:
         )
 
     def _create_dashboard(self) -> DashboardView:
-        return DashboardView(page=self.page)
+        return DashboardView(
+            page=self.page,
+            on_detail_changed=self.on_dashboard_detail_changed,
+        )
 
     def _create_search(self) -> SearchView:
         return SearchView(page=self.page)
