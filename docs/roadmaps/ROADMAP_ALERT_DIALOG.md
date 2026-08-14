@@ -2,7 +2,7 @@
 
 ## État
 
-**Phases 1 et 2 implémentées. Validation applicative en attente.**
+**Clôturée : AppDialog 100 % Python validé et ancien contrôle supprimé de PaperNestExtension.**
 
 `AppDialog` hérite désormais directement de `ft.AlertDialog`. La mise en page, le header, les variantes et les actions sont entièrement construits côté Python. `PaperNestAlertDialog` n’est plus importé ni utilisé par PaperNest.
 
@@ -44,38 +44,38 @@ PaperNestExtension ne doit plus intervenir dans la construction ou la mise en pa
 
 ## Phase 3 — Audit applicatif
 
-- [ ] Vérifier `CategoryEditorDialog`.
-- [ ] Vérifier `MetadataDialog`.
-- [ ] Vérifier les dialogues de renommage et déplacement.
-- [ ] Vérifier les suppressions et confirmations.
-- [ ] Vérifier les restaurations et la corbeille.
-- [ ] Vérifier les dialogues avec `title_action`.
-- [ ] Vérifier les ouvertures successives et imbriquées.
+- [x] Vérifier `CategoryEditorDialog`.
+- [x] Vérifier `MetadataDialog`.
+- [x] Vérifier les dialogues de renommage et déplacement.
+- [x] Vérifier les suppressions et confirmations.
+- [x] Vérifier les restaurations et la corbeille.
+- [x] Vérifier les dialogues avec `title_action`.
+- [x] Vérifier les ouvertures successives et imbriquées.
 
 ## Phase 4 — Validation
 
-- [ ] Lancer `flet run --recursive`.
-- [ ] Vérifier les hauteurs et largeurs réelles.
-- [ ] Vérifier le scroll.
-- [ ] Vérifier les contenus extensibles.
-- [ ] Valider le build Windows.
-- [ ] Faire valider visuellement et fonctionnellement par l’utilisateur.
+- [x] Lancer `flet run --recursive`.
+- [x] Vérifier les hauteurs et largeurs réelles.
+- [x] Vérifier le scroll.
+- [x] Vérifier les contenus extensibles.
+- [x] Valider le build Windows.
+- [x] Faire valider visuellement et fonctionnellement par l’utilisateur.
 
 ## Phase 5 — Nettoyage après validation
 
-- [ ] Coordonner la suppression de `PaperNestAlertDialog` dans PaperNestExtension.
-- [ ] Supprimer sa page d’exemple et ses exports.
-- [ ] Supprimer son contrôle Flutter et Python.
-- [ ] Supprimer `PaperNestDialogSurface` après la migration des pickers.
-- [ ] Mettre à jour la documentation et les changelogs.
+- [x] Coordonner la suppression de `PaperNestAlertDialog` dans PaperNestExtension.
+- [x] Supprimer sa page d’exemple et ses exports.
+- [x] Supprimer son contrôle Flutter et Python.
+- [x] Supprimer `PaperNestDialogSurface` après la migration des pickers.
+- [x] Mettre à jour la documentation et les changelogs.
 
 ## Pickers
 
-Les pickers restent un chantier séparé :
+Les pickers ont été traités dans leurs roadmaps dédiées :
 
-- ColorPicker : prototype Python avec `flet-color-picker` avant décision finale.
-- IconPicker : reconstruction 100 % Python.
-- DatePicker : wrapper Python autour de `ft.DatePicker`.
+- ColorPicker : composition Python validée avec `flet-color-pickers`.
+- IconPicker : reconstruction 100 % Python validée.
+- DatePicker : wrapper Python validé autour de `ft.DatePicker`.
 - FilePicker : inchangé.
 
 ## Critère de finalisation

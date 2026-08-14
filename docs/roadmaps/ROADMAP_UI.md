@@ -4,7 +4,7 @@
 
 La version actuelle de PaperNest reste terminée et stable.
 
-`PaperNestGlideRail`, l’identité visuelle et `PaperNestIconPicker` sont terminés, intégrés et validés sous Windows. Les chantiers actifs sont maintenant le nettoyage final des wrappers de pickers et la réorganisation de l’application d’exemple de PaperNestExtension. La migration vers `PaperNestAlertDialog` est planifiée mais n’a pas encore commencé.
+`PaperNestGlideRail`, l’identité visuelle, les wrappers Python des pickers et `AppDialog` sont terminés, intégrés et validés sous Windows. Les anciens contrôles Flutter de dialogue, couleur, date et icône ont été retirés de PaperNestExtension.
 
 ## Objectif
 
@@ -15,10 +15,10 @@ Préserver une interface simple et stable tout en ajoutant uniquement les améli
 - [x] `PaperNestTextField`.
 - [x] `PaperNestDropdown` et `PaperNestDropdownOption`.
 - [x] `SearchDropDown` pour les filtres concernés.
-- [x] `PaperNestColorPicker` via `BaseColorPicker`.
-- [x] `PaperNestDatePicker` via `BaseDatePickerField`.
+- [x] `BaseColorPicker` Python avec `MaterialPicker`.
+- [x] `BaseDatePickerField` Python avec `ft.DatePicker`.
 - [x] `PaperNestFilePicker` via `BaseFilePicker`.
-- [x] `PaperNestIconPicker` via `BaseIconPicker`.
+- [x] `BaseIconPicker` Python avec recherche dans `ft.Icons`.
 - [x] `PaperNestGlideRail` pour la navigation principale.
 
 ## Migrations terminées
@@ -31,27 +31,27 @@ Préserver une interface simple et stable tout en ajoutant uniquement les améli
 - [x] Centralisation de la navigation dans `src/app/navigation/navigation.py`.
 - [x] Sélection, nettoyage et intégration du symbole officiel PaperNest.
 
-## Chantier actif — Organisation des Pickers
+## Chantier terminé — Organisation des Pickers
 
 - [x] Créer le package `src/app/theme/pickers`.
 - [x] Y créer les quatre wrappers thématiques.
-- [ ] Mettre à jour tous les imports applicatifs.
-- [ ] Supprimer les anciens fichiers à la racine de `src/app/theme`.
-- [ ] Supprimer définitivement `BaseIconField` de `forms.py`.
-- [ ] Nettoyer les imports devenus inutiles.
-- [ ] Valider le lancement et le build Windows.
+- [x] Mettre à jour tous les imports applicatifs.
+- [x] Supprimer les anciens fichiers à la racine de `src/app/theme`.
+- [x] Supprimer définitivement `BaseIconField` de `forms.py`.
+- [x] Nettoyer les imports devenus inutiles.
+- [x] Valider le lancement et le build Windows.
 
 Voir `ROADMAP_PICKERS_ORGANIZATION.md`.
 
-## Chantier planifié — PaperNestAlertDialog
+## Chantier terminé — AppDialog Python
 
 - [x] Créer une roadmap PaperNest dédiée.
 - [x] Créer une roadmap PaperNestExtension dédiée.
-- [ ] Étudier les sources Python et Flutter d’`AlertDialog`.
-- [ ] Développer `PaperNestAlertDialog` dans PaperNestExtension.
-- [ ] Faire hériter `AppDialog` du nouveau contrôle.
-- [ ] Partager le rendu Flutter avec les pickers compatibles.
-- [ ] Conserver le DatePicker natif si la migration dégrade ses fonctions.
+- [x] Étudier les sources Python et Flutter d’`AlertDialog`.
+- [x] Abandonner le fork `PaperNestAlertDialog` au profit de `ft.AlertDialog`.
+- [x] Faire hériter `AppDialog` de `ft.AlertDialog`.
+- [x] Construire le rendu PaperNest entièrement en Python.
+- [x] Conserver et valider le DatePicker natif.
 
 Voir `ROADMAP_ALERT_DIALOG.md`.
 
