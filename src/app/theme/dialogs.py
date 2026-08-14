@@ -6,14 +6,7 @@ from typing import Iterable, Optional
 import flet as ft
 
 from app.theme.buttons import DangerButton, PrimaryButton, SecondaryButton
-from app.theme.tokens import (
-    AppColors,
-    AppRadius,
-    AppSizes,
-    AppSpacing,
-    AppText,
-    AppTheme,
-)
+from app.theme.tokens import AppColors, AppRadius, AppSizes, AppSpacing, AppText
 
 
 class DialogVariant(str, Enum):
@@ -39,7 +32,6 @@ class DialogHeader(ft.Container):
         bgcolor=AppColors.PANEL_DARK,
         icon_bgcolor=AppColors.PANEL_DARK_SOFT,
         icon_color=AppColors.TEXT_LIGHT,
-        accent_color=AppColors.PRIMARY,
         icon_size: float = AppSizes.ICON_MD,
         icon_container_size: float = 38,
         icon_border_radius: float = AppRadius.MD,
@@ -101,15 +93,6 @@ class DialogHeader(ft.Container):
                     alignment=ft.Alignment.CENTER,
                     border_radius=icon_border_radius,
                     bgcolor=icon_bgcolor,
-                    border=ft.Border.all(
-                        1,
-                        ft.Colors.with_opacity(0.46, accent_color),
-                    ),
-                    shadow=ft.BoxShadow(
-                        blur_radius=12,
-                        spread_radius=-3,
-                        color=ft.Colors.with_opacity(0.34, accent_color),
-                    ),
                     content=icon_control,
                 )
             )
@@ -135,11 +118,7 @@ class DialogHeader(ft.Container):
 
         super().__init__(
             bgcolor=bgcolor,
-            gradient=AppTheme.dark_glass_gradient(),
             padding=padding,
-            border=ft.Border.only(
-                bottom=ft.BorderSide(2, accent_color),
-            ),
             border_radius=ft.BorderRadius.only(
                 top_left=AppRadius.XL,
                 top_right=AppRadius.XL,
@@ -186,7 +165,6 @@ class AppDialog(ft.AlertDialog):
                 palette["icon_background"],
             ),
             icon_color=kwargs.pop("icon_color", palette["icon_color"]),
-            accent_color=kwargs.pop("accent_color", palette["accent_color"]),
             icon_size=kwargs.pop("icon_size", AppSizes.ICON_MD),
             icon_container_size=kwargs.pop("icon_container_size", 38),
             icon_border_radius=kwargs.pop(
@@ -225,21 +203,18 @@ class AppDialog(ft.AlertDialog):
                 expand=False,
             )
 
-        kwargs.setdefault("bgcolor", AppColors.GLASS_SURFACE_STRONG)
+        kwargs.setdefault("bgcolor", AppColors.SURFACE)
         kwargs.setdefault(
             "barrier_color",
-            ft.Colors.with_opacity(0.58, ft.Colors.GREY_900),
+            ft.Colors.with_opacity(0.48, ft.Colors.BLACK),
         )
         kwargs.setdefault(
             "shadow_color",
-            ft.Colors.with_opacity(0.30, ft.Colors.BLACK),
+            ft.Colors.with_opacity(0.22, ft.Colors.BLACK),
         )
         kwargs.setdefault(
             "shape",
-            ft.RoundedRectangleBorder(
-                radius=AppRadius.XL,
-                side=ft.BorderSide(1, AppColors.GLASS_BORDER),
-            ),
+            ft.RoundedRectangleBorder(radius=AppRadius.XL),
         )
         kwargs.setdefault("clip_behavior", ft.ClipBehavior.ANTI_ALIAS)
         kwargs.setdefault("title_padding", 0)
@@ -281,27 +256,22 @@ class AppDialog(ft.AlertDialog):
             DialogVariant.STANDARD: {
                 "icon_background": AppColors.PANEL_DARK_SOFT,
                 "icon_color": AppColors.TEXT_LIGHT,
-                "accent_color": AppColors.PRIMARY,
             },
             DialogVariant.PRIMARY: {
                 "icon_background": AppColors.PRIMARY,
                 "icon_color": AppColors.TEXT,
-                "accent_color": AppColors.PRIMARY,
             },
             DialogVariant.SUCCESS: {
                 "icon_background": AppColors.SUCCESS,
                 "icon_color": AppColors.TEXT_LIGHT,
-                "accent_color": AppColors.SUCCESS,
             },
             DialogVariant.WARNING: {
                 "icon_background": AppColors.WARNING,
                 "icon_color": AppColors.TEXT_LIGHT,
-                "accent_color": AppColors.WARNING,
             },
             DialogVariant.DANGER: {
                 "icon_background": AppColors.ERROR,
                 "icon_color": AppColors.TEXT_LIGHT,
-                "accent_color": AppColors.ERROR,
             },
         }[variant]
 
