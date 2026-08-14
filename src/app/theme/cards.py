@@ -12,6 +12,7 @@ from app.theme.tokens import (
     AppSizes,
     AppSpacing,
     AppText,
+    AppTheme,
 )
 from app.theme.buttons import IconAction
 
@@ -68,8 +69,16 @@ class AppCard(ft.Container):
             CardDensity.COMFORTABLE: AppSpacing.XL,
         }[density]
 
-        resolved_bg = bgcolor or (AppColors.PRIMARY_SOFT if selected else AppColors.SURFACE)
-        resolved_border = border_color or (AppColors.PRIMARY_DARK if selected else AppColors.BORDER_LIGHT)
+        resolved_bg = bgcolor or (
+            AppColors.PRIMARY_SOFT
+            if selected
+            else AppColors.GLASS_SURFACE
+        )
+        resolved_border = border_color or (
+            AppColors.PRIMARY_DARK
+            if selected
+            else AppColors.GLASS_BORDER
+        )
 
         icon_control = None
 
@@ -197,7 +206,7 @@ class AppCard(ft.Container):
             bgcolor=resolved_bg,
             border_radius=AppRadius.LG,
             border=ft.Border.all(1, resolved_border),
-            shadow=(AppShadows.card() if shadow else None),
+            shadow=(AppShadows.glass() if shadow else None),
             on_click=(None if disabled else on_click),
             opacity=(0.55 if disabled else 1),
             tooltip=tooltip,
@@ -272,7 +281,8 @@ class PageHeader(ft.Container):
 
         super().__init__(
             padding=AppSpacing.XL,
-            bgcolor=AppColors.PANEL_DARK,
+            bgcolor=AppColors.GLASS_DARK,
+            gradient=AppTheme.dark_glass_gradient(),
             border_radius=AppRadius.LG,
             content=ft.Row(
                 controls=[
@@ -314,16 +324,17 @@ class AppSection(ft.Container):
 
         super().__init__(
             border_radius=AppRadius.LG,
-            border=ft.Border.all(1, AppColors.BORDER_LIGHT),
-            bgcolor=AppColors.SURFACE,
+            border=ft.Border.all(1, AppColors.GLASS_BORDER),
+            bgcolor=AppColors.GLASS_SURFACE,
             clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
             expand=expand,
-            shadow=AppShadows.card(),
+            shadow=AppShadows.glass(),
             content=ft.Column(
                 spacing=0,
                 controls=[
                     ft.Container(
-                        bgcolor=AppColors.PANEL_DARK,
+                        bgcolor=AppColors.GLASS_DARK,
+                        gradient=AppTheme.dark_glass_gradient(),
                         padding=ft.Padding.symmetric(
                             horizontal=AppSpacing.LG,
                             vertical=AppSpacing.MD,
@@ -340,7 +351,7 @@ class AppSection(ft.Container):
                         padding=AppSpacing.LG,
                         content=content,
                         expand=True,
-                        bgcolor=AppColors.SURFACE,
+                        bgcolor=AppColors.GLASS_SURFACE_SOFT,
                     ),
                 ],
             ),

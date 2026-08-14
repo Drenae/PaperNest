@@ -34,6 +34,15 @@ class AppColors:
     SURFACE = ft.Colors.WHITE
     SURFACE_ALT = ft.Colors.GREY_200
 
+    # Surfaces translucides utilisées par le langage visuel glassmorphism.
+    GLASS_SURFACE = ft.Colors.with_opacity(0.86, ft.Colors.WHITE)
+    GLASS_SURFACE_STRONG = ft.Colors.with_opacity(0.94, ft.Colors.WHITE)
+    GLASS_SURFACE_SOFT = ft.Colors.with_opacity(0.68, ft.Colors.WHITE)
+    GLASS_DARK = ft.Colors.with_opacity(0.94, ft.Colors.GREY_900)
+    GLASS_DARK_SOFT = ft.Colors.with_opacity(0.84, ft.Colors.GREY_900)
+    GLASS_BORDER = ft.Colors.with_opacity(0.72, ft.Colors.WHITE)
+    GLASS_BORDER_DARK = ft.Colors.with_opacity(0.18, ft.Colors.WHITE)
+
     PANEL = ft.Colors.GREY_300
     PANEL_STRONG = ft.Colors.GREY_400
     PANEL_DARK = ft.Colors.GREY_900
@@ -140,6 +149,23 @@ class AppShadows:
             offset=ft.Offset(0, 8),
         )
 
+    @staticmethod
+    def glass() -> list[ft.BoxShadow]:
+        return [
+            ft.BoxShadow(
+                blur_radius=28,
+                spread_radius=-6,
+                color=ft.Colors.with_opacity(0.18, ft.Colors.GREY_900),
+                offset=ft.Offset(0, 12),
+            ),
+            ft.BoxShadow(
+                blur_radius=12,
+                spread_radius=-4,
+                color=ft.Colors.with_opacity(0.16, AppColors.PRIMARY),
+                offset=ft.Offset(0, 3),
+            ),
+        ]
+
 
 class AppTheme:
     """Fabriques communes utilisées par les composants UI."""
@@ -171,3 +197,27 @@ class AppTheme:
     @staticmethod
     def input_focus_color() -> str:
         return AppColors.PRIMARY_DARK
+
+    @staticmethod
+    def workspace_gradient() -> ft.LinearGradient:
+        return ft.LinearGradient(
+            begin=ft.Alignment.TOP_LEFT,
+            end=ft.Alignment.BOTTOM_RIGHT,
+            colors=[
+                ft.Colors.GREY_100,
+                ft.Colors.with_opacity(0.42, AppColors.PRIMARY_LIGHT),
+                ft.Colors.GREY_200,
+            ],
+            stops=[0.0, 0.48, 1.0],
+        )
+
+    @staticmethod
+    def dark_glass_gradient() -> ft.LinearGradient:
+        return ft.LinearGradient(
+            begin=ft.Alignment.TOP_LEFT,
+            end=ft.Alignment.BOTTOM_RIGHT,
+            colors=[
+                AppColors.GLASS_DARK,
+                AppColors.GLASS_DARK_SOFT,
+            ],
+        )

@@ -3,7 +3,7 @@ from __future__ import annotations
 import flet as ft
 
 from app.navigation.navigation import NavigationManager
-from app.theme.tokens import AppColors, AppSizes, AppSpacing
+from app.theme.tokens import AppColors, AppSizes, AppSpacing, AppTheme
 
 
 class MainWindow:
@@ -19,6 +19,7 @@ class MainWindow:
             margin=ft.Margin.only(left=AppSizes.SIDEBAR_COMPACT_WIDTH),
             padding=AppSpacing.XL,
             bgcolor=AppColors.BACKGROUND,
+            gradient=AppTheme.workspace_gradient(),
         )
 
         self.navigation = NavigationManager(

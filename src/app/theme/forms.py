@@ -25,11 +25,11 @@ def _label_control(value: LabelValue):
 
 class _InputMixin:
     def _apply_common_input_style(self, compact: bool = False):
-        self.bgcolor = AppColors.SURFACE
+        self.bgcolor = AppColors.GLASS_SURFACE_STRONG
         self.filled = True
         self.border_width = 1
         self.focused_border_width = 2
-        self.border_color = AppColors.BORDER
+        self.border_color = AppColors.GLASS_BORDER
         self.focused_border_color = AppColors.PRIMARY_DARK
         self.border_radius = AppRadius.MD
         self.height = AppSizes.FIELD_HEIGHT_COMPACT if compact else AppSizes.FIELD_HEIGHT
