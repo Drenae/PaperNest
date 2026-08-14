@@ -29,7 +29,7 @@ class DialogHeader(ft.Container):
         subtitle: str | ft.Control | None = None,
         icon=None,
         title_action: Optional[ft.Control] = None,
-        bgcolor=ft.Colors.with_opacity(0.94, ft.Colors.GREY_900),
+        bgcolor=AppColors.PANEL_DARK,
         icon_bgcolor=AppColors.PANEL_DARK_SOFT,
         icon_color=AppColors.TEXT_LIGHT,
         icon_size: float = AppSizes.ICON_MD,
@@ -93,10 +93,6 @@ class DialogHeader(ft.Container):
                     alignment=ft.Alignment.CENTER,
                     border_radius=icon_border_radius,
                     bgcolor=icon_bgcolor,
-                    border=ft.Border.all(
-                        1,
-                        ft.Colors.with_opacity(0.18, ft.Colors.WHITE),
-                    ),
                     content=icon_control,
                 )
             )
@@ -122,18 +118,7 @@ class DialogHeader(ft.Container):
 
         super().__init__(
             bgcolor=bgcolor,
-            blur=ft.Blur(
-                12,
-                12,
-                ft.BlurTileMode.MIRROR,
-            ),
             padding=padding,
-            border=ft.Border.only(
-                bottom=ft.BorderSide(
-                    1,
-                    ft.Colors.with_opacity(0.24, AppColors.PRIMARY),
-                ),
-            ),
             border_radius=ft.BorderRadius.only(
                 top_left=AppRadius.XL,
                 top_right=AppRadius.XL,
@@ -148,7 +133,7 @@ class DialogHeader(ft.Container):
 
 
 class AppDialog(ft.AlertDialog):
-    """Dialogue PaperNest vitré, construit dans le conteneur natif Flet."""
+    """Dialogue PaperNest compact basé sur le AlertDialog natif de Flet."""
 
     def __init__(
         self,
@@ -174,10 +159,7 @@ class AppDialog(ft.AlertDialog):
             subtitle=subtitle,
             icon=icon,
             title_action=title_action,
-            bgcolor=kwargs.pop(
-                "header_bgcolor",
-                ft.Colors.with_opacity(0.94, ft.Colors.GREY_900),
-            ),
+            bgcolor=kwargs.pop("header_bgcolor", AppColors.PANEL_DARK),
             icon_bgcolor=kwargs.pop(
                 "icon_bgcolor",
                 palette["icon_background"],
@@ -196,12 +178,11 @@ class AppDialog(ft.AlertDialog):
         )
 
         effective_width = getattr(content, "width", None) or width
-        surface_width = effective_width + (AppSpacing.XL * 2)
         content_controls = [content] if content is not None else []
-        dialog_actions = list(actions or [])
 
         if scrollable:
-            body_content = ft.Container(
+            dialog_content = ft.Container(
+                width=effective_width,
                 height=max_height or 600,
                 content=ft.Column(
                     controls=content_controls,
@@ -211,7 +192,8 @@ class AppDialog(ft.AlertDialog):
                 ),
             )
         else:
-            body_content = ft.Container(
+            dialog_content = ft.Container(
+                width=effective_width,
                 content=ft.Column(
                     controls=content_controls,
                     spacing=0,
@@ -221,103 +203,49 @@ class AppDialog(ft.AlertDialog):
                 expand=False,
             )
 
-        body = ft.Container(
-            padding=ft.Padding.only(
-                left=AppSpacing.XL,
-                right=AppSpacing.XL,
-                top=AppSpacing.LG,
-                bottom=AppSpacing.MD,
-            ),
-            bgcolor=ft.Colors.with_opacity(0.92, ft.Colors.GREY_50),
-            content=body_content,
-        )
-
-        surface_controls: list[ft.Control] = [header, body]
-        if dialog_actions:
-            surface_controls.append(
-                ft.Container(
-                    padding=ft.Padding.only(
-                        left=AppSpacing.XL,
-                        right=AppSpacing.XL,
-                        top=AppSpacing.SM,
-                        bottom=AppSpacing.LG,
-                    ),
-                    bgcolor=ft.Colors.with_opacity(0.88, ft.Colors.GREY_100),
-                    border=ft.Border.only(
-                        top=ft.BorderSide(
-                            1,
-                            ft.Colors.with_opacity(0.52, AppColors.BORDER_LIGHT),
-                        ),
-                    ),
-                    content=ft.Row(
-                        controls=dialog_actions,
-                        alignment=ft.MainAxisAlignment.END,
-                        spacing=AppSpacing.SM,
-                        run_spacing=AppSpacing.SM,
-                        wrap=True,
-                    ),
-                )
-            )
-
-        surface = ft.Container(
-            width=surface_width,
-            bgcolor=ft.Colors.with_opacity(0.90, ft.Colors.GREY_50),
-            blur=ft.Blur(
-                18,
-                18,
-                ft.BlurTileMode.MIRROR,
-            ),
-            border=ft.Border.all(
-                1,
-                ft.Colors.with_opacity(0.46, ft.Colors.GREY_500),
-            ),
-            border_radius=AppRadius.XL,
-            clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
-            shadow=[
-                ft.BoxShadow(
-                    blur_radius=34,
-                    spread_radius=-8,
-                    color=ft.Colors.with_opacity(0.34, ft.Colors.BLACK),
-                    offset=ft.Offset(0, 16),
-                ),
-                ft.BoxShadow(
-                    blur_radius=8,
-                    spread_radius=-4,
-                    color=ft.Colors.with_opacity(0.16, ft.Colors.BLACK),
-                    offset=ft.Offset(0, 3),
-                ),
-            ],
-            content=ft.Column(
-                controls=surface_controls,
-                spacing=0,
-                tight=True,
-            ),
-        )
-
-        kwargs["bgcolor"] = ft.Colors.TRANSPARENT
+        kwargs.setdefault("bgcolor", AppColors.SURFACE)
         kwargs.setdefault(
             "barrier_color",
-            ft.Colors.with_opacity(0.46, ft.Colors.BLACK),
+            ft.Colors.with_opacity(0.48, ft.Colors.BLACK),
         )
-        kwargs["shadow_color"] = ft.Colors.TRANSPARENT
-        kwargs["elevation"] = 0
+        kwargs.setdefault(
+            "shadow_color",
+            ft.Colors.with_opacity(0.22, ft.Colors.BLACK),
+        )
         kwargs.setdefault(
             "shape",
             ft.RoundedRectangleBorder(radius=AppRadius.XL),
         )
         kwargs.setdefault("clip_behavior", ft.ClipBehavior.ANTI_ALIAS)
-        kwargs["title_padding"] = 0
-        kwargs["content_padding"] = 0
-        kwargs["actions_padding"] = 0
+        kwargs.setdefault("title_padding", 0)
+        kwargs.setdefault(
+            "content_padding",
+            ft.Padding.only(
+                left=AppSpacing.XL,
+                right=AppSpacing.XL,
+                top=AppSpacing.LG,
+                bottom=AppSpacing.MD,
+            ),
+        )
+        kwargs.setdefault(
+            "actions_padding",
+            ft.Padding.only(
+                left=AppSpacing.XL,
+                right=AppSpacing.XL,
+                top=AppSpacing.SM,
+                bottom=AppSpacing.LG,
+            ),
+        )
+        kwargs.setdefault("actions_alignment", ft.MainAxisAlignment.END)
         kwargs.pop("actions_spacing", None)
-        kwargs.pop("actions_alignment", None)
 
         effective_modal = modal or not dismissible
 
         super().__init__(
             modal=effective_modal,
-            content=surface,
-            actions=[],
+            title=header,
+            content=dialog_content,
+            actions=list(actions or []),
             scrollable=False,
             **kwargs,
         )
