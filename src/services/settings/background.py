@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_BACKGROUND_ASSET = "backgrounds/papernest_default.jpg"
 SUPPORTED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
-MAX_BACKGROUND_SIZE_BYTES = 20 * 1024 * 1024
+MAX_BACKGROUND_SIZE_BYTES = 50 * 1024 * 1024
 _HEX_COLOR_PATTERN = re.compile(r"^#[0-9A-F]{6}$")
 
 
@@ -172,7 +172,7 @@ class BackgroundService:
         if check_extension and path.suffix.casefold() not in SUPPORTED_IMAGE_EXTENSIONS:
             raise ValueError("Formats acceptés : PNG, JPG, JPEG et WebP.")
         if path.stat().st_size > MAX_BACKGROUND_SIZE_BYTES:
-            raise ValueError("L’image dépasse la taille maximale de 20 Mo.")
+            raise ValueError("L’image dépasse la taille maximale de 50 Mo.")
         try:
             with Image.open(path) as image:
                 image.verify()

@@ -26,8 +26,8 @@ class AdminBuilder:
                 spacing=AppSpacing.LG,
                 run_spacing=AppSpacing.LG,
                 controls=[
-                    ft.Container(col={"sm": 12, "lg": 5}, content=backup_panel),
-                    ft.Container(col={"sm": 12, "lg": 7}, content=category_panel),
+                    ft.Container(col={"sm": 12, "xl": 7}, content=backup_panel),
+                    ft.Container(col={"sm": 12, "xl": 5}, content=category_panel),
                 ],
             ),
             appearance_panel,

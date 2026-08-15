@@ -25,17 +25,16 @@ class AppearancePanel(Section):
             label="Type de fond",
             leading_icon=ft.Icons.WALLPAPER_ROUNDED,
             value=self.settings.mode.value,
+            on_select=self._handle_mode_change,
             options=[
                 PaperNestDropdownOption(key=BackgroundMode.IMAGE.value, text="Image"),
                 PaperNestDropdownOption(key=BackgroundMode.COLOR.value, text="Couleur"),
             ],
         )
-        self.mode_field.on_select = self._handle_mode_change
 
         self.color_field = BaseColorPicker(
             label="Couleur du fond",
             value=self.settings.color,
-            visible=self.settings.mode is BackgroundMode.COLOR,
             on_change=self._handle_color_change,
         )
         self.file_picker = BaseFilePicker(
@@ -45,18 +44,18 @@ class AppearancePanel(Section):
             allowed_extensions=["png", "jpg", "jpeg", "webp"],
             dialog_title="Choisir une image de fond",
             drop_text="Déposez une image de fond ici",
-            drop_subtitle="PNG, JPG, JPEG ou WebP — 20 Mo maximum",
+            drop_subtitle="PNG, JPG, JPEG ou WebP — haute résolution acceptée",
             icon=ft.Icons.ADD_PHOTO_ALTERNATE_ROUNDED,
             click_to_pick=True,
             show_file_list=True,
             show_file_size=True,
             show_constraints=True,
-            visible=self.settings.mode is BackgroundMode.IMAGE,
+            max_file_size="50 MB",
+            height=178,
             on_files_changed=self._handle_files_changed,
         )
 
         self.preview = ft.Container(
-            height=180,
             border_radius=AppRadius.MD,
             border=ft.Border.all(1, AppColors.BORDER),
             clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
@@ -72,6 +71,10 @@ class AppearancePanel(Section):
             on_click=self._reset,
         )
         self._render_preview()
+        self.mode_content = ft.Column(
+            spacing=AppSpacing.MD,
+            controls=self._build_mode_controls(),
+        )
 
         super().__init__(
             title="Apparence",
@@ -86,23 +89,22 @@ class AppearancePanel(Section):
                         color=AppColors.TEXT_MUTED,
                     ),
                     self.mode_field,
-                    self.color_field,
-                    self.file_picker,
-                    ft.Text("Aperçu", weight=ft.FontWeight.BOLD),
-                    self.preview,
+                    self.mode_content,
                     ft.Row(
                         alignment=ft.MainAxisAlignment.END,
+                        wrap=True,
                         controls=[self.reset_button, self.apply_button],
                     ),
                 ],
             ),
         )
 
-    def _handle_mode_change(self, _event=None) -> None:
-        mode = self._selected_mode()
-        self.color_field.visible = mode is BackgroundMode.COLOR
-        self.file_picker.visible = mode is BackgroundMode.IMAGE
+    def _handle_mode_change(self, event=None) -> None:
+        selected_value = getattr(event, "data", None)
+        if selected_value in {mode.value for mode in BackgroundMode}:
+            self.mode_field.value = selected_value
         self._render_preview()
+        self.mode_content.controls = self._build_mode_controls()
         self._safe_update()
 
     def _handle_color_change(self, value: str | None) -> None:
@@ -143,10 +145,9 @@ class AppearancePanel(Section):
         self.pending_image = None
         self.mode_field.value = self.settings.mode.value
         self.color_field.value = self.settings.color
-        self.color_field.visible = False
-        self.file_picker.visible = True
         background_service.apply(self.app_page, self.settings)
         self._render_preview()
+        self.mode_content.controls = self._build_mode_controls()
         notifications(self.app_page).success("Le fond PaperNest par défaut a été restauré.")
         self.app_page.update()
 
@@ -159,9 +160,11 @@ class AppearancePanel(Section):
     def _render_preview(self, *, color: str | None = None) -> None:
         mode = self._selected_mode()
         if mode is BackgroundMode.COLOR:
+            self.preview.height = 72
             self.preview.bgcolor = color or str(self.color_field.value or self.settings.color)
             self.preview.content = None
             return
+        self.preview.height = 178
         self.preview.bgcolor = None
         source = background_service.resolve_image_source(
             str(self.pending_image)
@@ -174,6 +177,37 @@ class AppearancePanel(Section):
             width=1200,
             height=180,
         )
+
+    def _build_mode_controls(self) -> list[ft.Control]:
+        if self._selected_mode() is BackgroundMode.COLOR:
+            return [
+                self.color_field,
+                ft.Text("Aperçu", weight=ft.FontWeight.BOLD),
+                self.preview,
+            ]
+        return [
+            ft.ResponsiveRow(
+                spacing=AppSpacing.LG,
+                run_spacing=AppSpacing.MD,
+                vertical_alignment=ft.CrossAxisAlignment.START,
+                controls=[
+                    ft.Container(
+                        col={"sm": 12, "lg": 6},
+                        content=self.file_picker,
+                    ),
+                    ft.Container(
+                        col={"sm": 12, "lg": 6},
+                        content=ft.Column(
+                            spacing=AppSpacing.SM,
+                            controls=[
+                                ft.Text("Aperçu", weight=ft.FontWeight.BOLD),
+                                self.preview,
+                            ],
+                        ),
+                    ),
+                ],
+            )
+        ]
 
     def _safe_update(self) -> None:
         try:

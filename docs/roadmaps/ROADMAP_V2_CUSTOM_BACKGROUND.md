@@ -32,7 +32,7 @@ Cette fondation préparera une évolution glassmorphism ultérieure. Le glassmor
 - [x] Ne jamais dépendre du chemin du fichier source.
 - [x] Accepter PNG, JPG, JPEG et WebP.
 - [x] Vérifier réellement le contenu avec Pillow.
-- [x] Limiter la taille du fichier importé à 20 Mo.
+- [x] Conserver la résolution originale et accepter les images jusqu’à 50 Mo.
 - [x] Revenir automatiquement au fond par défaut si le fichier est absent ou corrompu.
 - [x] Remplacer proprement l’ancienne image personnalisée.
 
