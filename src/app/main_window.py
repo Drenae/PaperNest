@@ -3,7 +3,7 @@ from __future__ import annotations
 import flet as ft
 
 from app.navigation.navigation import NavigationManager
-from app.theme.tokens import AppColors, AppSizes, AppSpacing
+from app.theme.tokens import AppSizes, AppSpacing
 
 
 class MainWindow:
@@ -18,7 +18,6 @@ class MainWindow:
             expand=True,
             margin=ft.Margin.only(left=AppSizes.SIDEBAR_COMPACT_WIDTH),
             padding=AppSpacing.XL,
-            bgcolor=AppColors.BACKGROUND,
         )
 
         self.navigation = NavigationManager(
@@ -31,7 +30,6 @@ class MainWindow:
         )
 
     def build(self) -> None:
-        self.page.bgcolor = AppColors.BACKGROUND
         self.page.padding = 0
         self.page.spacing = 0
 
