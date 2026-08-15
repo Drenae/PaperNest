@@ -16,6 +16,17 @@ from app.theme.tokens import (
 from app.theme.buttons import IconAction
 
 
+# Le glassmorphism reste volontairement discret : le fond personnalisé doit
+# rester perceptible sans réduire la lisibilité des contenus PaperNest.
+_GLASS_BLUR = 12
+_GLASS_SURFACE = ft.Colors.with_opacity(0.82, AppColors.SURFACE)
+_GLASS_SELECTED_SURFACE = ft.Colors.with_opacity(0.84, AppColors.PRIMARY_SOFT)
+_GLASS_DARK_SURFACE = ft.Colors.with_opacity(0.91, AppColors.PANEL_DARK)
+_GLASS_BODY_SURFACE = ft.Colors.with_opacity(0.18, AppColors.SURFACE)
+_GLASS_BORDER = ft.Colors.with_opacity(0.68, ft.Colors.WHITE)
+_GLASS_DARK_BORDER = ft.Colors.with_opacity(0.14, ft.Colors.WHITE)
+
+
 class CardOrientation(str, Enum):
     HORIZONTAL = "horizontal"
     VERTICAL = "vertical"
@@ -68,8 +79,19 @@ class AppCard(ft.Container):
             CardDensity.COMFORTABLE: AppSpacing.XL,
         }[density]
 
-        resolved_bg = bgcolor or (AppColors.PRIMARY_SOFT if selected else AppColors.SURFACE)
-        resolved_border = border_color or (AppColors.PRIMARY_DARK if selected else AppColors.BORDER_LIGHT)
+        resolved_bg = (
+            bgcolor
+            if bgcolor is not None
+            else (_GLASS_SELECTED_SURFACE if selected else _GLASS_SURFACE)
+        )
+        resolved_border = (
+            border_color
+            if border_color is not None
+            else (AppColors.PRIMARY_DARK if selected else _GLASS_BORDER)
+        )
+
+        kwargs.setdefault("blur", _GLASS_BLUR)
+        kwargs.setdefault("clip_behavior", ft.ClipBehavior.ANTI_ALIAS)
 
         icon_control = None
 
@@ -270,9 +292,14 @@ class PageHeader(ft.Container):
 
         leading.append(ft.Column(spacing=2, controls=text_controls))
 
+        kwargs.setdefault("blur", _GLASS_BLUR)
+        kwargs.setdefault("border", ft.Border.all(1, _GLASS_DARK_BORDER))
+        kwargs.setdefault("shadow", AppShadows.card())
+        kwargs.setdefault("clip_behavior", ft.ClipBehavior.ANTI_ALIAS)
+
         super().__init__(
             padding=AppSpacing.XL,
-            bgcolor=AppColors.PANEL_DARK,
+            bgcolor=_GLASS_DARK_SURFACE,
             border_radius=AppRadius.LG,
             content=ft.Row(
                 controls=[
@@ -312,10 +339,12 @@ class AppSection(ft.Container):
             )
         )
 
+        kwargs.setdefault("blur", _GLASS_BLUR)
+
         super().__init__(
             border_radius=AppRadius.LG,
-            border=ft.Border.all(1, AppColors.BORDER_LIGHT),
-            bgcolor=AppColors.SURFACE,
+            border=ft.Border.all(1, _GLASS_BORDER),
+            bgcolor=_GLASS_SURFACE,
             clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
             expand=expand,
             shadow=AppShadows.card(),
@@ -323,7 +352,7 @@ class AppSection(ft.Container):
                 spacing=0,
                 controls=[
                     ft.Container(
-                        bgcolor=AppColors.PANEL_DARK,
+                        bgcolor=_GLASS_DARK_SURFACE,
                         padding=ft.Padding.symmetric(
                             horizontal=AppSpacing.LG,
                             vertical=AppSpacing.MD,
@@ -340,7 +369,7 @@ class AppSection(ft.Container):
                         padding=AppSpacing.LG,
                         content=content,
                         expand=True,
-                        bgcolor=AppColors.SURFACE,
+                        bgcolor=_GLASS_BODY_SURFACE,
                     ),
                 ],
             ),
