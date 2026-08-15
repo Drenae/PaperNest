@@ -163,10 +163,10 @@ class AppearancePanel(Section):
             self.preview.content = None
             return
         self.preview.bgcolor = None
-        source = (
+        source = background_service.resolve_image_source(
             str(self.pending_image)
             if self.pending_image is not None
-            else self.settings.image_path or background_service.default_asset
+            else self.settings.image_path
         )
         self.preview.content = ft.Image(
             src=source,

@@ -116,17 +116,30 @@ class BackgroundService:
         import flet as ft
 
         resolved = self._normalize(settings or self.load())
-        page.bgcolor = None
         if resolved.mode is BackgroundMode.COLOR:
-            page.decoration = ft.BoxDecoration(color=resolved.color)
+            page.decoration = None
+            page.bgcolor = resolved.color
             return
+
+        page.bgcolor = ft.Colors.TRANSPARENT
         page.decoration = ft.BoxDecoration(
             image=ft.DecorationImage(
-                src=resolved.image_path or self.default_asset,
+                src=self.resolve_image_source(resolved.image_path),
                 fit=ft.BoxFit.COVER,
                 alignment=ft.Alignment.CENTER,
             )
         )
+
+    def resolve_image_source(self, image_path: str | None) -> str | bytes:
+        if not image_path:
+            return self.default_asset
+        try:
+            return Path(image_path).read_bytes()
+        except OSError:
+            logger.warning(
+                "Image de fond impossible à lire, fond PaperNest utilisé."
+            )
+            return self.default_asset
 
     def _normalize(self, settings: BackgroundSettings) -> BackgroundSettings:
         color = self._normalize_color(settings.color)

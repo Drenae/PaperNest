@@ -1,7 +1,10 @@
 import json
+import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from PIL import Image
 
@@ -92,6 +95,42 @@ class BackgroundServiceTests(unittest.TestCase):
 
         self.assertFalse(imported.exists())
         self.assertEqual(reset_settings, BackgroundSettings())
+
+    def test_apply_color_clears_decoration_and_sets_page_background(self) -> None:
+        fake_flet = self.create_fake_flet()
+        page = types.SimpleNamespace(bgcolor=None, decoration="previous")
+
+        with patch.dict(sys.modules, {"flet": fake_flet}):
+            self.service.apply(
+                page,
+                BackgroundSettings(mode=BackgroundMode.COLOR, color="#AABBCC"),
+            )
+
+        self.assertEqual(page.bgcolor, "#AABBCC")
+        self.assertIsNone(page.decoration)
+
+    def test_apply_image_uses_transparent_page_and_decoration(self) -> None:
+        fake_flet = self.create_fake_flet()
+        page = types.SimpleNamespace(bgcolor="#FFFFFF", decoration=None)
+
+        with patch.dict(sys.modules, {"flet": fake_flet}):
+            self.service.apply(page, BackgroundSettings())
+
+        self.assertEqual(page.bgcolor, "transparent")
+        self.assertEqual(
+            page.decoration["image"]["src"],
+            self.service.default_asset,
+        )
+
+    @staticmethod
+    def create_fake_flet() -> types.SimpleNamespace:
+        return types.SimpleNamespace(
+            Colors=types.SimpleNamespace(TRANSPARENT="transparent"),
+            BoxFit=types.SimpleNamespace(COVER="cover"),
+            Alignment=types.SimpleNamespace(CENTER="center"),
+            DecorationImage=lambda **kwargs: kwargs,
+            BoxDecoration=lambda **kwargs: kwargs,
+        )
 
 
 if __name__ == "__main__":
