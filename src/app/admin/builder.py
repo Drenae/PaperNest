@@ -4,7 +4,7 @@ import flet as ft
 
 from app.admin.state import AdminState
 from app.theme.buttons import IconAction
-from app.theme.cards import AppCard, CardDensity, CardOrientation, HeaderCard
+from app.theme.cards import AppCard, CardDensity, CardOrientation, PageHeader
 from app.theme.state_view import StateView
 from app.theme.tokens import AppColors, AppSpacing
 
@@ -16,7 +16,7 @@ class AdminBuilder:
         category_panel: ft.Control,
     ) -> list[ft.Control]:
         return [
-            HeaderCard(
+            PageHeader(
                 icon=ft.Icons.ADMIN_PANEL_SETTINGS_ROUNDED,
                 title="Administration",
                 subtitle="Protégez vos données et gérez les classeurs PaperNest.",

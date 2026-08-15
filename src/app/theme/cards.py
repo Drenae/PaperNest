@@ -204,7 +204,6 @@ class AppCard(ft.Container):
             ink=(on_click is not None and not disabled),
             **kwargs,
         )
-
     @staticmethod
     def _to_text(value, **kwargs) -> Optional[ft.Control]:
         if value is None or value == "":
@@ -345,61 +344,4 @@ class AppSection(ft.Container):
                 ],
             ),
             **kwargs,
-        )
-
-
-# Compatibilité avec les vues existantes.
-class HeaderCard(PageHeader):
-    pass
-
-
-class Section(AppSection):
-    pass
-
-
-class CabinetCard(AppCard):
-    def __init__(self, label: str, value, icon, color, bgcolor, on_click=None):
-        super().__init__(
-            title=label,
-            subtitle=f"{value} élément(s)",
-            icon=icon,
-            icon_color=(color or AppColors.PRIMARY_DARK),
-            icon_bgcolor=bgcolor,
-            on_click=on_click,
-            orientation=CardOrientation.VERTICAL,
-        )
-
-
-class CategoryCard(AppCard):
-    def __init__(self, label: str, icon, color, bgcolor, on_open=None, on_edit=None, on_delete=None):
-        super().__init__(
-            title=label,
-            icon=icon,
-            icon_color=(color or AppColors.PRIMARY_DARK),
-            icon_bgcolor=bgcolor,
-            actions=[
-                IconAction(
-                    icon=ft.Icons.FOLDER_OPEN_ROUNDED,
-                    color=AppColors.PRIMARY_DARK,
-                    tooltip="Ouvrir le dossier",
-                    on_click=on_open,
-                    compact=True,
-                ),
-                IconAction(
-                    icon=ft.Icons.EDIT_ROUNDED,
-                    color=AppColors.TEXT_MUTED,
-                    tooltip="Modifier / Renommer",
-                    on_click=on_edit,
-                    compact=True,
-                ),
-                IconAction(
-                    icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
-                    color=AppColors.ERROR,
-                    tooltip="Supprimer",
-                    on_click=on_delete,
-                    compact=True,
-                ),
-            ],
-            orientation=CardOrientation.VERTICAL,
-            density=CardDensity.COMPACT,
         )

@@ -7,7 +7,7 @@ from papernestextension import PaperNestFilePickerFilesChangedEvent
 
 from app.notifications import notifications
 from app.theme.buttons import PrimaryButton, SecondaryButton
-from app.theme.cards import Section
+from app.theme.cards import AppSection
 from app.theme.forms import BaseDropDown, PaperNestDropdownOption
 from app.theme.pickers import BaseColorPicker, BaseFilePicker
 from app.theme.tokens import AppColors, AppRadius, AppSpacing
@@ -15,7 +15,7 @@ from core.models.background_settings import BackgroundMode
 from services.settings import background_service
 
 
-class AppearancePanel(Section):
+class AppearancePanel(AppSection):
     def __init__(self, page: ft.Page) -> None:
         self.app_page = page
         self.settings = background_service.load()

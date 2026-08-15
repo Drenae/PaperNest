@@ -7,7 +7,7 @@ from app.detail.builder import DetailBuilder
 from app.detail.controller import DetailController
 from app.detail.state import DetailState
 from app.preview import PreviewController, PreviewPanel
-from app.theme.cards import HeaderCard
+from app.theme.cards import PageHeader
 from app.theme.forms import SearchTextField
 from app.theme.status_bar import StatusBar
 from core.events.event_bus import (
@@ -87,7 +87,7 @@ class DetailView(ft.Column):
             tight=True,
             spacing=AppSpacing.SM,
             controls=[
-                HeaderCard(
+                PageHeader(
                     title=self.state.category_name,
                     subtitle="Visualisation et gestion locale de vos documents.",
                     icon=category_icon,

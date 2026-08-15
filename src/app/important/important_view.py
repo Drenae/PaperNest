@@ -6,7 +6,7 @@ from app.important.state import ImportantState
 from app.notifications import notifications
 from app.preview import PreviewController, PreviewPanel
 from app.theme.buttons import PrimaryButton
-from app.theme.cards import HeaderCard
+from app.theme.cards import PageHeader
 from app.theme.status_bar import StatusBar
 from core.events.event_bus import (
     DocumentDeleted,
@@ -62,7 +62,13 @@ class ImportantView(ft.Column):
                 tight=True,
                 spacing=10,
                 controls=[
-                    HeaderCard(title="Documents importants", subtitle=("Retrouvez vos favoris et les prochaines échéances."), icon=ft.Icons.STAR_ROUNDED),
+                    PageHeader(
+                        title="Documents importants",
+                        subtitle=(
+                            "Retrouvez vos favoris et les prochaines échéances."
+                        ),
+                        icon=ft.Icons.STAR_ROUNDED,
+                    ),
                     ft.Row(controls=[self.favorites_button, self.upcoming_button], spacing=10),
                     self.status_bar,
                     ft.Divider(height=1, color=AppColors.BORDER),

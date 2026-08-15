@@ -4,7 +4,7 @@ import flet as ft
 
 from app.notifications import notifications
 from app.theme.buttons import PrimaryButton
-from app.theme.cards import Section
+from app.theme.cards import AppSection
 from app.theme.forms import BaseNumberField
 from app.theme.tokens import AppColors, AppSpacing
 from core.models.trash_settings import (
@@ -14,7 +14,7 @@ from core.models.trash_settings import (
 from services.settings import trash_settings_service
 
 
-class TrashSettingsPanel(Section):
+class TrashSettingsPanel(AppSection):
     def __init__(self, page: ft.Page) -> None:
         self.app_page = page
         retention_days = trash_settings_service.get_retention_days()

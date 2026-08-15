@@ -5,7 +5,7 @@ from papernestextension.controls.material.papernest_textfield import PaperNestTe
 
 from app.notifications import notifications
 from app.theme.buttons import DangerButton, OutlineButton, PrimaryButton
-from app.theme.cards import HeaderCard
+from app.theme.cards import PageHeader
 from app.theme.forms import BaseCheckbox, SearchTextField
 from app.theme.status_bar import StatusBar
 from app.trash.builder import TrashBuilder
@@ -47,7 +47,7 @@ class TrashView(ft.Column):
         retention_days = trash_settings_service.get_retention_days()
         retention_unit = "jour" if retention_days == 1 else "jours"
         self.controls = [
-            HeaderCard(
+            PageHeader(
                 title="Corbeille",
                 subtitle=(
                     "Les documents sont supprimés automatiquement après "

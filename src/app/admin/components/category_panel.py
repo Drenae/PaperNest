@@ -4,7 +4,7 @@ from core.events.event_bus import CategoryCreated, CategoryDeleted, CategoryRena
 from app.theme.tokens import AppColors, AppSpacing
 from repositories.category_repository import category_repository
 from app.theme.buttons import IconAction, PrimaryButton
-from app.theme.cards import Section
+from app.theme.cards import AppSection
 
 
 def _color(value, fallback):
@@ -12,7 +12,7 @@ def _color(value, fallback):
     return raw if raw.startswith("#") else getattr(ft.Colors, raw, fallback)
 
 
-class CategoryPanel(Section):
+class CategoryPanel(AppSection):
     def __init__(self, page: ft.Page, on_add_parent, on_add_child, on_rename, on_delete):
         self.app_page = page
         self.on_add_parent = on_add_parent

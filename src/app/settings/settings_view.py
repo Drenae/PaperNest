@@ -3,7 +3,7 @@ from __future__ import annotations
 import flet as ft
 
 from app.settings.components import AppearancePanel, TrashSettingsPanel
-from app.theme.cards import HeaderCard
+from app.theme.cards import PageHeader
 from app.theme.tokens import AppSpacing
 
 
@@ -16,7 +16,7 @@ class SettingsView(ft.Column):
             spacing=AppSpacing.LG,
             scroll=ft.ScrollMode.AUTO,
             controls=[
-                HeaderCard(
+                PageHeader(
                     title="Paramètres",
                     subtitle="Personnalisez le fonctionnement et l’apparence de PaperNest.",
                     icon=ft.Icons.SETTINGS_ROUNDED,

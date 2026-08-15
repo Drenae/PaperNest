@@ -15,7 +15,7 @@ from papernestextension import (
 
 from app.notifications import notifications
 from app.theme.buttons import IconAction, PrimaryButton
-from app.theme.cards import Section
+from app.theme.cards import AppSection
 from app.theme.pickers import BaseFilePicker
 from app.theme.forms import BaseCheckbox, BaseDropDown, PaperNestDropdownOption
 from app.theme.tokens import AppColors
@@ -35,7 +35,7 @@ class StagedFile:
     category_key: str | None = None
 
 
-class UploadPanel(Section):
+class UploadPanel(AppSection):
     """Import multiple piloté par la sélection interne de PaperNestFilePicker."""
 
     def __init__(
