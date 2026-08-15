@@ -18,6 +18,7 @@ class MainWindow:
             expand=True,
             margin=ft.Margin.only(left=AppSizes.SIDEBAR_COMPACT_WIDTH),
             padding=AppSpacing.XL,
+            bgcolor=ft.Colors.TRANSPARENT,
         )
 
         self.navigation = NavigationManager(

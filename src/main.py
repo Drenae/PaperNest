@@ -3,11 +3,11 @@ import logging
 import flet as ft
 
 from app.main_window import MainWindow
-from app.theme.tokens import AppColors
 from core.application.application import application
 from core.config.logging import configure_logging, get_current_log_path
 from core.scheduling.scheduler import task_scheduler
 from services.files.archive import ArchiveFileService
+from services.settings import background_service
 from services.trash.service import TrashService
 from utils.compatibility import check_python_version
 
@@ -22,22 +22,12 @@ def main(page: ft.Page) -> None:
     page.theme_mode = ft.ThemeMode.LIGHT
     page.padding = 0
     page.spacing = 0
-    page.bgcolor = ft.Colors.TRANSPARENT
-    page.decoration = ft.BoxDecoration(
-        gradient=ft.LinearGradient(
-            begin=ft.Alignment.TOP_LEFT,
-            end=ft.Alignment.BOTTOM_RIGHT,
-            colors=[
-                AppColors.BACKGROUND,
-                AppColors.PANEL,
-            ],
-        ),
-    )
     page.window.maximized = True
 
     try:
         application.start()
         ArchiveFileService.initialize_storage_tree()
+        background_service.apply(page)
         task_scheduler.submit(
             TrashService.purge_expired,
             label="Nettoyage automatique de la corbeille",

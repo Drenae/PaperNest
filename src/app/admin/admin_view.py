@@ -6,6 +6,7 @@ import logging
 import flet as ft
 
 from app.admin.builder import AdminBuilder
+from app.admin.components.appearance_panel import AppearancePanel
 from app.admin.components.backup_panel import BackupPanel
 from app.admin.components.category_panel import CategoryPanel
 from app.admin.controller import AdminController
@@ -71,12 +72,17 @@ class AdminView(ft.Column):
             on_rename=self.show_edit_dialog,
             on_delete=self.show_delete_dialog,
         )
+        self.appearance_panel = AppearancePanel(self.app_page)
 
         super().__init__(
             expand=True,
             spacing=AppSpacing.LG,
             scroll=ft.ScrollMode.AUTO,
-            controls=AdminBuilder.build_layout(self.backup_panel, self.category_panel),
+            controls=AdminBuilder.build_layout(
+                self.backup_panel,
+                self.category_panel,
+                self.appearance_panel,
+            ),
         )
         self.app_page.run_task(self.controller.load_backups)
 

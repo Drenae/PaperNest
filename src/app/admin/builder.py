@@ -11,7 +11,11 @@ from app.theme.tokens import AppColors, AppSpacing
 
 class AdminBuilder:
     @staticmethod
-    def build_layout(backup_panel: ft.Control, category_panel: ft.Control) -> list[ft.Control]:
+    def build_layout(
+        backup_panel: ft.Control,
+        category_panel: ft.Control,
+        appearance_panel: ft.Control,
+    ) -> list[ft.Control]:
         return [
             HeaderCard(
                 icon=ft.Icons.ADMIN_PANEL_SETTINGS_ROUNDED,
@@ -26,6 +30,7 @@ class AdminBuilder:
                     ft.Container(col={"sm": 12, "lg": 7}, content=category_panel),
                 ],
             ),
+            appearance_panel,
         ]
 
     @staticmethod
