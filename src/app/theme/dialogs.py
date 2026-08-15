@@ -9,9 +9,8 @@ from app.theme.buttons import (
     AppButton,
     DangerButton,
     PrimaryButton,
-    SecondaryButton,
     SuccessButton,
-    WarningButton,
+    WarningButton, OutlineButton,
 )
 from app.theme.tokens import AppColors, AppRadius, AppSizes, AppSpacing, AppText
 
@@ -323,7 +322,7 @@ class ConfirmDialog(AppDialog):
                 )
             ),
             actions=[
-                SecondaryButton(
+                OutlineButton(
                     cancel_text,
                     icon=ft.Icons.CLOSE_ROUNDED,
                     on_click=on_cancel,
@@ -433,7 +432,7 @@ class DangerDialog(AppDialog):
                 controls=controls,
             ),
             actions=[
-                SecondaryButton(
+                OutlineButton(
                     cancel_text,
                     icon=ft.Icons.CLOSE_ROUNDED,
                     on_click=on_cancel,
@@ -475,7 +474,7 @@ class FormDialog(AppDialog):
             variant=variant,
             content=form,
             actions=[
-                SecondaryButton(
+                OutlineButton(
                     cancel_text,
                     icon=ft.Icons.CLOSE_ROUNDED,
                     on_click=on_cancel,
