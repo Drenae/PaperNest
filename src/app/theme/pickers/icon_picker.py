@@ -6,8 +6,8 @@ from typing import Any
 
 import flet as ft
 
-from app.theme.buttons import PrimaryButton, SecondaryButton
-from app.theme.dialogs import AppDialog, DialogVariant
+from app.theme.buttons import PrimaryButton
+from app.theme.dialogs import FormDialog
 from app.theme.forms import PickerTextField, SearchTextField
 from app.theme.tokens import AppColors, AppRadius, AppSpacing, AppText
 
@@ -238,28 +238,20 @@ class BaseIconPicker(ft.Column):
             )
         controls.extend([self._search_field, self._result_text, self._grid])
 
-        self._dialog = AppDialog(
+        self._dialog = FormDialog(
             title=self._picker_title,
             icon=ft.Icons.EMOJI_SYMBOLS_ROUNDED,
-            variant=DialogVariant.PRIMARY,
             width=self._dialog_width,
-            content=ft.Column(
+            form=ft.Column(
                 controls=controls,
                 spacing=AppSpacing.MD,
                 tight=True,
             ),
-            actions=[
-                SecondaryButton(
-                    self._cancel_text,
-                    icon=ft.Icons.CLOSE_ROUNDED,
-                    on_click=lambda _event: self._close_dialog(page),
-                ),
-                PrimaryButton(
-                    self._confirm_text,
-                    icon=ft.Icons.CHECK_ROUNDED,
-                    on_click=lambda _event: self._apply_value(page),
-                ),
-            ],
+            on_submit=lambda _event: self._apply_value(page),
+            on_cancel=lambda _event: self._close_dialog(page),
+            submit_text=self._confirm_text,
+            cancel_text=self._cancel_text,
+            submit_icon=ft.Icons.CHECK_ROUNDED,
         )
         page.overlay.append(self._dialog)
         self._dialog.open = True

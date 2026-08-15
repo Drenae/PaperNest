@@ -5,7 +5,14 @@ from typing import Iterable, Optional
 
 import flet as ft
 
-from app.theme.buttons import DangerButton, PrimaryButton, SecondaryButton
+from app.theme.buttons import (
+    AppButton,
+    DangerButton,
+    PrimaryButton,
+    SecondaryButton,
+    SuccessButton,
+    WarningButton,
+)
 from app.theme.tokens import AppColors, AppRadius, AppSizes, AppSpacing, AppText
 
 
@@ -281,7 +288,7 @@ class ConfirmDialog(AppDialog):
         self,
         *,
         title: str,
-        message: str,
+        message: str | None = None,
         on_confirm,
         on_cancel,
         icon=ft.Icons.HELP_OUTLINE_ROUNDED,
@@ -289,16 +296,31 @@ class ConfirmDialog(AppDialog):
         cancel_text: str = "Annuler",
         variant: DialogVariant = DialogVariant.PRIMARY,
         confirm_icon=ft.Icons.CHECK_ROUNDED,
+        content: Optional[ft.Control] = None,
+        confirm_disabled: bool = False,
+        loading: bool = False,
         **kwargs,
     ):
+        self.confirm_button = self._build_action_button(
+            variant=variant,
+            text=confirm_text,
+            icon=confirm_icon,
+            on_click=on_confirm,
+            disabled=confirm_disabled,
+            loading=loading,
+        )
         super().__init__(
             title=title,
             icon=icon,
             variant=variant,
-            content=ft.Text(
-                message,
-                size=AppText.BODY,
-                color=AppColors.TEXT_SECONDARY,
+            content=(
+                content
+                if content is not None
+                else ft.Text(
+                    message or "",
+                    size=AppText.BODY,
+                    color=AppColors.TEXT_SECONDARY,
+                )
             ),
             actions=[
                 SecondaryButton(
@@ -306,13 +328,34 @@ class ConfirmDialog(AppDialog):
                     icon=ft.Icons.CLOSE_ROUNDED,
                     on_click=on_cancel,
                 ),
-                PrimaryButton(
-                    confirm_text,
-                    icon=confirm_icon,
-                    on_click=on_confirm,
-                ),
+                self.confirm_button,
             ],
             **kwargs,
+        )
+
+    @staticmethod
+    def _build_action_button(
+        *,
+        variant: DialogVariant,
+        text: str,
+        icon,
+        on_click,
+        disabled: bool = False,
+        loading: bool = False,
+    ) -> AppButton:
+        button_class = {
+            DialogVariant.STANDARD: PrimaryButton,
+            DialogVariant.PRIMARY: PrimaryButton,
+            DialogVariant.SUCCESS: SuccessButton,
+            DialogVariant.WARNING: WarningButton,
+            DialogVariant.DANGER: DangerButton,
+        }[variant]
+        return button_class(
+            text,
+            icon=icon,
+            on_click=on_click,
+            disabled=disabled,
+            loading=loading,
         )
 
 
@@ -324,12 +367,18 @@ class DangerDialog(AppDialog):
         message: str,
         on_confirm,
         on_cancel,
+        icon=ft.Icons.DELETE_FOREVER_ROUNDED,
         confirm_text: str = "Supprimer définitivement",
         cancel_text: str = "Annuler",
         details: Optional[ft.Control] = None,
+        content: Optional[ft.Control] = None,
+        warning_text: str | None = "Cette action est irréversible.",
+        confirm_icon=ft.Icons.DELETE_FOREVER_ROUNDED,
+        confirm_disabled: bool = False,
+        loading: bool = False,
         **kwargs,
     ):
-        controls: list[ft.Control] = [
+        controls: list[ft.Control] = [content] if content is not None else [
             ft.Text(
                 message,
                 size=AppText.BODY,
@@ -346,29 +395,37 @@ class DangerDialog(AppDialog):
                     content=details,
                 )
             )
-        controls.append(
-            ft.Row(
-                spacing=AppSpacing.SM,
-                vertical_alignment=ft.CrossAxisAlignment.START,
-                controls=[
-                    ft.Icon(
-                        ft.Icons.WARNING_AMBER_ROUNDED,
-                        size=AppSizes.ICON_SM,
-                        color=AppColors.ERROR,
-                    ),
-                    ft.Text(
-                        "Cette action est irréversible.",
-                        size=AppText.CAPTION,
-                        weight=ft.FontWeight.W_600,
-                        color=AppColors.ERROR,
-                        expand=True,
-                    ),
-                ],
+        if warning_text:
+            controls.append(
+                ft.Row(
+                    spacing=AppSpacing.SM,
+                    vertical_alignment=ft.CrossAxisAlignment.START,
+                    controls=[
+                        ft.Icon(
+                            ft.Icons.WARNING_AMBER_ROUNDED,
+                            size=AppSizes.ICON_SM,
+                            color=AppColors.ERROR,
+                        ),
+                        ft.Text(
+                            warning_text,
+                            size=AppText.CAPTION,
+                            weight=ft.FontWeight.W_600,
+                            color=AppColors.ERROR,
+                            expand=True,
+                        ),
+                    ],
+                )
             )
+        self.confirm_button = DangerButton(
+            confirm_text,
+            icon=confirm_icon,
+            on_click=on_confirm,
+            disabled=confirm_disabled,
+            loading=loading,
         )
         super().__init__(
             title=title,
-            icon=ft.Icons.DELETE_FOREVER_ROUNDED,
+            icon=icon,
             variant=DialogVariant.DANGER,
             content=ft.Column(
                 spacing=AppSpacing.MD,
@@ -381,11 +438,7 @@ class DangerDialog(AppDialog):
                     icon=ft.Icons.CLOSE_ROUNDED,
                     on_click=on_cancel,
                 ),
-                DangerButton(
-                    confirm_text,
-                    icon=ft.Icons.DELETE_FOREVER_ROUNDED,
-                    on_click=on_confirm,
-                ),
+                self.confirm_button,
             ],
             **kwargs,
         )
@@ -408,8 +461,9 @@ class FormDialog(AppDialog):
         variant: DialogVariant = DialogVariant.PRIMARY,
         **kwargs,
     ):
-        self.submit_button = PrimaryButton(
-            submit_text,
+        self.submit_button = ConfirmDialog._build_action_button(
+            variant=variant,
+            text=submit_text,
             icon=submit_icon,
             on_click=on_submit,
             disabled=submit_disabled,

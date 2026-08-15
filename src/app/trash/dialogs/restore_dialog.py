@@ -4,8 +4,7 @@ import logging
 import flet as ft
 
 from app.notifications import notifications
-from app.theme.buttons import GhostButton, SuccessButton
-from app.theme.dialogs import AppDialog, DialogVariant
+from app.theme.dialogs import DialogVariant, FormDialog
 from app.theme.forms import BaseDropDown, PaperNestDropdownOption
 from core.errors.exceptions import PaperNestError
 from services.trash.service import TrashService, TrashedDocument
@@ -18,7 +17,7 @@ class RestoreDialog:
         self.page = page
         self.document = document
         self.on_restored = on_restored
-        self.dialog: AppDialog | None = None
+        self.dialog: FormDialog | None = None
 
     def show(self) -> None:
         categories = TrashService.get_available_categories()
@@ -46,8 +45,6 @@ class RestoreDialog:
 
         error_text = ft.Text("", size=12, color=ft.Colors.RED_600)
 
-        restore_button = SuccessButton("Restaurer", icon=ft.Icons.RESTORE_FROM_TRASH_ROUNDED)
-
         async def restore(event) -> None:
             if not selector.value:
                 error_text.value = ("Sélectionnez un classeur de destination.")
@@ -72,14 +69,12 @@ class RestoreDialog:
                 error_text.value = ("Impossible de restaurer le document.")
                 restore_button.disabled = False
                 self.page.update()
-        restore_button.on_click = restore
-
-        self.dialog = AppDialog(
+        self.dialog = FormDialog(
             modal=True,
             title="Restaurer le document",
             icon=ft.Icons.RESTORE_FROM_TRASH_ROUNDED,
             variant=DialogVariant.SUCCESS,
-            content=ft.Column(
+            form=ft.Column(
                 tight=True,
                 spacing=12,
                 controls=[
@@ -88,11 +83,12 @@ class RestoreDialog:
                     error_text,
                 ],
             ),
-            actions=[
-                GhostButton("Annuler", on_click=lambda event: self.close()),
-                restore_button,
-            ],
+            on_submit=restore,
+            on_cancel=lambda event: self.close(),
+            submit_text="Restaurer",
+            submit_icon=ft.Icons.RESTORE_FROM_TRASH_ROUNDED,
         )
+        restore_button = self.dialog.submit_button
 
         self.page.overlay.append(self.dialog)
         self.dialog.open = True

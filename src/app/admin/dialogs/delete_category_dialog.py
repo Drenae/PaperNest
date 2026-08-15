@@ -5,8 +5,7 @@ import flet as ft
 
 from core.errors.exceptions import PaperNestError
 from services.categories.service import category_service
-from app.theme.buttons import GhostButton, DangerButton
-from app.theme.dialogs import AppDialog, DialogVariant
+from app.theme.dialogs import DangerDialog
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +15,7 @@ class DeleteCategoryDialog:
         self.page = page
         self.category = category
         self.on_deleted = on_deleted
-        self.dialog: AppDialog | None = None
+        self.dialog: DangerDialog | None = None
 
     def show(self) -> None:
         document_count = int(
@@ -29,11 +28,6 @@ class DeleteCategoryDialog:
             self._show_non_empty_category_dialog(document_count)
 
     def _show_empty_category_dialog(self) -> None:
-        delete_button = DangerButton(
-            text="Supprimer",
-            icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
-        )
-
         error_text = ft.Text(
             "",
             size=12,
@@ -69,13 +63,15 @@ class DeleteCategoryDialog:
                 delete_button.disabled = False
                 self.page.update()
 
-        delete_button.on_click = delete
-
-        self.dialog = AppDialog(
+        self.dialog = DangerDialog(
             modal=True,
             title="Supprimer le classeur",
             icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
-            variant=DialogVariant.DANGER,
+            message=f"Supprimer définitivement le classeur « {self.category['name']} » ?",
+            on_confirm=delete,
+            on_cancel=lambda event: self.close(),
+            confirm_text="Supprimer",
+            confirm_icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
             content=ft.Column(
                 tight=True,
                 spacing=12,
@@ -91,14 +87,8 @@ class DeleteCategoryDialog:
                     error_text,
                 ],
             ),
-            actions=[
-                GhostButton(
-                    "Annuler",
-                    on_click=lambda event: self.close(),
-                ),
-                delete_button,
-            ],
         )
+        delete_button = self.dialog.confirm_button
 
         self._open()
 
@@ -129,11 +119,6 @@ class DeleteCategoryDialog:
             "",
             size=12,
             color=ft.Colors.RED_600,
-        )
-
-        delete_button = DangerButton(
-            text="Supprimer",
-            icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
         )
 
         async def delete(event) -> None:
@@ -171,19 +156,21 @@ class DeleteCategoryDialog:
                 delete_button.disabled = False
                 self.page.update()
 
-        delete_button.on_click = delete
-
         label = (
             f"{document_count} document"
             if document_count == 1
             else f"{document_count} documents"
         )
 
-        self.dialog = AppDialog(
+        self.dialog = DangerDialog(
             modal=True,
             title="Supprimer un classeur non vide",
             icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
-            variant=DialogVariant.DANGER,
+            message=f"Le classeur « {self.category['name']} » contient {label}.",
+            on_confirm=delete,
+            on_cancel=lambda event: self.close(),
+            confirm_text="Supprimer",
+            confirm_icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
             content=ft.Column(
                 tight=True,
                 spacing=12,
@@ -196,14 +183,8 @@ class DeleteCategoryDialog:
                     error_text,
                 ],
             ),
-            actions=[
-                GhostButton(
-                    "Annuler",
-                    on_click=lambda event: self.close(),
-                ),
-                delete_button,
-            ],
         )
+        delete_button = self.dialog.confirm_button
 
         self._open()
 

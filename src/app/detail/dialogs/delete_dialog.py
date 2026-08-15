@@ -3,8 +3,7 @@ import asyncio
 import flet as ft
 
 from app.notifications import notifications
-from app.theme.buttons import GhostButton, DangerButton
-from app.theme.dialogs import AppDialog, DialogVariant
+from app.theme.dialogs import DangerDialog
 from core.errors.exceptions import PaperNestError
 from services.documents.delete import document_delete_service
 
@@ -14,7 +13,7 @@ class DeleteDialog:
         self.page = page
         self.document = document
         self.on_deleted = on_deleted
-        self.dialog: AppDialog | None = None
+        self.dialog: DangerDialog | None = None
 
     def show(self) -> None:
         if self.document.document_id is None:
@@ -29,17 +28,16 @@ class DeleteDialog:
             color=ft.Colors.RED_600,
         )
 
-        self.delete_button = DangerButton(
-            "Mettre à la corbeille",
-            icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
-            on_click=self.delete,
-        )
-
-        self.dialog = AppDialog(
+        self.dialog = DangerDialog(
             modal=True,
             title="Mettre à la corbeille",
             icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
-            variant=DialogVariant.DANGER,
+            message="Le document sera déplacé dans la corbeille PaperNest.",
+            on_confirm=self.delete,
+            on_cancel=lambda event: self.close(),
+            confirm_text="Mettre à la corbeille",
+            confirm_icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
+            warning_text=None,
             content=ft.Column(
                 tight=True,
                 spacing=12,
@@ -60,14 +58,8 @@ class DeleteDialog:
                     self.error_text,
                 ],
             ),
-            actions=[
-                GhostButton(
-                    "Annuler",
-                    on_click=lambda event: self.close(),
-                ),
-                self.delete_button,
-            ],
         )
+        self.delete_button = self.dialog.confirm_button
 
         self.page.overlay.append(self.dialog)
         self.dialog.open = True

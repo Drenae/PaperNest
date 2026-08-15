@@ -12,7 +12,7 @@ from app.search.controller import SearchController
 from app.search.state import SearchState
 from app.theme.buttons import DangerButton, PrimaryButton, SecondaryButton
 from app.theme.cards import AppSection
-from app.theme.dialogs import AppDialog, DialogVariant
+from app.theme.dialogs import FormDialog
 from app.theme.forms import (
     BaseCheckbox,
     BaseDropDown,
@@ -493,19 +493,12 @@ class SearchPanel(AppSection):
                 name_field.state_message = str(error)
                 name_field.update()
 
-        dialog = AppDialog(
+        dialog = FormDialog(
             title="Enregistrer la recherche",
             icon=ft.Icons.BOOKMARK_ADD_ROUNDED,
-            variant=DialogVariant.PRIMARY,
-            content=name_field,
-            actions=[
-                SecondaryButton("Annuler", on_click=close),
-                PrimaryButton(
-                    "Enregistrer",
-                    icon=ft.Icons.SAVE_ROUNDED,
-                    on_click=save,
-                ),
-            ],
+            form=name_field,
+            on_submit=save,
+            on_cancel=close,
         )
         self.app_page.overlay.append(dialog)
         dialog.open = True

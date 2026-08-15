@@ -9,8 +9,7 @@ from papernestextension.controls.material.papernest_textfield import PaperNestTe
 from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppColors, AppRadius, AppSpacing
 from services.categories.service import category_service
-from app.theme.buttons import GhostButton, PrimaryButton
-from app.theme.dialogs import AppDialog, DialogVariant
+from app.theme.dialogs import FormDialog
 from app.theme.forms import BaseTextField
 from app.theme.pickers import (
     BaseColorPicker,
@@ -61,7 +60,7 @@ class CategoryEditorDialog:
         self.category = category
         self.parent = parent
         self.on_saved = on_saved
-        self.dialog: AppDialog | None = None
+        self.dialog: FormDialog | None = None
 
     def show(self) -> None:
         editing = self.category is not None
@@ -110,17 +109,11 @@ class CategoryEditorDialog:
         )
         self.error_text = ft.Text("", size=12, color=AppColors.ERROR)
         self.name_field.on_change = self.update_preview
-        self.save_button = PrimaryButton(
-            "Enregistrer" if editing else "Créer",
-            icon=ft.Icons.SAVE_ROUNDED,
-            on_click=self.save,
-        )
-        self.dialog = AppDialog(
+        self.dialog = FormDialog(
             title=("Modifier la sous-catégorie" if editing and self.category and self.category.get("parent_key") else "Modifier le classeur") if editing else (f"Ajouter dans {self.parent['name']}" if self.parent else "Ajouter un classeur"),
             icon=ft.Icons.EDIT_ROUNDED if editing else ft.Icons.CREATE_NEW_FOLDER_ROUNDED,
-            variant=DialogVariant.PRIMARY,
             width=560,
-            content=ft.Column(
+            form=ft.Column(
                 tight=True,
                 spacing=AppSpacing.MD,
                 controls=[
@@ -131,8 +124,11 @@ class CategoryEditorDialog:
                     self.error_text,
                 ],
             ),
-            actions=[GhostButton("Annuler", on_click=self.close), self.save_button],
+            on_submit=self.save,
+            on_cancel=self.close,
+            submit_text="Enregistrer" if editing else "Créer",
         )
+        self.save_button = self.dialog.submit_button
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
         self.page.update()

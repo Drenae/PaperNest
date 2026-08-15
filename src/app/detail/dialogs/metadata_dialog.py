@@ -4,9 +4,8 @@ import flet as ft
 
 from app.notifications import notifications
 from app.shared.tag_editor import TagEditor
-from app.theme.buttons import PrimaryButton, GhostButton
 from app.theme.pickers import BaseDatePickerField
-from app.theme.dialogs import AppDialog, DialogVariant
+from app.theme.dialogs import FormDialog
 from app.theme.forms import BaseTextField
 from app.theme.forms import BaseSwitch, BaseTextArea
 from core.errors.exceptions import PaperNestError
@@ -20,7 +19,7 @@ class MetadataDialog:
         self.page = page
         self.document = document
         self.on_saved = on_saved
-        self.dialog: AppDialog | None = None
+        self.dialog: FormDialog | None = None
 
     async def show(self) -> None:
         if self.document.document_id is None:
@@ -127,19 +126,12 @@ class MetadataDialog:
             color=ft.Colors.RED_600,
         )
 
-        self.save_button = PrimaryButton(
-            text="Enregistrer",
-            icon=ft.Icons.SAVE_ROUNDED,
-            on_click=self.save,
-        )
-
-        self.dialog = AppDialog(
+        self.dialog = FormDialog(
             modal=True,
             title="Informations du document",
             icon=ft.Icons.INFO_OUTLINE_ROUNDED,
-            variant=DialogVariant.PRIMARY,
             title_action=self.favorite_field,
-            content=ft.Container(
+            form=ft.Container(
                 width=650,
                 content=ft.Column(
                     tight=True,
@@ -199,14 +191,10 @@ class MetadataDialog:
                     ],
                 ),
             ),
-            actions=[
-                GhostButton(
-                    "Annuler",
-                    on_click=lambda event: self.close(),
-                ),
-                self.save_button,
-            ],
+            on_submit=self.save,
+            on_cancel=lambda event: self.close(),
         )
+        self.save_button = self.dialog.submit_button
 
     async def save(self, event) -> None:
         self.set_loading(True)

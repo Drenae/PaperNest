@@ -140,6 +140,20 @@ class SuccessButton(AppButton):
         super().__init__(text=text, **kwargs)
 
 
+class WarningButton(AppButton):
+    def __init__(self, text: ButtonContent, **kwargs):
+        kwargs.setdefault("bgcolor", AppColors.WARNING)
+        kwargs.setdefault(
+            "gradient",
+            AppTheme.button_gradient(
+                AppColors.WARNING,
+                AppColors.WARNING_DARK,
+            ),
+        )
+        kwargs.setdefault("color", AppColors.TEXT_LIGHT)
+        super().__init__(text=text, **kwargs)
+
+
 class DangerButton(AppButton):
     def __init__(self, text: ButtonContent, **kwargs):
         kwargs.setdefault("bgcolor", AppColors.ERROR)

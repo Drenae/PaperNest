@@ -4,9 +4,8 @@ from pathlib import Path
 import flet as ft
 from papernestextension.controls.material.papernest_textfield import PaperNestTextFieldState
 
-from app.theme.buttons import PrimaryButton, GhostButton
 from app.theme.forms import BaseTextField
-from app.theme.dialogs import AppDialog, DialogVariant
+from app.theme.dialogs import FormDialog
 
 from core.errors.exceptions import PaperNestError
 from services.documents.rename import document_rename_service
@@ -17,7 +16,7 @@ class RenameDialog:
         self.page = page
         self.document = document
         self.on_renamed = on_renamed
-        self.dialog: AppDialog | None = None
+        self.dialog: FormDialog | None = None
 
     def show(self) -> None:
         if self.document.document_id is None:
@@ -39,20 +38,13 @@ class RenameDialog:
             color=ft.Colors.RED_600,
         )
 
-        self.rename_button = PrimaryButton(
-            "Renommer",
-            icon=ft.Icons.DRIVE_FILE_RENAME_OUTLINE_ROUNDED,
-            on_click=self.rename,
-        )
-
         self.name_field = name_field
 
-        self.dialog = AppDialog(
+        self.dialog = FormDialog(
             modal=True,
             title="Renommer le document",
             icon=ft.Icons.DRIVE_FILE_RENAME_OUTLINE_ROUNDED,
-            variant=DialogVariant.PRIMARY,
-            content=ft.Column(
+            form=ft.Column(
                 tight=True,
                 spacing=12,
                 controls=[
@@ -69,14 +61,12 @@ class RenameDialog:
                     self.error_text,
                 ],
             ),
-            actions=[
-                GhostButton(
-                    "Annuler",
-                    on_click=lambda event: self.close(),
-                ),
-                self.rename_button,
-            ],
+            on_submit=self.rename,
+            on_cancel=lambda event: self.close(),
+            submit_text="Renommer",
+            submit_icon=ft.Icons.DRIVE_FILE_RENAME_OUTLINE_ROUNDED,
         )
+        self.rename_button = self.dialog.submit_button
 
         self.page.overlay.append(self.dialog)
         self.dialog.open = True

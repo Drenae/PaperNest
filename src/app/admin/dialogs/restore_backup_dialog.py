@@ -4,8 +4,7 @@ from pathlib import Path
 
 import flet as ft
 
-from app.theme.buttons import PrimaryButton, GhostButton
-from app.theme.dialogs import AppDialog, DialogVariant
+from app.theme.dialogs import ConfirmDialog, DialogVariant
 from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppColors
 from services.backup.service import BackupService
@@ -19,7 +18,7 @@ class RestoreBackupDialog:
         self.page = page
         self.backup_path = backup_path
         self.on_restored = on_restored
-        self.dialog: AppDialog | None = None
+        self.dialog: ConfirmDialog | None = None
 
     def show(self) -> None:
         backup_name = Path(self.backup_path).name
@@ -30,18 +29,15 @@ class RestoreBackupDialog:
             color=ft.Colors.RED_600,
         )
 
-        self.restore_button = PrimaryButton(
-            text="Restaurer",
-            icon=ft.Icons.SETTINGS_BACKUP_RESTORE_ROUNDED,
-            bgcolor=ft.Colors.ORANGE_700,
-            on_click=self.restore,
-        )
-
-        self.dialog = AppDialog(
+        self.dialog = ConfirmDialog(
             modal=True,
             title="Restaurer une sauvegarde",
             icon=ft.Icons.SETTINGS_BACKUP_RESTORE_ROUNDED,
             variant=DialogVariant.WARNING,
+            on_confirm=self.restore,
+            on_cancel=lambda event: self.close(),
+            confirm_text="Restaurer",
+            confirm_icon=ft.Icons.SETTINGS_BACKUP_RESTORE_ROUNDED,
             content=ft.Column(
                 tight=True,
                 spacing=12,
@@ -62,14 +58,8 @@ class RestoreBackupDialog:
                     self.error_text,
                 ],
             ),
-            actions=[
-                GhostButton(
-                    "Annuler",
-                    on_click=lambda event: self.close(),
-                ),
-                self.restore_button,
-            ],
         )
+        self.restore_button = self.dialog.confirm_button
 
         self.page.overlay.append(self.dialog)
         self.dialog.open = True
