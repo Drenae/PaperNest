@@ -92,7 +92,6 @@ class AppearancePanel(Section):
                     self.mode_content,
                     ft.Row(
                         alignment=ft.MainAxisAlignment.END,
-                        wrap=True,
                         controls=[self.reset_button, self.apply_button],
                     ),
                 ],

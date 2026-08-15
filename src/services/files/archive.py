@@ -7,7 +7,7 @@ import unicodedata
 from datetime import datetime
 from pathlib import Path
 
-from core.config.appearance import BACKGROUND_ROOT
+from core.config.settings import BACKGROUND_ROOT
 from core.config.constants import (
     APP_ROOT,
     COPY_BUFFER_SIZE,

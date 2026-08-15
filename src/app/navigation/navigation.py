@@ -14,6 +14,7 @@ from app.admin.admin_view import AdminView
 from app.dashboard.dashboard_view import DashboardView
 from app.important.important_view import ImportantView
 from app.search.search_view import SearchView
+from app.settings.settings_view import SettingsView
 from app.theme.tokens import AppColors, AppRadius, AppSizes, AppSpacing
 from app.trash.trash_view import TrashView
 
@@ -74,6 +75,12 @@ class NavigationManager:
             ),
         ]
         self.secondary_destinations = [
+            NavigationDestination(
+                "Paramètres",
+                ft.Icons.SETTINGS_OUTLINED,
+                ft.Icons.SETTINGS_ROUNDED,
+                self._create_settings,
+            ),
             NavigationDestination(
                 "Administration",
                 ft.Icons.ADMIN_PANEL_SETTINGS_OUTLINED,
@@ -192,6 +199,9 @@ class NavigationManager:
             on_categories_changed=self.on_categories_changed,
             on_restore_done=self.on_restore_done,
         )
+
+    def _create_settings(self) -> SettingsView:
+        return SettingsView(page=self.page)
 
 
 __all__ = ["NavigationDestination", "NavigationManager"]

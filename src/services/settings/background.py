@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from PIL import Image, UnidentifiedImageError
 
-from core.config.appearance import APPEARANCE_SETTINGS_PATH, BACKGROUND_ROOT
+from core.config.settings import APPEARANCE_SETTINGS_PATH, BACKGROUND_ROOT
 from core.models.background_settings import (
     DEFAULT_BACKGROUND_COLOR,
     BackgroundMode,

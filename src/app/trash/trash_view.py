@@ -19,6 +19,7 @@ from core.events.event_bus import TrashChanged
 from core.events.subscription import EventSubscription
 from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppColors
+from services.settings import trash_settings_service
 from services.trash.service import TrashedDocument
 
 logger = logging.getLogger(__name__)
@@ -43,8 +44,17 @@ class TrashView(ft.Column):
         self.status_bar = StatusBar()
         self.documents_list = ft.ListView(expand=True, spacing=12, padding=2)
 
+        retention_days = trash_settings_service.get_retention_days()
+        retention_unit = "jour" if retention_days == 1 else "jours"
         self.controls = [
-            HeaderCard(title="Corbeille", subtitle="Les documents sont supprimés automatiquement après 30 jours.", icon=ft.Icons.DELETE_OUTLINE_ROUNDED),
+            HeaderCard(
+                title="Corbeille",
+                subtitle=(
+                    "Les documents sont supprimés automatiquement après "
+                    f"{retention_days} {retention_unit}."
+                ),
+                icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
+            ),
             ft.Row(controls=[self.search_field, self.clean_button, self.empty_button], spacing=10),
             ft.Container(
                 padding=ft.Padding.symmetric(horizontal=8, vertical=6),

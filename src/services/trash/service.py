@@ -5,9 +5,11 @@ from pathlib import Path
 
 from core.config.constants import TRASH_ROOT
 from core.errors.exceptions import DocumentNotFoundError, PaperNestError
+from core.models.trash_settings import DEFAULT_TRASH_RETENTION_DAYS
 from repositories.category_repository import category_repository
 from services.documents.delete import document_delete_service
 from services.documents.restore import document_restore_service
+from services.settings import trash_settings_service
 
 
 class TrashError(PaperNestError):
@@ -48,7 +50,7 @@ class TrashedDocument:
 class TrashService:
     TRASH_DOCUMENTS_ROOT = TRASH_ROOT / "documents"
     MANIFEST_FILENAME = "document.json"
-    DEFAULT_RETENTION_DAYS = 30
+    DEFAULT_RETENTION_DAYS = DEFAULT_TRASH_RETENTION_DAYS
 
     @staticmethod
     def initialize() -> None:
@@ -59,12 +61,13 @@ class TrashService:
         TrashService.initialize()
         query_terms = [term for term in search_query.strip().casefold().split() if term]
         documents: list[TrashedDocument] = []
+        retention_days = trash_settings_service.get_retention_days()
 
         for trash_folder in TrashService.TRASH_DOCUMENTS_ROOT.iterdir():
             if not trash_folder.is_dir():
                 continue
             try:
-                document = TrashService._read_entry(trash_folder)
+                document = TrashService._read_entry(trash_folder, retention_days)
             except InvalidTrashEntryError:
                 continue
 
@@ -147,7 +150,11 @@ class TrashService:
 
     @staticmethod
     def purge_expired(retention_days: int | None = None) -> int:
-        days = retention_days or TrashService.DEFAULT_RETENTION_DAYS
+        days = (
+            trash_settings_service.get_retention_days()
+            if retention_days is None
+            else retention_days
+        )
         deleted_count = 0
         for document in TrashService.list_documents():
             if document.age_days < days:
@@ -172,7 +179,10 @@ class TrashService:
         trash_folder = TrashService.TRASH_DOCUMENTS_ROOT / trash_id
         if not trash_folder.exists():
             raise DocumentNotFoundError("Ce document n’existe plus dans la corbeille.")
-        return TrashService._read_entry(trash_folder)
+        return TrashService._read_entry(
+            trash_folder,
+            trash_settings_service.get_retention_days(),
+        )
 
     @staticmethod
     def original_category_exists(trash_id: str) -> bool:
@@ -189,11 +199,12 @@ class TrashService:
         invalid_root = TRASH_ROOT / "entrees_endommagees"
         invalid_root.mkdir(parents=True, exist_ok=True)
         moved_count = 0
+        retention_days = trash_settings_service.get_retention_days()
         for trash_folder in TrashService.TRASH_DOCUMENTS_ROOT.iterdir():
             if not trash_folder.is_dir():
                 continue
             try:
-                TrashService._read_entry(trash_folder)
+                TrashService._read_entry(trash_folder, retention_days)
             except InvalidTrashEntryError:
                 destination = TrashService._build_unique_path(invalid_root / trash_folder.name)
                 trash_folder.rename(destination)
@@ -201,7 +212,10 @@ class TrashService:
         return moved_count
 
     @staticmethod
-    def _read_entry(trash_folder: Path) -> TrashedDocument:
+    def _read_entry(
+        trash_folder: Path,
+        retention_days: int | None = None,
+    ) -> TrashedDocument:
         manifest = TrashService._read_manifest(trash_folder)
         document_data = manifest["document"]
         files = [path for path in trash_folder.iterdir() if path.is_file() and path.name != TrashService.MANIFEST_FILENAME]
@@ -215,7 +229,7 @@ class TrashService:
         deleted_datetime = TrashService._parse_datetime(deleted_at)
         now = datetime.now().astimezone()
         age_days = max(0, (now.date() - deleted_datetime.date()).days) if deleted_datetime else 0
-        retention_days = TrashService.DEFAULT_RETENTION_DAYS
+        retention_days = retention_days or trash_settings_service.get_retention_days()
         remaining_days = max(0, retention_days - age_days)
         progress = min(1.0, max(0.0, age_days / retention_days))
         size_bytes = int(document_data.get("size_bytes", file_path.stat().st_size))
