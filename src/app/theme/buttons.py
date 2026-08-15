@@ -13,7 +13,6 @@ from app.theme.tokens import (
     AppTheme,
 )
 
-
 ButtonContent = Union[str, ft.Control]
 
 
@@ -100,6 +99,7 @@ class AppButton(PaperNestButton):
 
 class PrimaryButton(AppButton):
     def __init__(self, text: ButtonContent, **kwargs):
+        compact = kwargs.get("compact", False)
         kwargs.setdefault("bgcolor", AppColors.PRIMARY)
         kwargs.setdefault(
             "gradient",
@@ -109,6 +109,21 @@ class PrimaryButton(AppButton):
             ),
         )
         kwargs.setdefault("color", AppColors.TEXT)
+        kwargs.setdefault(
+            "style",
+            PaperNestButtonStyle(
+                shape=AppTheme.button_shape(AppRadius.MD),
+                padding=ft.Padding.symmetric(
+                    horizontal=AppSpacing.MD if compact else AppSpacing.LG,
+                    vertical=0,
+                ),
+                side=ft.BorderSide(2, AppColors.PRIMARY_DARK),
+                mouse_cursor={
+                    ft.ControlState.DISABLED: ft.MouseCursor.BASIC,
+                    ft.ControlState.DEFAULT: ft.MouseCursor.CLICK,
+                },
+            ),
+        )
         super().__init__(text=text, **kwargs)
 
 
@@ -128,6 +143,7 @@ class SecondaryButton(AppButton):
 
 class SuccessButton(AppButton):
     def __init__(self, text: ButtonContent, **kwargs):
+        compact = kwargs.get("compact", False)
         kwargs.setdefault("bgcolor", AppColors.SUCCESS)
         kwargs.setdefault(
             "gradient",
@@ -137,11 +153,27 @@ class SuccessButton(AppButton):
             ),
         )
         kwargs.setdefault("color", AppColors.TEXT_LIGHT)
+        kwargs.setdefault(
+            "style",
+            PaperNestButtonStyle(
+                shape=AppTheme.button_shape(AppRadius.MD),
+                padding=ft.Padding.symmetric(
+                    horizontal=AppSpacing.MD if compact else AppSpacing.LG,
+                    vertical=0,
+                ),
+                side=ft.BorderSide(2, AppColors.SUCCESS_DARK),
+                mouse_cursor={
+                    ft.ControlState.DISABLED: ft.MouseCursor.BASIC,
+                    ft.ControlState.DEFAULT: ft.MouseCursor.CLICK,
+                },
+            ),
+        )
         super().__init__(text=text, **kwargs)
 
 
 class WarningButton(AppButton):
     def __init__(self, text: ButtonContent, **kwargs):
+        compact = kwargs.get("compact", False)
         kwargs.setdefault("bgcolor", AppColors.WARNING)
         kwargs.setdefault(
             "gradient",
@@ -151,11 +183,27 @@ class WarningButton(AppButton):
             ),
         )
         kwargs.setdefault("color", AppColors.TEXT_LIGHT)
+        kwargs.setdefault(
+            "style",
+            PaperNestButtonStyle(
+                shape=AppTheme.button_shape(AppRadius.MD),
+                padding=ft.Padding.symmetric(
+                    horizontal=AppSpacing.MD if compact else AppSpacing.LG,
+                    vertical=0,
+                ),
+                side=ft.BorderSide(2, AppColors.WARNING_DARK),
+                mouse_cursor={
+                    ft.ControlState.DISABLED: ft.MouseCursor.BASIC,
+                    ft.ControlState.DEFAULT: ft.MouseCursor.CLICK,
+                },
+            ),
+        )
         super().__init__(text=text, **kwargs)
 
 
 class DangerButton(AppButton):
     def __init__(self, text: ButtonContent, **kwargs):
+        compact = kwargs.get("compact", False)
         kwargs.setdefault("bgcolor", AppColors.ERROR)
         kwargs.setdefault(
             "gradient",
@@ -165,6 +213,21 @@ class DangerButton(AppButton):
             ),
         )
         kwargs.setdefault("color", AppColors.TEXT_LIGHT)
+        kwargs.setdefault(
+            "style",
+            PaperNestButtonStyle(
+                shape=AppTheme.button_shape(AppRadius.MD),
+                padding=ft.Padding.symmetric(
+                    horizontal=AppSpacing.MD if compact else AppSpacing.LG,
+                    vertical=0,
+                ),
+                side=ft.BorderSide(2, AppColors.ERROR_DARK),
+                mouse_cursor={
+                    ft.ControlState.DISABLED: ft.MouseCursor.BASIC,
+                    ft.ControlState.DEFAULT: ft.MouseCursor.CLICK,
+                },
+            ),
+        )
         super().__init__(text=text, **kwargs)
 
 
