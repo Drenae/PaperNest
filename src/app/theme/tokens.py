@@ -122,10 +122,10 @@ class AppShadows:
             blur_radius=16,
             spread_radius=0,
             color=ft.Colors.with_opacity(
-                0.08,
+                0.25,
                 ft.Colors.BLACK,
             ),
-            offset=ft.Offset(0, 4),
+            offset=ft.Offset(0, 0),
         )
 
     @staticmethod

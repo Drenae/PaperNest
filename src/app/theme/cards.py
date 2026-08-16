@@ -313,8 +313,6 @@ class AppSection(ft.Container):
 
         super().__init__(
             border_radius=AppRadius.LG,
-            border=ft.Border.all(1, AppColors.BORDER_LIGHT),
-            bgcolor=AppColors.SURFACE,
             clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
             expand=expand,
             shadow=AppShadows.card(),
@@ -322,7 +320,10 @@ class AppSection(ft.Container):
                 spacing=0,
                 controls=[
                     ft.Container(
-                        bgcolor=AppColors.PANEL_DARK,
+                        bgcolor=ft.Colors.with_opacity(
+                            0.95,
+                            AppColors.PANEL_DARK,
+                        ),
                         padding=ft.Padding.symmetric(
                             horizontal=AppSpacing.LG,
                             vertical=AppSpacing.MD,
@@ -339,7 +340,20 @@ class AppSection(ft.Container):
                         padding=AppSpacing.LG,
                         content=content,
                         expand=True,
-                        bgcolor=AppColors.SURFACE,
+                        gradient=ft.LinearGradient(
+                            begin=ft.Alignment.TOP_LEFT,
+                            end=ft.Alignment.BOTTOM_RIGHT,
+                            colors=[
+                                ft.Colors.with_opacity(
+                                    0.65,
+                                    AppColors.SURFACE,
+                                ),
+                                ft.Colors.with_opacity(
+                                    0.65,
+                                    AppColors.SURFACE_ALT,
+                                ),
+                            ],
+                        ),
                     ),
                 ],
             ),
