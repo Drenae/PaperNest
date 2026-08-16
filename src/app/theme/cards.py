@@ -5,6 +5,7 @@ from typing import Callable, Iterable, Optional, Union
 
 import flet as ft
 
+from app.theme.buttons import IconAction
 from app.theme.tokens import (
     AppColors,
     AppRadius,
@@ -13,7 +14,6 @@ from app.theme.tokens import (
     AppSpacing,
     AppText,
 )
-from app.theme.buttons import IconAction
 
 
 class CardOrientation(str, Enum):
@@ -25,6 +25,156 @@ class CardDensity(str, Enum):
     COMPACT = "compact"
     NORMAL = "normal"
     COMFORTABLE = "comfortable"
+
+
+class PageHeader(ft.Container):
+    def __init__(
+        self,
+        title: str,
+        subtitle: Union[str, ft.Control, None] = None,
+        icon=None,
+        actions: Optional[Iterable[ft.Control]] = None,
+        on_back: Optional[Callable] = None,
+        **kwargs,
+    ):
+        actions = list(actions or [])
+
+        leading = []
+
+        if on_back is not None:
+            leading.append(
+                IconAction(
+                    icon=ft.Icons.ARROW_BACK_ROUNDED,
+                    color=AppColors.TEXT_LIGHT,
+                    tooltip="Retour",
+                    on_click=on_back,
+                )
+            )
+
+        if icon is not None:
+            leading.append(
+                ft.Container(
+                    width=52,
+                    height=52,
+                    alignment=ft.Alignment.CENTER,
+                    border_radius=AppRadius.LG,
+                    bgcolor=ft.Colors.with_opacity(0.12, AppColors.PRIMARY),
+                    content=ft.Icon(icon, size=AppSizes.ICON_LG, color=AppColors.PRIMARY),
+                )
+            )
+
+        text_controls = [
+            ft.Text(
+                title,
+                size=AppText.PAGE_TITLE,
+                weight=ft.FontWeight.BOLD,
+                color=AppColors.TEXT_LIGHT,
+            )
+        ]
+
+        if subtitle:
+            text_controls.append(
+                subtitle
+                if isinstance(subtitle, ft.Control)
+                else ft.Text(subtitle, size=AppText.BODY, color=ft.Colors.WHITE_70)
+            )
+
+        leading.append(ft.Column(spacing=2, controls=text_controls))
+
+        super().__init__(
+            padding=AppSpacing.XL,
+            bgcolor=ft.Colors.with_opacity(
+                0.95,
+                AppColors.PANEL_DARK,
+            ),
+            border_radius=AppRadius.LG,
+            shadow=AppShadows.card(),
+            content=ft.Row(
+                controls=[
+                    ft.Row(spacing=AppSpacing.MD, controls=leading),
+                    ft.Container(expand=True),
+                    ft.Row(spacing=AppSpacing.SM, controls=actions),
+                ],
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+            **kwargs,
+        )
+
+
+class AppSection(ft.Container):
+    def __init__(
+        self,
+        title: str,
+        content: ft.Control,
+        icon=None,
+        actions: Optional[Iterable[ft.Control]] = None,
+        expand=None,
+        **kwargs,
+    ):
+        actions = list(actions or [])
+
+        title_controls = []
+
+        if icon is not None:
+            title_controls.append(ft.Icon(icon, color=AppColors.PRIMARY, size=AppSizes.ICON_MD))
+
+        title_controls.append(
+            ft.Text(
+                title,
+                color=AppColors.TEXT_LIGHT,
+                size=AppText.SECTION_TITLE,
+                weight=ft.FontWeight.BOLD,
+            )
+        )
+
+        super().__init__(
+            border_radius=AppRadius.LG,
+            clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
+            expand=expand,
+            shadow=AppShadows.card(),
+            content=ft.Column(
+                spacing=0,
+                controls=[
+                    ft.Container(
+                        bgcolor=ft.Colors.with_opacity(
+                            0.95,
+                            AppColors.PANEL_DARK,
+                        ),
+                        padding=ft.Padding.symmetric(
+                            horizontal=AppSpacing.LG,
+                            vertical=AppSpacing.MD,
+                        ),
+                        content=ft.Row(
+                            controls=[
+                                ft.Row(spacing=AppSpacing.SM, controls=title_controls),
+                                ft.Container(expand=True),
+                                ft.Row(spacing=AppSpacing.XS, controls=actions),
+                            ]
+                        ),
+                    ),
+                    ft.Container(
+                        padding=AppSpacing.LG,
+                        content=content,
+                        expand=True,
+                        gradient=ft.LinearGradient(
+                            begin=ft.Alignment.TOP_LEFT,
+                            end=ft.Alignment.BOTTOM_RIGHT,
+                            colors=[
+                                ft.Colors.with_opacity(
+                                    0.65,
+                                    AppColors.SURFACE,
+                                ),
+                                ft.Colors.with_opacity(
+                                    0.65,
+                                    AppColors.SURFACE_ALT,
+                                ),
+                            ],
+                        ),
+                    ),
+                ],
+            ),
+            **kwargs,
+        )
 
 
 class AppCard(ft.Container):
@@ -213,149 +363,3 @@ class AppCard(ft.Container):
             return value
 
         return ft.Text(str(value), **kwargs)
-
-
-class PageHeader(ft.Container):
-    def __init__(
-        self,
-        title: str,
-        subtitle: Union[str, ft.Control, None] = None,
-        icon=None,
-        actions: Optional[Iterable[ft.Control]] = None,
-        on_back: Optional[Callable] = None,
-        **kwargs,
-    ):
-        actions = list(actions or [])
-
-        leading = []
-
-        if on_back is not None:
-            leading.append(
-                IconAction(
-                    icon=ft.Icons.ARROW_BACK_ROUNDED,
-                    color=AppColors.TEXT_LIGHT,
-                    tooltip="Retour",
-                    on_click=on_back,
-                )
-            )
-
-        if icon is not None:
-            leading.append(
-                ft.Container(
-                    width=52,
-                    height=52,
-                    alignment=ft.Alignment.CENTER,
-                    border_radius=AppRadius.LG,
-                    bgcolor=ft.Colors.with_opacity(0.12, AppColors.PRIMARY),
-                    content=ft.Icon(icon, size=AppSizes.ICON_LG, color=AppColors.PRIMARY),
-                )
-            )
-
-        text_controls = [
-            ft.Text(
-                title,
-                size=AppText.PAGE_TITLE,
-                weight=ft.FontWeight.BOLD,
-                color=AppColors.TEXT_LIGHT,
-            )
-        ]
-
-        if subtitle:
-            text_controls.append(
-                subtitle
-                if isinstance(subtitle, ft.Control)
-                else ft.Text(subtitle, size=AppText.BODY, color=ft.Colors.WHITE_70)
-            )
-
-        leading.append(ft.Column(spacing=2, controls=text_controls))
-
-        super().__init__(
-            padding=AppSpacing.XL,
-            bgcolor=AppColors.PANEL_DARK,
-            border_radius=AppRadius.LG,
-            content=ft.Row(
-                controls=[
-                    ft.Row(spacing=AppSpacing.MD, controls=leading),
-                    ft.Container(expand=True),
-                    ft.Row(spacing=AppSpacing.SM, controls=actions),
-                ],
-                vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            ),
-            **kwargs,
-        )
-
-
-class AppSection(ft.Container):
-    def __init__(
-        self,
-        title: str,
-        content: ft.Control,
-        icon=None,
-        actions: Optional[Iterable[ft.Control]] = None,
-        expand=None,
-        **kwargs,
-    ):
-        actions = list(actions or [])
-
-        title_controls = []
-
-        if icon is not None:
-            title_controls.append(ft.Icon(icon, color=AppColors.PRIMARY, size=AppSizes.ICON_MD))
-
-        title_controls.append(
-            ft.Text(
-                title,
-                color=AppColors.TEXT_LIGHT,
-                size=AppText.SECTION_TITLE,
-                weight=ft.FontWeight.BOLD,
-            )
-        )
-
-        super().__init__(
-            border_radius=AppRadius.LG,
-            clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
-            expand=expand,
-            shadow=AppShadows.card(),
-            content=ft.Column(
-                spacing=0,
-                controls=[
-                    ft.Container(
-                        bgcolor=ft.Colors.with_opacity(
-                            0.95,
-                            AppColors.PANEL_DARK,
-                        ),
-                        padding=ft.Padding.symmetric(
-                            horizontal=AppSpacing.LG,
-                            vertical=AppSpacing.MD,
-                        ),
-                        content=ft.Row(
-                            controls=[
-                                ft.Row(spacing=AppSpacing.SM, controls=title_controls),
-                                ft.Container(expand=True),
-                                ft.Row(spacing=AppSpacing.XS, controls=actions),
-                            ]
-                        ),
-                    ),
-                    ft.Container(
-                        padding=AppSpacing.LG,
-                        content=content,
-                        expand=True,
-                        gradient=ft.LinearGradient(
-                            begin=ft.Alignment.TOP_LEFT,
-                            end=ft.Alignment.BOTTOM_RIGHT,
-                            colors=[
-                                ft.Colors.with_opacity(
-                                    0.65,
-                                    AppColors.SURFACE,
-                                ),
-                                ft.Colors.with_opacity(
-                                    0.65,
-                                    AppColors.SURFACE_ALT,
-                                ),
-                            ],
-                        ),
-                    ),
-                ],
-            ),
-            **kwargs,
-        )
