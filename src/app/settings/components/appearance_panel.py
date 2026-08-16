@@ -23,6 +23,8 @@ class AppearancePanel(AppSection):
         self.app_page = page
         self.settings = background_service.load()
         self.pending_image: Path | None = None
+        self.pending_alignment_x = 0.0
+        self.pending_alignment_y = 0.0
         self._normalizing_picker = False
 
         self.mode_field = BaseDropDown(
@@ -166,6 +168,7 @@ class AppearancePanel(AppSection):
         self._safe_update()
 
     def _set_selected_file(self, selected: PaperNestFilePickerFile | None) -> None:
+        previous_path = self.pending_image
         self.pending_image = None
         self.selected_file.visible = False
         if selected is None or not selected.path:
@@ -174,6 +177,9 @@ class AppearancePanel(AppSection):
         if not path.is_file():
             return
         self.pending_image = path
+        if previous_path != path:
+            self.pending_alignment_x = 0.0
+            self.pending_alignment_y = 0.0
         self.selected_file_name.value = selected.name
         self.selected_file_size.value = self._format_file_size(selected.size)
         self.selected_file.visible = True
@@ -187,6 +193,8 @@ class AppearancePanel(AppSection):
 
     def _clear_selected_file(self, _event=None) -> None:
         self.pending_image = None
+        self.pending_alignment_x = 0.0
+        self.pending_alignment_y = 0.0
         self.selected_file.visible = False
         self._render_previews()
         self._safe_update()
@@ -198,11 +206,17 @@ class AppearancePanel(AppSection):
             if mode is BackgroundMode.COLOR:
                 settings = background_service.use_color(str(self.color_field.value or ""))
             elif self.pending_image is not None:
-                settings = background_service.import_image(self.pending_image)
+                settings = background_service.import_image(
+                    self.pending_image,
+                    alignment_x=self.pending_alignment_x,
+                    alignment_y=self.pending_alignment_y,
+                )
             else:
                 settings = background_service.use_image()
             self.settings = settings
             self.pending_image = None
+            self.pending_alignment_x = settings.alignment_x
+            self.pending_alignment_y = settings.alignment_y
             self.selected_file.visible = False
             background_service.apply(self.app_page, settings)
             self._render_previews()
@@ -217,6 +231,8 @@ class AppearancePanel(AppSection):
     def _reset(self, _event=None) -> None:
         self.settings = background_service.reset()
         self.pending_image = None
+        self.pending_alignment_x = 0.0
+        self.pending_alignment_y = 0.0
         self.selected_file.visible = False
         self.mode_field.value = self.settings.mode.value
         self.color_field.value = self.settings.color
@@ -247,37 +263,131 @@ class AppearancePanel(AppSection):
         mode = self._selected_mode()
         if mode is BackgroundMode.COLOR:
             self.preview.height = 190
+            self.preview.image = None
             self.preview.bgcolor = color or str(self.color_field.value or self.settings.color)
             self.preview.content = None
             return
         self.preview.height = 190
-        source = background_service.resolve_image_source(
-            str(self.pending_image)
-            if self.pending_image is not None
-            else self.settings.image_path
+        if self.pending_image is None:
+            self._render_empty_image_preview()
+            return
+        source = background_service.resolve_image_source(str(self.pending_image))
+        self._render_image(
+            self.preview,
+            source,
+            alignment_x=self.pending_alignment_x,
+            alignment_y=self.pending_alignment_y,
+            interactive=True,
         )
-        self._render_image(self.preview, source)
 
     def _render_current_preview(self) -> None:
         if self.settings.mode is BackgroundMode.COLOR:
+            self.current_preview.image = None
             self.current_preview.bgcolor = self.settings.color
             self.current_preview.content = None
             return
         source = background_service.resolve_image_source(self.settings.image_path)
-        self._render_image(self.current_preview, source)
+        self._render_image(
+            self.current_preview,
+            source,
+            alignment_x=self.settings.alignment_x,
+            alignment_y=self.settings.alignment_y,
+        )
+
+    def _render_image(
+        self,
+        container: ft.Container,
+        source: str | bytes,
+        *,
+        alignment_x: float,
+        alignment_y: float,
+        interactive: bool = False,
+    ) -> None:
+        container.bgcolor = None
+        container.image = ft.DecorationImage(
+            src=source,
+            fit=ft.BoxFit.COVER,
+            alignment=ft.Alignment(alignment_x, alignment_y),
+        )
+        container.content = (
+            ft.GestureDetector(
+                mouse_cursor=ft.MouseCursor.MOVE,
+                drag_interval=16,
+                on_pan_update=self._handle_crop_pan,
+                content=ft.Container(
+                    expand=True,
+                    alignment=ft.Alignment.BOTTOM_CENTER,
+                    padding=AppSpacing.SM,
+                    content=ft.Container(
+                        padding=ft.Padding.symmetric(
+                            horizontal=AppSpacing.MD,
+                            vertical=AppSpacing.XS,
+                        ),
+                        border_radius=AppRadius.PILL,
+                        bgcolor=ft.Colors.with_opacity(
+                            0.72,
+                            AppColors.PANEL_DARK,
+                        ),
+                        content=ft.Text(
+                            "Faites glisser l’image pour ajuster le cadrage",
+                            size=11,
+                            color=AppColors.TEXT_LIGHT,
+                        ),
+                    ),
+                ),
+            )
+            if interactive
+            else None
+        )
+
+    def _render_empty_image_preview(self) -> None:
+        self.preview.image = None
+        self.preview.bgcolor = ft.Colors.with_opacity(
+            0.45,
+            AppColors.SURFACE,
+        )
+        self.preview.content = ft.Column(
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=AppSpacing.SM,
+            controls=[
+                ft.Icon(
+                    ft.Icons.CROP_FREE_ROUNDED,
+                    color=AppColors.TEXT_MUTED,
+                ),
+                ft.Text(
+                    "Sélectionnez une image pour voir l’aperçu",
+                    color=AppColors.TEXT_MUTED,
+                    text_align=ft.TextAlign.CENTER,
+                ),
+            ],
+        )
+
+    def _handle_crop_pan(
+        self,
+        event: ft.DragUpdateEvent[ft.GestureDetector],
+    ) -> None:
+        if self.pending_image is None:
+            return
+        self.pending_alignment_x = self._clamp_alignment(
+            self.pending_alignment_x - (event.local_delta.x / 150)
+        )
+        self.pending_alignment_y = self._clamp_alignment(
+            self.pending_alignment_y - (event.local_delta.y / 95)
+        )
+        if self.preview.image is not None:
+            self.preview.image.alignment = ft.Alignment(
+                self.pending_alignment_x,
+                self.pending_alignment_y,
+            )
+        try:
+            self.preview.update()
+        except RuntimeError:
+            pass
 
     @staticmethod
-    def _render_image(container: ft.Container, source: str | bytes) -> None:
-        container.bgcolor = ft.Colors.with_opacity(
-            0.35,
-            AppColors.PANEL_DARK,
-        )
-        container.content = ft.Image(
-            src=source,
-            fit=ft.BoxFit.CONTAIN,
-            width=1200,
-            height=190,
-        )
+    def _clamp_alignment(value: float) -> float:
+        return max(-1.0, min(1.0, value))
 
     def _build_mode_controls(self) -> list[ft.Control]:
         if self._selected_mode() is BackgroundMode.COLOR:

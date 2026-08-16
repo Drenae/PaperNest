@@ -73,10 +73,18 @@ class BackgroundService:
                 mode=BackgroundMode.COLOR,
                 color=normalized_color,
                 image_path=current.image_path,
+                alignment_x=current.alignment_x,
+                alignment_y=current.alignment_y,
             )
         )
 
-    def import_image(self, source: str | Path) -> BackgroundSettings:
+    def import_image(
+        self,
+        source: str | Path,
+        *,
+        alignment_x: float = 0.0,
+        alignment_y: float = 0.0,
+    ) -> BackgroundSettings:
         source_path = Path(source).expanduser()
         self._validate_image(source_path)
         self.background_root.mkdir(parents=True, exist_ok=True)
@@ -95,6 +103,8 @@ class BackgroundService:
                 mode=BackgroundMode.IMAGE,
                 color=current.color,
                 image_path=str(destination),
+                alignment_x=self._normalize_alignment(alignment_x),
+                alignment_y=self._normalize_alignment(alignment_y),
             )
         )
 
@@ -105,6 +115,8 @@ class BackgroundService:
                 mode=BackgroundMode.IMAGE,
                 color=current.color,
                 image_path=current.image_path,
+                alignment_x=current.alignment_x,
+                alignment_y=current.alignment_y,
             )
         )
 
@@ -121,12 +133,15 @@ class BackgroundService:
             page.bgcolor = resolved.color
             return
 
-        page.bgcolor = resolved.color
+        page.bgcolor = ft.Colors.TRANSPARENT
         page.decoration = ft.BoxDecoration(
             image=ft.DecorationImage(
                 src=self.resolve_image_source(resolved.image_path),
-                fit=ft.BoxFit.CONTAIN,
-                alignment=ft.Alignment.CENTER,
+                fit=ft.BoxFit.COVER,
+                alignment=ft.Alignment(
+                    resolved.alignment_x,
+                    resolved.alignment_y,
+                ),
             )
         )
 
@@ -156,6 +171,8 @@ class BackgroundService:
             mode=settings.mode,
             color=color,
             image_path=image_path,
+            alignment_x=self._normalize_alignment(settings.alignment_x),
+            alignment_y=self._normalize_alignment(settings.alignment_y),
         )
 
     @staticmethod
@@ -164,6 +181,13 @@ class BackgroundService:
         if not _HEX_COLOR_PATTERN.fullmatch(normalized):
             return DEFAULT_BACKGROUND_COLOR
         return normalized
+
+    @staticmethod
+    def _normalize_alignment(value: float) -> float:
+        try:
+            return max(-1.0, min(1.0, float(value)))
+        except (TypeError, ValueError):
+            return 0.0
 
     @staticmethod
     def _validate_image(path: Path, *, check_extension: bool = True) -> None:

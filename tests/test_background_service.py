@@ -109,26 +109,41 @@ class BackgroundServiceTests(unittest.TestCase):
         self.assertEqual(page.bgcolor, "#AABBCC")
         self.assertIsNone(page.decoration)
 
-    def test_apply_image_uses_color_backdrop_and_contained_decoration(self) -> None:
+    def test_apply_image_uses_transparent_page_and_cropped_decoration(self) -> None:
         fake_flet = self.create_fake_flet()
         page = types.SimpleNamespace(bgcolor="#FFFFFF", decoration=None)
 
         with patch.dict(sys.modules, {"flet": fake_flet}):
-            self.service.apply(page, BackgroundSettings())
+            self.service.apply(
+                page,
+                BackgroundSettings(alignment_x=0.25, alignment_y=-0.5),
+            )
 
-        self.assertEqual(page.bgcolor, DEFAULT_BACKGROUND_COLOR)
+        self.assertEqual(page.bgcolor, "transparent")
         self.assertEqual(
             page.decoration["image"]["src"],
             self.service.default_asset,
         )
-        self.assertEqual(page.decoration["image"]["fit"], "contain")
+        self.assertEqual(page.decoration["image"]["fit"], "cover")
+        self.assertEqual(page.decoration["image"]["alignment"], (0.25, -0.5))
+
+    def test_image_alignment_is_clamped_and_persisted(self) -> None:
+        settings = self.service.import_image(
+            self.create_image(),
+            alignment_x=4,
+            alignment_y=-3,
+        )
+
+        self.assertEqual(settings.alignment_x, 1.0)
+        self.assertEqual(settings.alignment_y, -1.0)
+        self.assertEqual(self.service.load(), settings)
 
     @staticmethod
     def create_fake_flet() -> types.SimpleNamespace:
         return types.SimpleNamespace(
             Colors=types.SimpleNamespace(TRANSPARENT="transparent"),
             BoxFit=types.SimpleNamespace(COVER="cover", CONTAIN="contain"),
-            Alignment=types.SimpleNamespace(CENTER="center"),
+            Alignment=lambda x, y: (x, y),
             DecorationImage=lambda **kwargs: kwargs,
             BoxDecoration=lambda **kwargs: kwargs,
         )
