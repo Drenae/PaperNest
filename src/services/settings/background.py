@@ -5,10 +5,11 @@ import logging
 import re
 import shutil
 import uuid
+from io import BytesIO
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from core.config.settings import APPEARANCE_SETTINGS_PATH, BACKGROUND_ROOT
 from core.models.background_settings import (
@@ -84,6 +85,8 @@ class BackgroundService:
         *,
         alignment_x: float = 0.0,
         alignment_y: float = 0.0,
+        zoom: float = 1.0,
+        target_aspect_ratio: float = 16 / 9,
     ) -> BackgroundSettings:
         source_path = Path(source).expanduser()
         self._validate_image(source_path)
@@ -93,7 +96,21 @@ class BackgroundService:
         )
         temporary = destination.with_name(f".{destination.name}.part")
         temporary.unlink(missing_ok=True)
-        shutil.copy2(source_path, temporary)
+        normalized_zoom = self._normalize_zoom(zoom)
+        if normalized_zoom > 1.0:
+            cropped = self.load_preview_image(source_path, max_size=None)
+            cropped = self._crop_image(
+                cropped,
+                alignment_x=alignment_x,
+                alignment_y=alignment_y,
+                zoom=normalized_zoom,
+                target_aspect_ratio=target_aspect_ratio,
+            )
+            self._save_image(cropped, temporary, source_path.suffix.casefold())
+            alignment_x = 0.0
+            alignment_y = 0.0
+        else:
+            shutil.copy2(source_path, temporary)
         self._validate_image(temporary, check_extension=False)
         temporary.replace(destination)
         self._remove_previous_images(keep=destination)
@@ -107,6 +124,77 @@ class BackgroundService:
                 alignment_y=self._normalize_alignment(alignment_y),
             )
         )
+
+    def load_preview_image(
+        self,
+        source: str | Path,
+        *,
+        max_size: int | None = 1600,
+    ) -> Image.Image:
+        with Image.open(Path(source)) as opened:
+            image = ImageOps.exif_transpose(opened).convert("RGB")
+        if max_size:
+            image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+        return image
+
+    def render_crop_preview(
+        self,
+        image: Image.Image,
+        *,
+        alignment_x: float,
+        alignment_y: float,
+        zoom: float,
+        target_aspect_ratio: float,
+    ) -> bytes:
+        cropped = self._crop_image(
+            image,
+            alignment_x=alignment_x,
+            alignment_y=alignment_y,
+            zoom=zoom,
+            target_aspect_ratio=target_aspect_ratio,
+        )
+        output = BytesIO()
+        cropped.save(output, format="JPEG", quality=88, optimize=True)
+        return output.getvalue()
+
+    def _crop_image(
+        self,
+        image: Image.Image,
+        *,
+        alignment_x: float,
+        alignment_y: float,
+        zoom: float,
+        target_aspect_ratio: float,
+    ) -> Image.Image:
+        width, height = image.size
+        ratio = max(0.2, min(5.0, float(target_aspect_ratio or 16 / 9)))
+        image_ratio = width / height
+        if image_ratio > ratio:
+            base_height = float(height)
+            base_width = base_height * ratio
+        else:
+            base_width = float(width)
+            base_height = base_width / ratio
+        normalized_zoom = self._normalize_zoom(zoom)
+        crop_width = max(1.0, base_width / normalized_zoom)
+        crop_height = max(1.0, base_height / normalized_zoom)
+        x = (self._normalize_alignment(alignment_x) + 1.0) / 2.0
+        y = (self._normalize_alignment(alignment_y) + 1.0) / 2.0
+        left = (width - crop_width) * x
+        top = (height - crop_height) * y
+        return image.crop((left, top, left + crop_width, top + crop_height))
+
+    @staticmethod
+    def _save_image(image: Image.Image, path: Path, suffix: str) -> None:
+        image_format = {
+            ".png": "PNG",
+            ".webp": "WEBP",
+            ".jpg": "JPEG",
+            ".jpeg": "JPEG",
+        }.get(suffix, "JPEG")
+        if image_format == "JPEG" and image.mode != "RGB":
+            image = image.convert("RGB")
+        image.save(path, format=image_format, quality=94)
 
     def use_image(self) -> BackgroundSettings:
         current = self.load()
@@ -188,6 +276,13 @@ class BackgroundService:
             return max(-1.0, min(1.0, float(value)))
         except (TypeError, ValueError):
             return 0.0
+
+    @staticmethod
+    def _normalize_zoom(value: float) -> float:
+        try:
+            return max(1.0, min(4.0, float(value)))
+        except (TypeError, ValueError):
+            return 1.0
 
     @staticmethod
     def _validate_image(path: Path, *, check_extension: bool = True) -> None:

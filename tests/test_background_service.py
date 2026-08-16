@@ -138,6 +138,31 @@ class BackgroundServiceTests(unittest.TestCase):
         self.assertEqual(settings.alignment_y, -1.0)
         self.assertEqual(self.service.load(), settings)
 
+    def test_zoom_crops_the_imported_image_to_the_requested_ratio(self) -> None:
+        source = self.root / "wide.png"
+        Image.new("RGB", (400, 200), "#FFBF26").save(source)
+
+        settings = self.service.import_image(
+            source,
+            alignment_x=1.0,
+            zoom=2.0,
+            target_aspect_ratio=1.0,
+        )
+
+        with Image.open(Path(settings.image_path or "")) as imported:
+            self.assertEqual(imported.size, (100, 100))
+        self.assertEqual(settings.alignment_x, 0.0)
+        self.assertEqual(settings.alignment_y, 0.0)
+
+    def test_zoom_is_limited_to_four_times(self) -> None:
+        source = self.root / "square.png"
+        Image.new("RGB", (400, 400), "#FFBF26").save(source)
+
+        settings = self.service.import_image(source, zoom=99, target_aspect_ratio=1.0)
+
+        with Image.open(Path(settings.image_path or "")) as imported:
+            self.assertEqual(imported.size, (100, 100))
+
     @staticmethod
     def create_fake_flet() -> types.SimpleNamespace:
         return types.SimpleNamespace(

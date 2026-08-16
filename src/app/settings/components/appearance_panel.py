@@ -25,6 +25,8 @@ class AppearancePanel(AppSection):
         self.pending_image: Path | None = None
         self.pending_alignment_x = 0.0
         self.pending_alignment_y = 0.0
+        self.pending_zoom = 1.0
+        self._preview_source = None
         self._normalizing_picker = False
 
         self.mode_field = BaseDropDown(
@@ -104,6 +106,7 @@ class AppearancePanel(AppSection):
 
         self.current_preview = self._new_preview_container()
         self.preview = self._new_preview_container()
+        self.zoom_label = ft.Text("100 %", size=11, color=AppColors.TEXT_LIGHT)
         self.apply_button = PrimaryButton(
             "Appliquer",
             icon=ft.Icons.CHECK_ROUNDED,
@@ -180,6 +183,8 @@ class AppearancePanel(AppSection):
         if previous_path != path:
             self.pending_alignment_x = 0.0
             self.pending_alignment_y = 0.0
+            self.pending_zoom = 1.0
+        self._preview_source = background_service.load_preview_image(path)
         self.selected_file_name.value = selected.name
         self.selected_file_size.value = self._format_file_size(selected.size)
         self.selected_file.visible = True
@@ -195,6 +200,8 @@ class AppearancePanel(AppSection):
         self.pending_image = None
         self.pending_alignment_x = 0.0
         self.pending_alignment_y = 0.0
+        self.pending_zoom = 1.0
+        self._preview_source = None
         self.selected_file.visible = False
         self._render_previews()
         self._safe_update()
@@ -210,6 +217,8 @@ class AppearancePanel(AppSection):
                     self.pending_image,
                     alignment_x=self.pending_alignment_x,
                     alignment_y=self.pending_alignment_y,
+                    zoom=self.pending_zoom,
+                    target_aspect_ratio=self._page_aspect_ratio(),
                 )
             else:
                 settings = background_service.use_image()
@@ -217,6 +226,8 @@ class AppearancePanel(AppSection):
             self.pending_image = None
             self.pending_alignment_x = settings.alignment_x
             self.pending_alignment_y = settings.alignment_y
+            self.pending_zoom = 1.0
+            self._preview_source = None
             self.selected_file.visible = False
             background_service.apply(self.app_page, settings)
             self._render_previews()
@@ -233,6 +244,8 @@ class AppearancePanel(AppSection):
         self.pending_image = None
         self.pending_alignment_x = 0.0
         self.pending_alignment_y = 0.0
+        self.pending_zoom = 1.0
+        self._preview_source = None
         self.selected_file.visible = False
         self.mode_field.value = self.settings.mode.value
         self.color_field.value = self.settings.color
@@ -272,11 +285,23 @@ class AppearancePanel(AppSection):
             self._render_empty_image_preview()
             return
         source = background_service.resolve_image_source(str(self.pending_image))
+        preview_alignment_x = self.pending_alignment_x
+        preview_alignment_y = self.pending_alignment_y
+        if self.pending_zoom > 1.0 and self._preview_source is not None:
+            source = background_service.render_crop_preview(
+                self._preview_source,
+                alignment_x=self.pending_alignment_x,
+                alignment_y=self.pending_alignment_y,
+                zoom=self.pending_zoom,
+                target_aspect_ratio=self._page_aspect_ratio(),
+            )
+            preview_alignment_x = 0.0
+            preview_alignment_y = 0.0
         self._render_image(
             self.preview,
             source,
-            alignment_x=self.pending_alignment_x,
-            alignment_y=self.pending_alignment_y,
+            alignment_x=preview_alignment_x,
+            alignment_y=preview_alignment_y,
             interactive=True,
         )
 
@@ -314,25 +339,33 @@ class AppearancePanel(AppSection):
                 mouse_cursor=ft.MouseCursor.MOVE,
                 drag_interval=16,
                 on_pan_update=self._handle_crop_pan,
+                on_scroll=self._handle_crop_scroll,
                 content=ft.Container(
                     expand=True,
                     alignment=ft.Alignment.BOTTOM_CENTER,
                     padding=AppSpacing.SM,
-                    content=ft.Container(
-                        padding=ft.Padding.symmetric(
-                            horizontal=AppSpacing.MD,
-                            vertical=AppSpacing.XS,
-                        ),
-                        border_radius=AppRadius.PILL,
-                        bgcolor=ft.Colors.with_opacity(
-                            0.72,
-                            AppColors.PANEL_DARK,
-                        ),
-                        content=ft.Text(
-                            "Faites glisser l’image pour ajuster le cadrage",
-                            size=11,
-                            color=AppColors.TEXT_LIGHT,
-                        ),
+                    content=ft.Column(
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        spacing=AppSpacing.XS,
+                        controls=[
+                            self._zoom_controls(),
+                            ft.Container(
+                                padding=ft.Padding.symmetric(
+                                    horizontal=AppSpacing.MD,
+                                    vertical=AppSpacing.XS,
+                                ),
+                                border_radius=AppRadius.PILL,
+                                bgcolor=ft.Colors.with_opacity(
+                                    0.72,
+                                    AppColors.PANEL_DARK,
+                                ),
+                                content=ft.Text(
+                                    "Glissez pour cadrer · molette pour zoomer",
+                                    size=11,
+                                    color=AppColors.TEXT_LIGHT,
+                                ),
+                            ),
+                        ],
                     ),
                 ),
             )
@@ -376,14 +409,72 @@ class AppearancePanel(AppSection):
             self.pending_alignment_y - (event.local_delta.y / 95)
         )
         if self.preview.image is not None:
-            self.preview.image.alignment = ft.Alignment(
-                self.pending_alignment_x,
-                self.pending_alignment_y,
-            )
-        try:
-            self.preview.update()
-        except RuntimeError:
-            pass
+            self._refresh_interactive_preview()
+
+    def _handle_crop_scroll(self, event) -> None:
+        delta = getattr(getattr(event, "scroll_delta", None), "y", 0.0)
+        if not delta:
+            return
+        self._set_zoom(self.pending_zoom + (-0.15 if delta > 0 else 0.15))
+
+    def _zoom_out(self, _event=None) -> None:
+        self._set_zoom(self.pending_zoom - 0.25)
+
+    def _zoom_in(self, _event=None) -> None:
+        self._set_zoom(self.pending_zoom + 0.25)
+
+    def _reset_crop(self, _event=None) -> None:
+        self.pending_alignment_x = 0.0
+        self.pending_alignment_y = 0.0
+        self._set_zoom(1.0)
+
+    def _set_zoom(self, value: float) -> None:
+        if self.pending_image is None:
+            return
+        self.pending_zoom = max(1.0, min(4.0, value))
+        self.zoom_label.value = f"{round(self.pending_zoom * 100):d} %"
+        self._refresh_interactive_preview()
+
+    def _refresh_interactive_preview(self) -> None:
+        self._render_previews()
+        self._safe_update()
+
+    def _zoom_controls(self) -> ft.Container:
+        return ft.Container(
+            padding=ft.Padding.symmetric(horizontal=AppSpacing.XS),
+            border_radius=AppRadius.PILL,
+            bgcolor=ft.Colors.with_opacity(0.82, AppColors.PANEL_DARK),
+            content=ft.Row(
+                tight=True,
+                spacing=0,
+                controls=[
+                    IconAction(
+                        icon=ft.Icons.REMOVE_ROUNDED,
+                        tooltip="Dézoomer",
+                        compact=True,
+                        on_click=self._zoom_out,
+                    ),
+                    self.zoom_label,
+                    IconAction(
+                        icon=ft.Icons.RESTART_ALT_ROUNDED,
+                        tooltip="Réinitialiser le cadrage",
+                        compact=True,
+                        on_click=self._reset_crop,
+                    ),
+                    IconAction(
+                        icon=ft.Icons.ADD_ROUNDED,
+                        tooltip="Zoomer",
+                        compact=True,
+                        on_click=self._zoom_in,
+                    ),
+                ],
+            ),
+        )
+
+    def _page_aspect_ratio(self) -> float:
+        width = float(getattr(self.app_page, "width", 0) or 0)
+        height = float(getattr(self.app_page, "height", 0) or 0)
+        return width / height if width > 0 and height > 0 else 16 / 9
 
     @staticmethod
     def _clamp_alignment(value: float) -> float:
