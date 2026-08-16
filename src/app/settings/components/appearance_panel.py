@@ -287,7 +287,7 @@ class AppearancePanel(AppSection):
         source = background_service.resolve_image_source(str(self.pending_image))
         preview_alignment_x = self.pending_alignment_x
         preview_alignment_y = self.pending_alignment_y
-        if self.pending_zoom > 1.0 and self._preview_source is not None:
+        if self.pending_zoom != 1.0 and self._preview_source is not None:
             source = background_service.render_crop_preview(
                 self._preview_source,
                 alignment_x=self.pending_alignment_x,
@@ -431,7 +431,7 @@ class AppearancePanel(AppSection):
     def _set_zoom(self, value: float) -> None:
         if self.pending_image is None:
             return
-        self.pending_zoom = max(1.0, min(4.0, value))
+        self.pending_zoom = max(0.5, min(4.0, value))
         self.zoom_label.value = f"{round(self.pending_zoom * 100):d} %"
         self._refresh_interactive_preview()
 

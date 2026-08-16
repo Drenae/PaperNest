@@ -163,6 +163,33 @@ class BackgroundServiceTests(unittest.TestCase):
         with Image.open(Path(settings.image_path or "")) as imported:
             self.assertEqual(imported.size, (100, 100))
 
+    def test_zoom_out_extends_edges_without_black_bands(self) -> None:
+        source = self.root / "portrait.png"
+        image = Image.new("RGB", (100, 200), "#102030")
+        image.paste("#FFBF26", (0, 0, 100, 1))
+        image.paste("#D81B60", (0, 199, 100, 200))
+        image.save(source)
+
+        settings = self.service.import_image(
+            source,
+            zoom=0.5,
+            target_aspect_ratio=1.0,
+        )
+
+        with Image.open(Path(settings.image_path or "")) as imported:
+            self.assertEqual(imported.size, (200, 200))
+            self.assertNotEqual(imported.getpixel((0, 100)), (0, 0, 0))
+            self.assertNotEqual(imported.getpixel((199, 100)), (0, 0, 0))
+
+    def test_zoom_out_is_limited_to_fifty_percent(self) -> None:
+        source = self.root / "square-small.png"
+        Image.new("RGB", (100, 100), "#FFBF26").save(source)
+
+        settings = self.service.import_image(source, zoom=0.1, target_aspect_ratio=1.0)
+
+        with Image.open(Path(settings.image_path or "")) as imported:
+            self.assertEqual(imported.size, (200, 200))
+
     @staticmethod
     def create_fake_flet() -> types.SimpleNamespace:
         return types.SimpleNamespace(

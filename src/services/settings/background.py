@@ -97,7 +97,7 @@ class BackgroundService:
         temporary = destination.with_name(f".{destination.name}.part")
         temporary.unlink(missing_ok=True)
         normalized_zoom = self._normalize_zoom(zoom)
-        if normalized_zoom > 1.0:
+        if normalized_zoom != 1.0:
             cropped = self.load_preview_image(source_path, max_size=None)
             cropped = self._crop_image(
                 cropped,
@@ -153,6 +153,7 @@ class BackgroundService:
             zoom=zoom,
             target_aspect_ratio=target_aspect_ratio,
         )
+        cropped.thumbnail((1600, 1600), Image.Resampling.LANCZOS)
         output = BytesIO()
         cropped.save(output, format="JPEG", quality=88, optimize=True)
         return output.getvalue()
@@ -182,7 +183,71 @@ class BackgroundService:
         y = (self._normalize_alignment(alignment_y) + 1.0) / 2.0
         left = (width - crop_width) * x
         top = (height - crop_height) * y
-        return image.crop((left, top, left + crop_width, top + crop_height))
+        if normalized_zoom >= 1.0:
+            return image.crop((left, top, left + crop_width, top + crop_height))
+        extended = self._crop_with_edge_extension(
+            image,
+            left=left,
+            top=top,
+            width=crop_width,
+            height=crop_height,
+        )
+        extended.thumbnail((4096, 4096), Image.Resampling.LANCZOS)
+        return extended
+
+    @staticmethod
+    def _crop_with_edge_extension(
+        image: Image.Image,
+        *,
+        left: float,
+        top: float,
+        width: float,
+        height: float,
+    ) -> Image.Image:
+        crop_left = round(left)
+        crop_top = round(top)
+        target_width = max(1, round(width))
+        target_height = max(1, round(height))
+        crop_right = crop_left + target_width
+        crop_bottom = crop_top + target_height
+
+        source_left = max(0, crop_left)
+        source_top = max(0, crop_top)
+        source_right = min(image.width, crop_right)
+        source_bottom = min(image.height, crop_bottom)
+        source = image.crop((source_left, source_top, source_right, source_bottom))
+        destination_left = source_left - crop_left
+        destination_top = source_top - crop_top
+
+        canvas = Image.new(image.mode, (target_width, target_height))
+        canvas.paste(source, (destination_left, destination_top))
+        destination_right = destination_left + source.width
+        destination_bottom = destination_top + source.height
+
+        if destination_left > 0:
+            left_edge = source.crop((0, 0, 1, source.height)).resize(
+                (destination_left, source.height)
+            )
+            canvas.paste(left_edge, (0, destination_top))
+        if destination_right < target_width:
+            right_width = target_width - destination_right
+            right_edge = source.crop(
+                (source.width - 1, 0, source.width, source.height)
+            ).resize((right_width, source.height))
+            canvas.paste(right_edge, (destination_right, destination_top))
+        if destination_top > 0:
+            top_edge = canvas.crop((0, destination_top, target_width, destination_top + 1))
+            canvas.paste(top_edge.resize((target_width, destination_top)), (0, 0))
+        if destination_bottom < target_height:
+            bottom_height = target_height - destination_bottom
+            bottom_edge = canvas.crop(
+                (0, destination_bottom - 1, target_width, destination_bottom)
+            )
+            canvas.paste(
+                bottom_edge.resize((target_width, bottom_height)),
+                (0, destination_bottom),
+            )
+        return canvas
 
     @staticmethod
     def _save_image(image: Image.Image, path: Path, suffix: str) -> None:
@@ -280,7 +345,7 @@ class BackgroundService:
     @staticmethod
     def _normalize_zoom(value: float) -> float:
         try:
-            return max(1.0, min(4.0, float(value)))
+            return max(0.5, min(4.0, float(value)))
         except (TypeError, ValueError):
             return 1.0
 
