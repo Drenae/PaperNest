@@ -109,24 +109,25 @@ class BackgroundServiceTests(unittest.TestCase):
         self.assertEqual(page.bgcolor, "#AABBCC")
         self.assertIsNone(page.decoration)
 
-    def test_apply_image_uses_transparent_page_and_decoration(self) -> None:
+    def test_apply_image_uses_color_backdrop_and_contained_decoration(self) -> None:
         fake_flet = self.create_fake_flet()
         page = types.SimpleNamespace(bgcolor="#FFFFFF", decoration=None)
 
         with patch.dict(sys.modules, {"flet": fake_flet}):
             self.service.apply(page, BackgroundSettings())
 
-        self.assertEqual(page.bgcolor, "transparent")
+        self.assertEqual(page.bgcolor, DEFAULT_BACKGROUND_COLOR)
         self.assertEqual(
             page.decoration["image"]["src"],
             self.service.default_asset,
         )
+        self.assertEqual(page.decoration["image"]["fit"], "contain")
 
     @staticmethod
     def create_fake_flet() -> types.SimpleNamespace:
         return types.SimpleNamespace(
             Colors=types.SimpleNamespace(TRANSPARENT="transparent"),
-            BoxFit=types.SimpleNamespace(COVER="cover"),
+            BoxFit=types.SimpleNamespace(COVER="cover", CONTAIN="contain"),
             Alignment=types.SimpleNamespace(CENTER="center"),
             DecorationImage=lambda **kwargs: kwargs,
             BoxDecoration=lambda **kwargs: kwargs,

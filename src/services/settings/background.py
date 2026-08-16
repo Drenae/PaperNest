@@ -121,11 +121,11 @@ class BackgroundService:
             page.bgcolor = resolved.color
             return
 
-        page.bgcolor = ft.Colors.TRANSPARENT
+        page.bgcolor = resolved.color
         page.decoration = ft.BoxDecoration(
             image=ft.DecorationImage(
                 src=self.resolve_image_source(resolved.image_path),
-                fit=ft.BoxFit.COVER,
+                fit=ft.BoxFit.CONTAIN,
                 alignment=ft.Alignment.CENTER,
             )
         )
