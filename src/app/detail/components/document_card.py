@@ -12,10 +12,7 @@ from app.detail.dialogs.metadata_dialog import MetadataDialog
 from app.detail.dialogs.move_dialog import MoveDialog
 from app.detail.dialogs.rename_dialog import RenameDialog
 from app.notifications import notifications
-from app.shared.document_card import (
-    DocumentCard as BaseDocumentCard,
-    DocumentCardVariant,
-)
+from app.theme.cards import AppCard, CardVariant
 from app.theme.buttons import IconAction
 from core.errors.exceptions import PaperNestError
 from app.theme.tokens import AppColors
@@ -23,7 +20,7 @@ from services.files.archive import ArchiveFileService
 from services.documents.metadata import metadata_service
 
 
-class DocumentCard(BaseDocumentCard):
+class DocumentCard(AppCard):
     """
     Adaptateur métier de la carte universelle pour DetailView.
 
@@ -52,9 +49,9 @@ class DocumentCard(BaseDocumentCard):
             metadata=self._build_metadata(),
             tags=self.document.tags,
             variant=(
-                DocumentCardVariant.SEARCH
+                CardVariant.SEARCH
                 if searching
-                else DocumentCardVariant.STANDARD
+                else CardVariant.DOCUMENT
             ),
             selected=selected,
             favorite=self.document.is_favorite,
