@@ -177,64 +177,6 @@ class AppSection(ft.Container):
         )
 
 
-class ListTileCard(ft.ListTile):
-    """Card temporaire, légère, basée sur ListTile."""
-
-    def __init__(
-        self,
-        title: Union[str, ft.Control],
-        subtitle: Union[str, ft.Control, None] = None,
-        icon=None,
-        icon_color=AppColors.PRIMARY_DARK,
-        icon_bgcolor=AppColors.PRIMARY_LIGHT,
-        trailing: Optional[ft.Control] = None,
-        on_click: Optional[Callable] = None,
-        bgcolor=AppColors.CARD_BG,
-        hover_color=AppColors.SURFACE_ALT,
-        **kwargs,
-    ):
-        title_control = (
-            title
-            if isinstance(title, ft.Control)
-            else ft.Text(
-                str(title),
-                weight=ft.FontWeight.BOLD,
-                color=AppColors.TEXT_MAIN,
-            )
-        )
-
-        subtitle_control = None
-        if subtitle not in (None, ""):
-            subtitle_control = (
-                subtitle
-                if isinstance(subtitle, ft.Control)
-                else ft.Text(
-                    str(subtitle),
-                    color=AppColors.TEXT_MUTED,
-                )
-            )
-
-        leading = None
-        if icon is not None:
-            leading = ft.CircleAvatar(
-                content=ft.Icon(icon, color=icon_color),
-                color=icon_color,
-                bgcolor=icon_bgcolor,
-                radius=21,
-            )
-
-        super().__init__(
-            leading=leading,
-            title=title_control,
-            subtitle=subtitle_control,
-            trailing=trailing,
-            bgcolor=bgcolor,
-            hover_color=hover_color,
-            on_click=on_click,
-            **kwargs,
-        )
-
-
 class AppCard(ft.Container):
     def __init__(
         self,

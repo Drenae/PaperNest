@@ -4,7 +4,7 @@ from core.events.event_bus import CategoryCreated, CategoryDeleted, CategoryRena
 from app.theme.tokens import AppColors, AppSpacing
 from repositories.category_repository import category_repository
 from app.theme.buttons import IconAction, PrimaryButton
-from app.theme.cards import AppSection, ListTileCard
+from app.theme.cards import AppSection
 
 
 def _color(value, fallback):
@@ -79,14 +79,11 @@ class CategoryPanel(AppSection):
         subtitle = f"{count} document{'s' if count != 1 else ''}"
 
         if not children:
-            content = ListTileCard(
-                icon=getattr(ft.Icons, str(category.get("icon")), ft.Icons.FOLDER_ROUNDED),
-                icon_color=_color(category.get("color"), AppColors.SECONDARY),
-                icon_bgcolor=_color(category.get("bg"), AppColors.PANEL),
-                title=str(category["name"]),
-                subtitle=subtitle,
+            content = ft.ListTile(
+                leading=leading,
+                title=ft.Text(str(category["name"]), weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
+                subtitle=ft.Text(subtitle, color=AppColors.TEXT_MUTED),
                 trailing=actions,
-                bgcolor=ft.Colors.TRANSPARENT,
             )
         else:
             child_count = len(children)
@@ -109,16 +106,17 @@ class CategoryPanel(AppSection):
             content=content,
         )
 
-    def _build_leading(self, category: dict) -> ft.CircleAvatar:
-        icon_color = _color(category.get("color"), AppColors.SECONDARY)
-        return ft.CircleAvatar(
+    def _build_leading(self, category: dict) -> ft.Container:
+        return ft.Container(
+            width=42,
+            height=42,
+            alignment=ft.Alignment.CENTER,
+            border_radius=10,
+            bgcolor=_color(category.get("bg"), AppColors.PANEL),
             content=ft.Icon(
                 getattr(ft.Icons, str(category.get("icon")), ft.Icons.FOLDER_ROUNDED),
-                color=icon_color,
+                color=_color(category.get("color"), AppColors.SECONDARY),
             ),
-            color=icon_color,
-            bgcolor=_color(category.get("bg"), AppColors.PANEL),
-            radius=21,
         )
 
     def _build_parent_actions(self, category: dict) -> ft.Row:
