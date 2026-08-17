@@ -3,7 +3,7 @@ from __future__ import annotations
 import flet as ft
 
 from app.search.state import SearchState
-from app.theme.cards import AppCard, CardVariant
+from app.shared.document_card import DocumentCard, DocumentCardVariant
 from app.theme.buttons import IconAction
 from app.theme.state_view import StateView
 from app.theme.tokens import AppColors
@@ -70,20 +70,20 @@ class SearchBuilder:
         on_preview,
         on_open_folder,
         on_open_document,
-    ) -> AppCard:
+    ) -> DocumentCard:
         metadata = [str(document.category), str(document.file_size)]
         if document.person_name:
             metadata.append(f"Personne : {document.person_name}")
         if document.match_reason:
             metadata.append(str(document.match_reason))
 
-        return AppCard(
+        return DocumentCard(
             title=document.name,
             extension=document.extension,
             metadata=metadata,
             tags=document.tags,
             favorite=document.is_favorite,
-            variant=CardVariant.SEARCH,
+            variant=DocumentCardVariant.SEARCH,
             tooltip=f"Aperçu de {document.name}",
             on_click=lambda _event, selected=index: on_preview(selected),
             actions=[

@@ -4,7 +4,7 @@ from core.events.event_bus import CategoryCreated, CategoryDeleted, CategoryRena
 from app.theme.tokens import AppColors, AppSpacing
 from repositories.category_repository import category_repository
 from app.theme.buttons import IconAction, PrimaryButton
-from app.theme.cards import AppCard, AppSection, CardDensity, CardOrientation
+from app.theme.cards import AppSection
 
 
 def _color(value, fallback):
@@ -71,75 +71,65 @@ class CategoryPanel(AppSection):
         if update_control and self._mounted:
             self.update()
 
-    def build_parent_control(self, category: dict) -> AppCard:
+    def build_parent_control(self, category: dict) -> ft.Container:
         children = list(category.get("children") or [])
+        leading = self._build_leading(category)
         actions = self._build_parent_actions(category)
         count = int(category.get("document_count", 0))
         subtitle = f"{count} document{'s' if count != 1 else ''}"
-        expansion_content = None
-        if children:
-            child_count = len(children)
-            subtitle = (
-                f"{subtitle} · {child_count} sous-catégorie"
-                f"{'s' if child_count != 1 else ''}"
+
+        if not children:
+            content = ft.ListTile(
+                leading=leading,
+                title=ft.Text(str(category["name"]), weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
+                subtitle=ft.Text(subtitle, color=AppColors.TEXT_MUTED),
+                trailing=actions,
             )
-            expansion_content = ft.Column(
-                spacing=AppSpacing.SM,
-                controls=[self.build_child_card(child) for child in children],
+        else:
+            child_count = len(children)
+            content = ft.ExpansionTile(
+                leading=leading,
+                title=ft.Text(str(category["name"]), weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
+                subtitle=ft.Text(
+                    f"{subtitle} · {child_count} sous-catégorie{'s' if child_count != 1 else ''}",
+                    color=AppColors.TEXT_MUTED,
+                ),
+                trailing=actions,
+                expanded=False,
+                controls=[self.build_child_tile(child) for child in children],
             )
 
-        return AppCard(
-            title=str(category["name"]),
-            subtitle=subtitle,
-            icon=getattr(
-                ft.Icons,
-                str(category.get("icon")),
-                ft.Icons.FOLDER_ROUNDED,
-            ),
-            icon_color=_color(category.get("color"), AppColors.SECONDARY),
-            icon_bgcolor=_color(category.get("bg"), AppColors.PANEL),
-            actions=actions,
-            expansion_content=expansion_content,
-            orientation=CardOrientation.HORIZONTAL,
-            density=CardDensity.COMPACT,
-            shadow=False,
+        return ft.Container(
+            bgcolor=AppColors.CARD_BG,
+            border=ft.Border.all(1, AppColors.BORDER),
+            border_radius=12,
+            content=content,
         )
 
-    def _build_parent_actions(self, category: dict) -> list[ft.Control]:
-        return [
-            IconAction(
-                icon=ft.Icons.CREATE_NEW_FOLDER_ROUNDED,
-                tooltip="Ajouter une sous-catégorie",
-                icon_color=AppColors.SECONDARY,
-                on_click=lambda e, item=category: self.on_add_child(item),
+    def _build_leading(self, category: dict) -> ft.Container:
+        return ft.Container(
+            width=42,
+            height=42,
+            alignment=ft.Alignment.CENTER,
+            border_radius=10,
+            bgcolor=_color(category.get("bg"), AppColors.PANEL),
+            content=ft.Icon(
+                getattr(ft.Icons, str(category.get("icon")), ft.Icons.FOLDER_ROUNDED),
+                color=_color(category.get("color"), AppColors.SECONDARY),
             ),
-            IconAction(
-                icon=ft.Icons.EDIT_OUTLINED,
-                tooltip="Modifier",
-                icon_color=AppColors.SECONDARY,
-                on_click=lambda e, item=category: self.on_rename(item),
-            ),
-            IconAction(
-                icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
-                tooltip="Supprimer",
-                icon_color=AppColors.ERROR,
-                on_click=lambda e, item=category: self.on_delete(item),
-            ),
-        ]
+        )
 
-    def build_child_card(self, category: dict) -> AppCard:
-        count = int(category.get("document_count", 0))
-        return AppCard(
-            title=str(category["name"]),
-            subtitle=f"{count} document{'s' if count != 1 else ''}",
-            icon=getattr(
-                ft.Icons,
-                str(category.get("icon")),
-                ft.Icons.SUBDIRECTORY_ARROW_RIGHT_ROUNDED,
-            ),
-            icon_color=_color(category.get("color"), AppColors.SECONDARY),
-            icon_bgcolor=_color(category.get("bg"), AppColors.PANEL),
-            actions=[
+    def _build_parent_actions(self, category: dict) -> ft.Row:
+        return ft.Row(
+            tight=True,
+            spacing=0,
+            controls=[
+                IconAction(
+                    icon=ft.Icons.CREATE_NEW_FOLDER_ROUNDED,
+                    tooltip="Ajouter une sous-catégorie",
+                    icon_color=AppColors.SECONDARY,
+                    on_click=lambda e, item=category: self.on_add_child(item),
+                ),
                 IconAction(
                     icon=ft.Icons.EDIT_OUTLINED,
                     tooltip="Modifier",
@@ -153,10 +143,40 @@ class CategoryPanel(AppSection):
                     on_click=lambda e, item=category: self.on_delete(item),
                 ),
             ],
-            orientation=CardOrientation.HORIZONTAL,
-            density=CardDensity.COMPACT,
+        )
+
+    def build_child_tile(self, category: dict) -> ft.Control:
+        count = int(category.get("document_count", 0))
+        return ft.Container(
+            margin=ft.Margin.only(left=34, right=10, bottom=8),
+            border_radius=10,
             bgcolor=AppColors.PANEL,
-            shadow=False,
+            content=ft.ListTile(
+                leading=ft.Icon(
+                    getattr(ft.Icons, str(category.get("icon")), ft.Icons.SUBDIRECTORY_ARROW_RIGHT_ROUNDED),
+                    color=_color(category.get("color"), AppColors.SECONDARY),
+                ),
+                title=ft.Text(str(category["name"]), weight=ft.FontWeight.W_600),
+                subtitle=ft.Text(f"{count} document{'s' if count != 1 else ''}"),
+                trailing=ft.Row(
+                    tight=True,
+                    spacing=0,
+                    controls=[
+                        IconAction(
+                            icon=ft.Icons.EDIT_OUTLINED,
+                            tooltip="Modifier",
+                            icon_color=AppColors.SECONDARY,
+                            on_click=lambda e, item=category: self.on_rename(item),
+                        ),
+                        IconAction(
+                            icon=ft.Icons.DELETE_OUTLINE_ROUNDED,
+                            tooltip="Supprimer",
+                            icon_color=AppColors.ERROR,
+                            on_click=lambda e, item=category: self.on_delete(item),
+                        ),
+                    ],
+                ),
+            ),
         )
 
     @staticmethod

@@ -7,10 +7,13 @@ import flet as ft
 from app.theme.buttons import IconAction
 
 from services.trash.service import TrashedDocument
-from app.theme.cards import AppCard, CardVariant
+from app.shared.document_card import (
+    DocumentCard,
+    DocumentCardVariant,
+)
 
 
-class TrashedDocumentCard(AppCard):
+class TrashedDocumentCard(DocumentCard):
     """
     Adaptateur de la carte universelle pour un document placé
     dans la corbeille.
@@ -40,7 +43,7 @@ class TrashedDocumentCard(AppCard):
             extension=document.extension,
             metadata=self._build_metadata(),
             tags=document.tags,
-            variant=CardVariant.TRASH,
+            variant=DocumentCardVariant.TRASH,
             selected=selected,
             selectable=True,
             selection_value=selected,
