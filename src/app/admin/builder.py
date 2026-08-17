@@ -4,7 +4,7 @@ import flet as ft
 
 from app.admin.state import AdminState
 from app.theme.buttons import IconAction
-from app.theme.cards import ListTileCard, PageHeader
+from app.theme.cards import AppCard, CardDensity, CardOrientation, PageHeader
 from app.theme.state_view import StateView
 from app.theme.tokens import AppColors, AppSpacing
 
@@ -66,36 +66,35 @@ class AdminBuilder:
         ]
 
     @staticmethod
-    def build_backup_card(backup: dict, on_open_folder, on_verify, on_restore) -> ListTileCard:
+    def build_backup_card(backup: dict, on_open_folder, on_verify, on_restore) -> AppCard:
         backup_path = str(backup["path"])
-        return ListTileCard(
+        return AppCard(
             title=str(backup["name"]),
             subtitle=f"{backup['size']}   •   {backup['modified_at']}",
             icon=ft.Icons.ARCHIVE_OUTLINED,
             icon_color=AppColors.SECONDARY,
             icon_bgcolor=ft.Colors.BLUE_50,
-            trailing=ft.Row(
-                tight=True,
-                spacing=0,
-                controls=[
-                    IconAction(
-                        icon=ft.Icons.FOLDER_OPEN_ROUNDED,
-                        tooltip="Ouvrir le dossier",
-                        icon_color=AppColors.SECONDARY,
-                        on_click=lambda _event, path=backup_path: on_open_folder(path),
-                    ),
-                    IconAction(
-                        icon=ft.Icons.VERIFIED_OUTLINED,
-                        tooltip="Vérifier la sauvegarde",
-                        icon_color=ft.Colors.GREEN_700,
-                        on_click=lambda _event, path=backup_path: on_verify(path),
-                    ),
-                    IconAction(
-                        icon=ft.Icons.SETTINGS_BACKUP_RESTORE_ROUNDED,
-                        tooltip="Restaurer cette sauvegarde",
-                        icon_color=ft.Colors.ORANGE_700,
-                        on_click=lambda _event, path=backup_path: on_restore(path),
-                    ),
-                ],
-            ),
+            orientation=CardOrientation.HORIZONTAL,
+            density=CardDensity.COMPACT,
+            shadow=False,
+            actions=[
+                IconAction(
+                    icon=ft.Icons.FOLDER_OPEN_ROUNDED,
+                    tooltip="Ouvrir le dossier",
+                    icon_color=AppColors.SECONDARY,
+                    on_click=lambda _event, path=backup_path: on_open_folder(path),
+                ),
+                IconAction(
+                    icon=ft.Icons.VERIFIED_OUTLINED,
+                    tooltip="Vérifier la sauvegarde",
+                    icon_color=ft.Colors.GREEN_700,
+                    on_click=lambda _event, path=backup_path: on_verify(path),
+                ),
+                IconAction(
+                    icon=ft.Icons.SETTINGS_BACKUP_RESTORE_ROUNDED,
+                    tooltip="Restaurer cette sauvegarde",
+                    icon_color=ft.Colors.ORANGE_700,
+                    on_click=lambda _event, path=backup_path: on_restore(path),
+                ),
+            ],
         )

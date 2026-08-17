@@ -17,9 +17,15 @@ from app.theme.tokens import (
     AppSpacing,
 )
 from repositories.category_repository import category_repository
+from app.theme.badges import (
+    BadgeVariant,
+    CountBadge,
+)
 from app.theme.cards import (
+    AppCard,
     AppSection,
-    ListTileCard,
+    CardDensity,
+    CardOrientation,
 )
 from app.theme.empty_state import EmptyState
 
@@ -165,7 +171,7 @@ class CabinetPanel(AppSection):
     def build_category_card(
         self,
         category: dict,
-    ) -> ListTileCard:
+    ) -> AppCard:
         category_name = str(
             category.get("name")
             or category.get("label")
@@ -219,33 +225,23 @@ class CabinetPanel(AppSection):
                 f"{'s' if subcategory_count != 1 else ''}"
             )
 
-        count_color = (
-            AppColors.PRIMARY_DARK
-            if document_count > 0
-            else AppColors.TEXT_MUTED
-        )
-        count_background = (
-            AppColors.PRIMARY_LIGHT
-            if document_count > 0
-            else AppColors.SURFACE_ALT
-        )
-
-        return ListTileCard(
+        return AppCard(
             title=category_name,
             subtitle=subtitle,
             icon=icon,
             icon_color=icon_color,
             icon_bgcolor=icon_background,
-            trailing=ft.CircleAvatar(
-                content=ft.Text(
-                    str(document_count),
-                    color=count_color,
-                    weight=ft.FontWeight.BOLD,
+            badge=CountBadge(
+                document_count,
+                variant=(
+                    BadgeVariant.PRIMARY
+                    if document_count > 0
+                    else BadgeVariant.NEUTRAL
                 ),
-                color=count_color,
-                bgcolor=count_background,
-                radius=16,
             ),
+            orientation=CardOrientation.HORIZONTAL,
+            density=CardDensity.NORMAL,
+            shadow=False,
             on_click=(
                 lambda _event, item=category:
                 self.on_category_click(item)
