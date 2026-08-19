@@ -2,21 +2,10 @@ from __future__ import annotations
 
 import flet as ft
 
-from core.events.event_bus import (
-    CategoryCreated,
-    CategoryDeleted,
-    CategoryRenamed,
-    DocumentDeleted,
-    DocumentImported,
-    DocumentMoved,
-    DocumentRestored,
-    event_bus,
-)
 from app.theme.tokens import (
     AppColors,
     AppSpacing,
 )
-from repositories.category_repository import category_repository
 from app.theme.badges import (
     BadgeVariant,
     CountBadge,
@@ -46,9 +35,6 @@ class CabinetPanel(AppSection):
     ):
         self.on_category_click = on_category_click
 
-        self._subscribed = False
-        self._mounted = False
-
         self.category_grid = ft.ResponsiveRow(
             spacing=AppSpacing.MD,
             run_spacing=AppSpacing.MD,
@@ -61,83 +47,7 @@ class CabinetPanel(AppSection):
             content=self.category_grid,
         )
 
-        self.subscribe()
-
-        self.refresh_grid_ui(
-            update_page=False,
-        )
-
-    def did_mount(self) -> None:
-        self._mounted = True
-
-        self.subscribe()
-
-        self.refresh_grid_ui(
-            update_page=True,
-        )
-
-    def will_unmount(self) -> None:
-        self._mounted = False
-        self.unsubscribe()
-
-    def dispose(self) -> None:
-        self._mounted = False
-        self.unsubscribe()
-
-    def subscribe(self) -> None:
-        if self._subscribed:
-            return
-
-        for event_type in (
-            CategoryCreated,
-            CategoryRenamed,
-            CategoryDeleted,
-            DocumentImported,
-            DocumentMoved,
-            DocumentDeleted,
-            DocumentRestored,
-        ):
-            event_bus.subscribe(
-                event_type,
-                self._handle_event,
-            )
-
-        self._subscribed = True
-
-    def unsubscribe(self) -> None:
-        if not self._subscribed:
-            return
-
-        for event_type in (
-            CategoryCreated,
-            CategoryRenamed,
-            CategoryDeleted,
-            DocumentImported,
-            DocumentMoved,
-            DocumentDeleted,
-            DocumentRestored,
-        ):
-            event_bus.unsubscribe(
-                event_type,
-                self._handle_event,
-            )
-
-        self._subscribed = False
-
-    def _handle_event(
-        self,
-        _event,
-    ) -> None:
-        self.refresh_grid_ui(
-            update_page=True,
-        )
-
-    def refresh_grid_ui(
-        self,
-        update_page: bool = True,
-    ) -> None:
-        categories = category_repository.list_roots()
-
+    def render(self, categories: list[dict]) -> None:
         self.category_grid.controls.clear()
 
         if not categories:
@@ -164,9 +74,6 @@ class CabinetPanel(AppSection):
                         ),
                     )
                 )
-
-        if update_page and self._mounted:
-            self.update()
 
     def build_category_card(
         self,
